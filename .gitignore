@@ -1,0 +1,13 @@
+*Makefile.in
+aclocal.m4
+am
+*.cache
+*.guess
+config.h.in
+config.sub
+configure
+dependencies.m4
+*Doxyfile.in
+install-sh
+ltmain.sh
+missing
