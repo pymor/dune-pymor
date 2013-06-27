@@ -8,7 +8,7 @@
 AC_PREREQ(2.50)
 DUNE_AC_INIT # gets module version from dune.module file
 AM_INIT_AUTOMAKE
-AC_CONFIG_SRCDIR([src/dune_pymor.cc])
+AC_CONFIG_SRCDIR([])
 AC_CONFIG_HEADERS([config.h])
 
 
