@@ -23,7 +23,6 @@ LIBS="$DUNE_LIBS"
 
 AC_CONFIG_FILES([
   Makefile
-  src/Makefile
   doc/Makefile
   doc/doxygen/Makefile
   doc/doxygen/Doxyfile
