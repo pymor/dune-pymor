@@ -1,0 +1,10 @@
+################################
+# Dune module information file #
+################################
+
+#Name of the module
+Module: dune-pymor
+Version: 0.0.1
+Maintainer: felix.albrecht@wwu.de
+#depending on 
+Depends: dune-common
