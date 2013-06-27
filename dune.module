@@ -1,10 +1,8 @@
-################################
-# Dune module information file #
-################################
+# This file is part of the dune-pymor project (https://github.com/pyMor/dune-pymor).
+# Copyright Holders: Felix Albrecht, Stephan Rave
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#Name of the module
 Module: dune-pymor
 Version: 0.0.1
 Maintainer: felix.albrecht@wwu.de
-#depending on 
 Depends: dune-common
