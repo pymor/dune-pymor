@@ -6,4 +6,4 @@
 Module: dune-pymor
 Version: 0.0.1
 Maintainer: felix.albrecht@wwu.de
-Depends: dune-common
+Depends: dune-common (>= 2.2.1) dune-stuff
