@@ -8,6 +8,7 @@
 
 #include "config.h"
 
+#ifdef HAVE_DUNE_GRID
 #if !HAVE_GRIDTYPE
   #include <dune/grid/sgrid.hh>
   namespace Dune
@@ -19,6 +20,7 @@
       typedef Dune::SGrid< dimgrid, dimworld > GridType;
     }
   }
+#endif
 #endif
 
 #endif // DUNE_PYMOR_CONFIG_H
