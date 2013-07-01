@@ -21,3 +21,6 @@ config.h
 libtool
 stamp-h1
 *.user
+*.project
+*.pydevproject
+*.pyc
