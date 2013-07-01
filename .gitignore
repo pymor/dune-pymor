@@ -20,3 +20,4 @@ config.h
 *.pc
 libtool
 stamp-h1
+*.user
