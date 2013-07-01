@@ -6,7 +6,7 @@
 #ifndef DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
 #define DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
 
-//#if HAVE_EIGEN
+#if HAVE_EIGEN
 
 #include <dune/stuff/la/container/eigen.hh>
 
@@ -49,6 +49,6 @@ public:
 } // namespace Pymor
 } // namespace Dune
 
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN
 
 #endif // DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
