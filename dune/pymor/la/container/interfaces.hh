@@ -8,21 +8,18 @@
 
 #include <utility>
 #include <vector>
+#include <string>
 
 #include <dune/common/float_cmp.hh>
 
 namespace Dune {
-namespace pymor {
+namespace Pymor {
 namespace LA {
 
 
-template< class ScalarImp = double >
 class VectorInterface
 {
 public:
-  typedef ScalarImp ScalarType;
-
-  VectorInterface() = delete;
 
   virtual ~VectorInterface() {}
 
@@ -30,13 +27,13 @@ public:
    * \brief   A unique (per class, not per instance) identifier.
    * \return
    */
-  virtual std::string type() const = delete;
+  virtual std::string type() const = 0;
 
   /**
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    */
-  virtual size_t dim() const = delete;
+  virtual int dim() const = 0;
 
   /**
    * \brief   Check vectors for equality.
@@ -46,7 +43,7 @@ public:
    * \return          Truth value of the comparison.
    */
   virtual bool almost_equal(const VectorInterface* other,
-                            const ScalarType epsilon = Dune::DefaultEpsilon< ScalarType >::value()) const = delete;
+                            const ScalarType epsilon = Dune::DefaultEpsilon< ScalarType >::value()) const = 0;
 
   /**
    * \brief BLAS SCAL operation (in-place sclar multiplication).
@@ -59,32 +56,32 @@ public:
    * \param alpha The scalar coefficient with which the vector is multiplied
    * \param x     Vector that is to be added.
    */
-  virtual void axpy(const ScalarType alpha, const VectorInterface* x) = delete;
+  virtual void axpy(const ScalarType alpha, const VectorInterface* x) = 0;
 
   /**
    * \brief   Computes the scalar products between two vectors.
    * \param   other The second factor.
    * \return        The scalar product.
    */
-  virtual ScalarType dot(const VectorInterface* other) const = delete;
+  virtual ScalarType dot(const VectorInterface* other) const = 0;
 
   /**
    * \brief   The l1-norm of the vector.
    * \return  The l1-norm of the vector.
    */
-  virtual ScalarType l1_norm() const = delete;
+  virtual ScalarType l1_norm() const = 0;
 
   /**
    * \brief   The l2-norm of the vector.
    * \return  The l2-norm of the vector.
    */
-  virtual ScalarType l2_norm() const = delete;
+  virtual ScalarType l2_norm() const = 0;
 
   /**
    * \brief   The l-infintiy-norm of the vector.
    * \return  The l-infintiy-norm of the vector.
    */
-  virtual ScalarType sup_norm() const = delete;
+  virtual ScalarType sup_norm() const = 0;
 
   /**
    * \brief Extract components of the vector.
@@ -92,45 +89,45 @@ public:
    * \return                  A Dune::DynamicVector `result` such that `result[i]` is the `component_indices[i]`-th
                               component of the vector.
    */
-  virtual std::vector< ScalarType >* components(const std::vector< size_t >* component_indices) const = delete;
+  virtual std::vector< ScalarType >* components(const std::vector< size_t >* component_indices) const = 0;
 
   /**
    * \brief   The maximum absolute value of the vector.
    * \return  A pair< max_ind, max_val >, where max_ind is the index at which the maximum is attained and max_val is the
    *          absolute value.
    */
-  virtual std::pair< size_t, ScalarType > amax() const = delete;
+  virtual std::pair< size_t, ScalarType > amax() const = 0;
 
   /**
    * \brief   Adds two vectors.
    * \param   other The right summand.
    * \return        The sum of this and other.
    */
-  virtual VectorInterface* add(const VectorInterface* other) const = delete;
+  virtual VectorInterface* add(const VectorInterface* other) const = 0;
 
   /**
    * \brief Inplace variant of add().
    * \param other The right summand.
    */
-  virtual void iadd(const VectorInterface* other) = delete;
+  virtual void iadd(const VectorInterface* other) = 0;
 
   /**
    * \brief   Subtracts two vectors.
    * \param   other The subtrahend.
    * \return        The difference between this and other.
    */
-  virtual VectorInterface* sub(const VectorInterface* other) const = delete;
+  virtual VectorInterface* sub(const VectorInterface* other) const = 0;
 
   /**
    * \brief Inplace variant of sub().
    * \param other The subtrahend.
    */
-  virtual void isub(const VectorInterface* other) = delete;
+  virtual void isub(const VectorInterface* other) = 0;
 }; // class VectorInterface
 
 
 } // namespace LA
-} // namespace pymor
+} // namespace Pymor
 } // namespace Dune
 
 #endif // DUNE_PYMOR_LA_CONTAINER_INTERFACES_HH
