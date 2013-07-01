@@ -29,6 +29,8 @@ AC_CONFIG_FILES([
   doc/doxygen/Doxyfile
   dune/Makefile
   dune/pymor/Makefile
+  dune/pymor/la/Makefile
+  dune/pymor/la/container/Makefile
   m4/Makefile
   dune-pymor.pc
 ])

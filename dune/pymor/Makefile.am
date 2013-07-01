@@ -6,4 +6,6 @@
 pymorincludedir = $(includedir)/dune/pymor
 pymorinclude_HEADERS = exists.hh
 
+SUBDIRDS = la
+
 include $(top_srcdir)/am/global-rules
