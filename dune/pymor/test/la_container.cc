@@ -17,12 +17,12 @@
 
 #if HAVE_EIGEN
   #include <dune/pymor/la/container/eigen.hh>
-#endif // HAVE_EIGEN
+#endif
 
 typedef testing::Types< Dune::Pymor::LA::DuneDynamicVector
 #if HAVE_EIGEN
                       , Dune::Pymor::LA::EigenDenseVector
-#endif // HAVE_EIGEN
+#endif
                       > VectorTypes;
 
 template< class VectorType >
