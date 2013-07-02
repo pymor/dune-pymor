@@ -6,7 +6,7 @@
 #ifndef DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
 #define DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
 
-//#if HAVE_EIGEN
+#if HAVE_EIGEN
 
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/la/container/eigen.hh>
@@ -18,8 +18,14 @@ namespace Pymor {
 namespace LA {
 
 
+/**
+ * \brief An implementation of Dune::Pymor::LA::VectorInterface using Dune::Stuff::LA::EigenDenseVector< double >.
+ *
+ * \see   Dune::Pymor::LA::VectorInterface
+ */
 class EigenDenseVector
   : public Dune::Stuff::LA::EigenDenseVector< double >
+  , public Dune::Pymor::LA::VectorInterface
 {
   typedef Dune::Stuff::LA::EigenDenseVector< double > BaseType;
 public:
@@ -38,69 +44,104 @@ public:
     return new ThisType(ss);
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::type
   virtual std::string type() const
   {
     return "dunepymor.vector.eigendense";
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::compatibleTypes
+  virtual std::vector< std::string > compatibleTypes() const
+  {
+    return {
+          type()
+    };
+  }
+
+  //! \copydoc Dune::Pymor::LA::VectorInterface::dim
   virtual int dim() const
   {
     return BaseType::size();
   }
 
-  bool almost_equal(const ThisType* other,
-                    const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::almost_equal
+  virtual bool almost_equal(const ThisType* other,
+                            const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     return Dune::Stuff::Common::FloatCmp::eq(*this, *other, epsilon);
   } // ... almost_equal(...)
 
-  void scal(const double alpha)
+  //! \copydoc Dune::Pymor::LA::VectorInterface::scal
+  virtual void scal(const double alpha)
   {
     BaseType::backend() *= alpha;
   }
 
-  void axpy(const double alpha, const ThisType* x)
+  //! \copydoc Dune::Pymor::LA::VectorInterface::axpy
+  virtual void axpy(const double alpha, const ThisType* x) throw (Exception::not_implemented_for_this_combination,
+                                                                  Exception::sizes_do_not_match)
   {
-    assert(dim() == x->dim() && "Sizes do not match!");
+    if (dim() != x->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of x (" << x->dim() << ") does not match size of this (" << dim() << ")!");
     BaseType::backend() += x->backend() * alpha;
   } // ... axpy(...)
 
-  double dot(const ThisType* other) const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::dot
+  virtual double dot(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+                                                         Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     return BaseType::backend().transpose() * other->backend();
   } // ... dot(...)
 
-  double l1_norm() const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::l1_norm
+  virtual double l1_norm() const
   {
     return BaseType::backend().lpNorm< 1 >();
   }
 
-  double l2_norm() const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::l2_norm
+  virtual double l2_norm() const
   {
     return BaseType::backend().norm();
   }
 
-  double sup_norm() const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::sup_norm
+  virtual double sup_norm() const
   {
     return BaseType::backend().lpNorm< ::Eigen::Infinity >();
   }
 
-  std::vector< double > components(const std::vector< int >& component_indices) const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::components
+  virtual std::vector< double > components(const std::vector< int >& component_indices) const
+    throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
   {
-    assert(int(component_indices.size()) <= dim() && "Sizes do not match!");
+    if (int(component_indices.size()) > dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of component_indices (" << component_indices.size() << ") is larger than this (" << dim() << ")!");
     std::vector< double > values(component_indices.size(), 0);
     for (size_t ii = 0; ii < component_indices.size(); ++ii) {
       const int component = component_indices[ii];
-      assert(0 <= component && "Wrong component index given!");
-      assert(component < dim() && "Wrong component index given!");
+      if (component < 0)
+        DUNE_PYMOR_THROW(Exception::index_out_of_range,
+                         "component_indices[" << ii << "] is negative (" << component << ")!");
+      if (component >= dim())
+        DUNE_PYMOR_THROW(Exception::index_out_of_range,
+                         "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
       values[ii] = BaseType::backend()[component];
     }
     return values;
   } // ... components(...)
 
-  std::vector< double > amax() const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::amax
+  virtual std::vector< double > amax() const
   {
     std::vector< double > result(2, 0.0);
     size_t minIndex = 0;
@@ -117,31 +158,47 @@ public:
     return result;
   } // ... amax(...)
 
-  ThisType* add(const ThisType* other) const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::add
+  virtual ThisType* add(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+                                                            Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     ThisType* result = new ThisType(*this);
     result->backend() += other->backend();
     return result;
   } // ... add(...)
 
-  void iadd(const ThisType* other)
+  //! \copydoc Dune::Pymor::LA::VectorInterface::iadd
+  virtual void iadd(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
+                                                  Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     BaseType::backend() += other->backend();
   } // ... iadd(...)
 
-  ThisType* sub(const ThisType* other) const
+  //! \copydoc Dune::Pymor::LA::VectorInterface::sub
+  virtual ThisType* sub(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+                                                            Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     ThisType* result = new ThisType(*this);
     result->backend() -= other->backend();
     return result;
   } // ... sub(...)
 
-  void isub(const ThisType* other)
+  //! \copydoc Dune::Pymor::LA::VectorInterface::isub
+  virtual void isub(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
+                                                  Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     BaseType::backend() -= other->backend();
   } // ... isub(...)
 }; // class EigenDenseVector
@@ -150,6 +207,6 @@ public:
 } // namespace Pymor
 } // namespace Dune
 
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN
 
 #endif // DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
