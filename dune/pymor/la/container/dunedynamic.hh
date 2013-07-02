@@ -23,10 +23,11 @@ namespace LA {
 
 
 /**
- * \brief An implementation of VectorInterface using the Dune::DynamicVector< double >.
+ * \brief An implementation of Dune::Pymor::LA::VectorInterface using Dune::DynamicVector< double >.
  */
 class DuneDynamicVector
   : public Dune::DynamicVector< double >
+  , public Dune::Pymor::LA::VectorInterface
 {
   typedef Dune::DynamicVector< double > BaseType;
 public:
@@ -36,41 +37,52 @@ public:
     : BaseType(ss, 0)
   {}
 
+  DuneDynamicVector(const BaseType& other)
+    : BaseType(other)
+  {}
+
   static ThisType* create(const int ss)
   {
     return new ThisType(ss);
   }
 
-  std::string type() const
+  virtual std::string type() const
   {
     return "dunepymor.vector.dunedynamic";
   }
 
-  int dim() const
+  virtual std::vector< std::string > compatibleTypes() const
+  {
+    return {
+        type()
+    };
+  }
+
+  virtual int dim() const
   {
     return BaseType::size();
   }
 
-  bool almost_equal(const ThisType* other,
-                    const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
+  virtual bool almost_equal(const ThisType* other,
+                            const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
   {
     assert(dim() == other->dim() && "Sizes do not match!");
     return Dune::Stuff::Common::FloatCmp::eq(*this, *other, epsilon);
   } // ... almost_equal(...)
 
-  void scal(const double alpha)
+  virtual void scal(const double alpha)
   {
     BaseType::operator*=(alpha);
   }
 
-  void axpy(const double alpha, const ThisType* x)
+  virtual void axpy(const double alpha, const ThisType* x)
   {
     assert(dim() == x->dim() && "Sizes do not match!");
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) += alpha * x->operator[](ii);
   } // ... axpy(...)
 
-  double dot(const ThisType* other) const
+  virtual double dot(const ThisType* other) const
   {
     assert(dim() == other->dim() && "Sizes do not match!");
     double result = 0;
@@ -79,22 +91,22 @@ public:
     return result;
   } // ... dot(...)
 
-  double l1_norm() const
+  virtual double l1_norm() const
   {
     return BaseType::one_norm();
   }
 
-  double l2_norm() const
+  virtual double l2_norm() const
   {
     return BaseType::two_norm();
   }
 
-  double sup_norm() const
+  virtual double sup_norm() const
   {
     return BaseType::infinity_norm();
   }
 
-  std::vector< double > components(const std::vector< int >& component_indices) const
+  virtual std::vector< double > components(const std::vector< int >& component_indices) const
   {
     assert(int(component_indices.size()) <= dim() && "Sizes do not match!");
     std::vector< double > values(component_indices.size(), 0);
@@ -107,7 +119,7 @@ public:
     return values;
   } // ... components(...)
 
-  std::vector< double > amax() const
+  virtual std::vector< double > amax() const
   {
     std::vector< double > result(2, 0.0);
     for (int ii = 0; ii < dim(); ++ii) {
@@ -120,7 +132,7 @@ public:
     return result;
   } // ... amax(...)
 
-  ThisType* add(const ThisType* other) const
+  virtual ThisType* add(const ThisType* other) const
   {
     assert(dim() == other->dim() && "Sizes do not match!");
     ThisType* result = create(other->dim());
@@ -129,14 +141,14 @@ public:
     return result;
   } // ... add(...)
 
-  void iadd(const ThisType* other)
+  virtual void iadd(const ThisType* other)
   {
     assert(dim() == other->dim() && "Sizes do not match!");
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) += other->operator[](ii);
   } // ... iadd(...)
 
-  ThisType* sub(const ThisType* other) const
+  virtual ThisType* sub(const ThisType* other) const
   {
     assert(dim() == other->dim() && "Sizes do not match!");
     ThisType* result = create(other->dim());
@@ -145,7 +157,7 @@ public:
     return result;
   } // ... sub(...)
 
-  void isub(const ThisType* other)
+  virtual void isub(const ThisType* other)
   {
     assert(dim() == other->dim() && "Sizes do not match!");
     for (int ii = 0; ii < dim(); ++ii)
