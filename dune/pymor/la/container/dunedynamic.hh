@@ -23,6 +23,8 @@ namespace LA {
 
 /**
  * \brief An implementation of Dune::Pymor::LA::VectorInterface using Dune::DynamicVector< double >.
+ *
+ * \see   Dune::Pymor::LA::VectorInterface
  */
 class DuneDynamicVector
   : public Dune::DynamicVector< double >
@@ -45,11 +47,13 @@ public:
     return new ThisType(ss);
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::type
   virtual std::string type() const
   {
     return "dunepymor.vector.dunedynamic";
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::compatibleTypes
   virtual std::vector< std::string > compatibleTypes() const
   {
     return {
@@ -57,11 +61,13 @@ public:
     };
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::dim
   virtual int dim() const
   {
     return BaseType::size();
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::almost_equal
   virtual bool almost_equal(const ThisType* other,
                             const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
     throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
@@ -72,11 +78,13 @@ public:
     return Dune::Stuff::Common::FloatCmp::eq(*this, *other, epsilon);
   } // ... almost_equal(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::scal
   virtual void scal(const double alpha)
   {
     BaseType::operator*=(alpha);
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::axpy
   virtual void axpy(const double alpha, const ThisType* x) throw (Exception::not_implemented_for_this_combination,
                                                                   Exception::sizes_do_not_match)
   {
@@ -87,6 +95,7 @@ public:
       BaseType::operator[](ii) += alpha * x->operator[](ii);
   } // ... axpy(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::dot
   virtual double dot(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
                                                          Exception::sizes_do_not_match)
   {
@@ -99,21 +108,25 @@ public:
     return result;
   } // ... dot(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::l1_norm
   virtual double l1_norm() const
   {
     return BaseType::one_norm();
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::l2_norm
   virtual double l2_norm() const
   {
     return BaseType::two_norm();
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::sup_norm
   virtual double sup_norm() const
   {
     return BaseType::infinity_norm();
   }
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::components
   virtual std::vector< double > components(const std::vector< int >& component_indices) const
     throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
   {
@@ -134,6 +147,7 @@ public:
     return values;
   } // ... components(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::amax
   virtual std::vector< double > amax() const
   {
     std::vector< double > result(2, 0.0);
@@ -147,6 +161,7 @@ public:
     return result;
   } // ... amax(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::add
   virtual ThisType* add(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
                                                             Exception::sizes_do_not_match)
   {
@@ -159,6 +174,7 @@ public:
     return result;
   } // ... add(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::iadd
   virtual void iadd(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
                                                   Exception::sizes_do_not_match)
   {
@@ -169,6 +185,7 @@ public:
       BaseType::operator[](ii) += other->operator[](ii);
   } // ... iadd(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::sub
   virtual ThisType* sub(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
                                                             Exception::sizes_do_not_match)
   {
@@ -181,6 +198,7 @@ public:
     return result;
   } // ... sub(...)
 
+  //! \copydoc Dune::Pymor::LA::VectorInterface::isub
   virtual void isub(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
                                                   Exception::sizes_do_not_match)
   {

@@ -124,7 +124,7 @@ public:
   /**
    * \brief Extract components of the vector.
    * \param component_indices Indices of the vector components that are to be returned.
-   * \return                  A Dune::DynamicVector `result` such that `result[i]` is the `component_indices[i]`-th
+   * \return                  A std::vector< double > `result` such that `result[i]` is the `component_indices[i]`-th
                               component of the vector.
    */
   virtual std::vector< double > components(const std::vector< int >& component_indices) const
@@ -132,8 +132,8 @@ public:
 
   /**
    * \brief   The maximum absolute value of the vector.
-   * \return  A pair< max_ind, max_val >, where max_ind is the index at which the maximum is attained and max_val is the
-   *          absolute value.
+   * \return  A std::vector< double > result, where int(result[0]) is the index at which the maximum is attained and
+   *          result[1] is the absolute maximum value.
    */
   virtual std::vector< double > amax() const = 0;
 
