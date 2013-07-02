@@ -5,6 +5,9 @@
 
 add_library( dunepymor-example-lacontainer STATIC "container.cc" )
 
+ADD_EXECUTABLE( examples_la_container "container_main.cc" ${COMMON_HEADER} )
+TARGET_LINK_LIBRARIES( examples_la_container dunepymor-example-lacontainer ${COMMON_LIBS} )
+
 find_package(PythonLibs)
 find_package(PythonInterp)
 include(CheckPythonModule)
