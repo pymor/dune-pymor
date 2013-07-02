@@ -15,14 +15,14 @@
 
 #include <dune/pymor/la/container/dunedynamic.hh>
 
-//#if HAVE_EIGEN
-//  #include <dune/pymor/la/container/eigen.hh>
-//#endif // HAVE_EIGEN
+#if HAVE_EIGEN
+  #include <dune/pymor/la/container/eigen.hh>
+#endif // HAVE_EIGEN
 
 typedef testing::Types< Dune::Pymor::LA::DuneDynamicVector
-//#if HAVE_EIGEN
-//                        Dune::Pymor::LA::EigenDenseVector< double >
-//#endif // HAVE_EIGEN
+#if HAVE_EIGEN
+                      , Dune::Pymor::LA::EigenDenseVector
+#endif // HAVE_EIGEN
                       > VectorTypes;
 
 template< class VectorType >
