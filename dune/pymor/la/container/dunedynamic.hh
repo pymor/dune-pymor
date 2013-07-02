@@ -11,7 +11,6 @@
 #include <string>
 
 #include <dune/common/dynvector.hh>
-#include <dune/common/float_cmp.hh>
 
 #include <dune/stuff/common/float_cmp.hh>
 
@@ -67,7 +66,9 @@ public:
                             const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
     throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     return Dune::Stuff::Common::FloatCmp::eq(*this, *other, epsilon);
   } // ... almost_equal(...)
 
@@ -76,18 +77,22 @@ public:
     BaseType::operator*=(alpha);
   }
 
-  virtual void axpy(const double alpha, const ThisType* x)
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+  virtual void axpy(const double alpha, const ThisType* x) throw (Exception::not_implemented_for_this_combination,
+                                                                  Exception::sizes_do_not_match)
   {
-    if (dim() != x->dim()) throw Exception::sizes_do_not_match();
+    if (dim() != x->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of x (" << x->dim() << ") does not match size of this (" << dim() << ")!");
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) += alpha * x->operator[](ii);
   } // ... axpy(...)
 
-  virtual double dot(const ThisType* other) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+  virtual double dot(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+                                                         Exception::sizes_do_not_match)
   {
-    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     double result = 0;
     for (int ii = 0; ii < dim(); ++ii)
       result += BaseType::operator[](ii) * other->operator[](ii);
@@ -112,12 +117,18 @@ public:
   virtual std::vector< double > components(const std::vector< int >& component_indices) const
     throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
   {
-    if (int(component_indices.size()) > dim()) throw Exception::sizes_do_not_match();
+    if (int(component_indices.size()) > dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of component_indices (" << component_indices.size() << ") is larger than this (" << dim() << ")!");
     std::vector< double > values(component_indices.size(), 0);
     for (size_t ii = 0; ii < component_indices.size(); ++ii) {
       const int component = component_indices[ii];
-      if (component < 0 ) throw Exception::index_out_of_range();
-      if (component >= dim() ) throw Exception::index_out_of_range();
+      if (component < 0)
+        DUNE_PYMOR_THROW(Exception::index_out_of_range,
+                         "component_indices[" << ii << "] is negative (" << component << ")!");
+      if (component >= dim())
+        DUNE_PYMOR_THROW(Exception::index_out_of_range,
+                         "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
       values[ii] = BaseType::operator[](component);
     }
     return values;
@@ -136,8 +147,8 @@ public:
     return result;
   } // ... amax(...)
 
-  virtual ThisType* add(const ThisType* other) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+  virtual ThisType* add(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+                                                            Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -148,28 +159,34 @@ public:
     return result;
   } // ... add(...)
 
-  virtual void iadd(const ThisType* other)
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+  virtual void iadd(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
+                                                  Exception::sizes_do_not_match)
   {
-    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) += other->operator[](ii);
   } // ... iadd(...)
 
-  virtual ThisType* sub(const ThisType* other) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+  virtual ThisType* sub(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+                                                            Exception::sizes_do_not_match)
   {
-    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     ThisType* result = create(other->dim());
     for (int ii = 0; ii < dim(); ++ii)
       result->operator[](ii) = BaseType::operator[](ii) - other->operator[](ii);
     return result;
   } // ... sub(...)
 
-  virtual void isub(const ThisType* other)
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+  virtual void isub(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
+                                                  Exception::sizes_do_not_match)
   {
-    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) -= other->operator[](ii);
   } // ... isub(...)
