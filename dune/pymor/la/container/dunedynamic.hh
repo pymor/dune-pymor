@@ -65,8 +65,9 @@ public:
 
   virtual bool almost_equal(const ThisType* other,
                             const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
     return Dune::Stuff::Common::FloatCmp::eq(*this, *other, epsilon);
   } // ... almost_equal(...)
 
@@ -76,15 +77,17 @@ public:
   }
 
   virtual void axpy(const double alpha, const ThisType* x)
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == x->dim() && "Sizes do not match!");
+    if (dim() != x->dim()) throw Exception::sizes_do_not_match();
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) += alpha * x->operator[](ii);
   } // ... axpy(...)
 
   virtual double dot(const ThisType* other) const
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
     double result = 0;
     for (int ii = 0; ii < dim(); ++ii)
       result += BaseType::operator[](ii) * other->operator[](ii);
@@ -107,13 +110,14 @@ public:
   }
 
   virtual std::vector< double > components(const std::vector< int >& component_indices) const
+    throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
   {
-    assert(int(component_indices.size()) <= dim() && "Sizes do not match!");
+    if (int(component_indices.size()) > dim()) throw Exception::sizes_do_not_match();
     std::vector< double > values(component_indices.size(), 0);
     for (size_t ii = 0; ii < component_indices.size(); ++ii) {
       const int component = component_indices[ii];
-      assert(0 <= component && "Wrong component index given!");
-      assert(component < dim() && "Wrong component index given!");
+      if (component < 0 ) throw Exception::index_out_of_range();
+      if (component >= dim() ) throw Exception::index_out_of_range();
       values[ii] = BaseType::operator[](component);
     }
     return values;
@@ -133,8 +137,11 @@ public:
   } // ... amax(...)
 
   virtual ThisType* add(const ThisType* other) const
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
     ThisType* result = create(other->dim());
     for (int ii = 0; ii < dim(); ++ii)
       result->operator[](ii) = BaseType::operator[](ii) + other->operator[](ii);
@@ -142,15 +149,17 @@ public:
   } // ... add(...)
 
   virtual void iadd(const ThisType* other)
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) += other->operator[](ii);
   } // ... iadd(...)
 
   virtual ThisType* sub(const ThisType* other) const
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
     ThisType* result = create(other->dim());
     for (int ii = 0; ii < dim(); ++ii)
       result->operator[](ii) = BaseType::operator[](ii) - other->operator[](ii);
@@ -158,8 +167,9 @@ public:
   } // ... sub(...)
 
   virtual void isub(const ThisType* other)
+    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
   {
-    assert(dim() == other->dim() && "Sizes do not match!");
+    if (dim() != other->dim()) throw Exception::sizes_do_not_match();
     for (int ii = 0; ii < dim(); ++ii)
       BaseType::operator[](ii) -= other->operator[](ii);
   } // ... isub(...)
