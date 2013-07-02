@@ -12,10 +12,10 @@
   #include "config.h"
 #endif
 
-#include <dune/pymor/la/container/eigen.hh>
+#include <dune/pymor/la/container/dunedynamic.hh>
 
 using namespace Dune::Pymor::LA;
 
-EigenDenseVector* createVector(const int ss);
+DuneDynamicVector* createVector(const int ss);
 
 #endif // DUNE_PYMOR_EXAMPLES_LA_CONTAINER_HH
