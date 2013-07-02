@@ -30,6 +30,12 @@ public:
   virtual std::string type() const = 0;
 
   /**
+   * \brief   A list of types which are compatible.
+   * \return  A list of types which are compatible.
+   */
+  virtual std::vector< std::string > compatibleTypes() const = 0;
+
+  /**
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    */
