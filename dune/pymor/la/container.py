@@ -11,6 +11,9 @@ def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
     namespace = module
     namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
     name = name.split('::')[-1].strip()
+    full_name = name
+    if len(namespaces) > 0:
+        full_name = '::'.join(namespaces) + '::' + name
     for nspace in namespaces:
         namespace = namespace.add_cpp_namespace(nspace)
     Vector = namespace.add_class(name)
@@ -25,7 +28,7 @@ def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
                       is_const=True)
     Vector.add_method('almost_equal',
                       pybindgen.retval('bool'),
-                      [pybindgen.param(name + ' *', 'other', transfer_ownership=False),
+                      [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False),
                        pybindgen.param('double', 'epsilon')],
                       is_const=True)
     Vector.add_method('scal',
@@ -34,10 +37,10 @@ def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
     Vector.add_method('axpy',
                       None,
                       [pybindgen.param('double', 'alpha'),
-                       pybindgen.param(name + ' *', 'x', transfer_ownership=False)])
+                       pybindgen.param(full_name + ' *', 'x', transfer_ownership=False)])
     Vector.add_method('dot',
                       pybindgen.retval('double'),
-                      [pybindgen.param(name + ' *', 'other', transfer_ownership=False)],
+                      [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)],
                       is_const=True)
     Vector.add_method('l1_norm',
                       pybindgen.retval('double'),
@@ -60,17 +63,17 @@ def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
                       [],
                       is_const=True)
     Vector.add_method('add',
-                      pybindgen.retval(name + ' *', caller_owns_return=True),
-                      [pybindgen.param(name + ' *', 'other', transfer_ownership=False)],
+                      pybindgen.retval(full_name + ' *', caller_owns_return=True),
+                      [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)],
                       is_const=True)
     Vector.add_method('iadd',
                       None,
-                      [pybindgen.param(name + ' *', 'other', transfer_ownership=False)])
+                      [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)])
     Vector.add_method('sub',
-                      pybindgen.retval(name + ' *', caller_owns_return=True),
-                      [pybindgen.param(name + ' *', 'other', transfer_ownership=False)],
+                      pybindgen.retval(full_name + ' *', caller_owns_return=True),
+                      [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)],
                       is_const=True)
     Vector.add_method('isub',
                       None,
-                      [pybindgen.param(name + ' *', 'other', transfer_ownership=False)])
+                      [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)])
     return module, Vector
