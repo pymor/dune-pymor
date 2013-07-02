@@ -17,12 +17,10 @@
   #include <dune/pymor/la/container/eigen.hh>
 #endif
 
-using namespace Dune::Pymor::LA;
-
-DuneDynamicVector* createDuneDynamicVector(const int ss);
+Dune::Pymor::LA::DuneDynamicVector* createDuneDynamicVector(const int ss);
 
 #if HAVE_EIGEN
-EigenDenseVector* createEigenDenseVector(const int ss);
+Dune::Pymor::LA::EigenDenseVector* createEigenDenseVector(const int ss);
 #endif
 
 #endif // DUNE_PYMOR_EXAMPLES_LA_CONTAINER_HH
