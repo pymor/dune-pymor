@@ -89,14 +89,14 @@ public:
    * \return                  A Dune::DynamicVector `result` such that `result[i]` is the `component_indices[i]`-th
                               component of the vector.
    */
-  virtual std::vector< double >* components(const std::vector< int >* component_indices) const = 0;
+  virtual std::vector< double > components(const std::vector< int >& component_indices) const = 0;
 
   /**
    * \brief   The maximum absolute value of the vector.
    * \return  A pair< max_ind, max_val >, where max_ind is the index at which the maximum is attained and max_val is the
    *          absolute value.
    */
-  virtual std::pair< int, double >* amax() const = 0;
+  virtual std::vector< double > amax() const = 0;
 
   /**
    * \brief   Adds two vectors.

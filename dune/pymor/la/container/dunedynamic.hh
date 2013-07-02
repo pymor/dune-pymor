@@ -94,27 +94,27 @@ public:
     return BaseType::infinity_norm();
   }
 
-  std::vector< double >* components(const std::vector< int >* component_indices) const
+  std::vector< double > components(const std::vector< int >& component_indices) const
   {
-    assert(int(component_indices->size()) <= dim() && "Sizes do not match!");
-    std::vector< double >* values = new std::vector< double >(component_indices->size(), 0);
-    for (size_t ii = 0; ii < component_indices->size(); ++ii) {
-      const int component = component_indices->operator[](ii);
+    assert(int(component_indices.size()) <= dim() && "Sizes do not match!");
+    std::vector< double > values(component_indices.size(), 0);
+    for (size_t ii = 0; ii < component_indices.size(); ++ii) {
+      const int component = component_indices[ii];
       assert(0 <= component && "Wrong component index given!");
       assert(component < dim() && "Wrong component index given!");
-      values->operator[](ii) = BaseType::operator[](component);
+      values[ii] = BaseType::operator[](component);
     }
     return values;
   } // ... components(...)
 
-  std::pair< int, double >* amax() const
+  std::vector< double > amax() const
   {
-    std::pair< int, double >* result = new std::pair< int, double >(0, 0.0);
+    std::vector< double > result(2, 0.0);
     for (int ii = 0; ii < dim(); ++ii) {
       const double value = std::abs(BaseType::operator[](ii));
-      if (value > result->second) {
-        result->first = ii;
-        result->second = value;
+      if (value > result[1]) {
+        result[0] = ii;
+        result[1] = value;
       }
     }
     return result;
