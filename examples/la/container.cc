@@ -5,7 +5,14 @@
 
 #include "container.hh"
 
-DuneDynamicVector *createVector(const int ss)
+DuneDynamicVector* createDuneDynamicVector(const int ss)
 {
   return DuneDynamicVector::create(ss);
 }
+
+#if HAVE_EIGEN
+EigenDenseVector* createEigenDenseVector(const int ss)
+{
+  return EigenDenseVector::create(ss);
+}
+#endif

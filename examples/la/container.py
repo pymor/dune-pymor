@@ -15,9 +15,13 @@ if __name__ == '__main__':
     # add dune-pymor constructs
     module = create_dune_module('lacontainerexample', 'container.hh')
     module, _ = add_dune_Vector(module, 'Dune::Pymor::LA::DuneDynamicVector')
+    module, _ = add_dune_Vector(module, 'Dune::Pymor::LA::EigenDenseVector')
     # add user code stuff
-    module.add_function('createVector',
+    module.add_function('createDuneDynamicVector',
                         pybindgen.retval('Dune::Pymor::LA::DuneDynamicVector *', caller_owns_return=True),
+                        [pybindgen.param('int', 'ss')])
+    module.add_function('createEigenDenseVector',
+                        pybindgen.retval('Dune::Pymor::LA::EigenDenseVector *', caller_owns_return=True),
                         [pybindgen.param('int', 'ss')])
     with open(generator_filename, 'wb') as output:
         module.generate(pybindgen.FileCodeSink(output))
