@@ -11,6 +11,7 @@
 #include <vector>
 #include <initializer_list>
 #include <sstream>
+#include <ostream>
 
 #include <dune/pymor/common/exceptions.hh>
 
@@ -18,6 +19,22 @@ namespace Dune {
 namespace Pymor {
 
 
+/**
+ * \brief Determines the type of any parameter as a set of components and their length.
+ *
+ *        This class is implemented using a std::map, where the components are std::string keys and their length are
+ *        int values. We use int instead of size_t because pybindgen does not offer any bindings for size_t. Usage
+ *        example:
+ *        \code
+ParameterType param1("diffusion", 1);
+ParameterType param2({"diffusion", "force"},
+                     {1, 2});
+ParameterType param3 = {"diffusion", 1};
+ParameterType param4 = {{"diffusion", "force"}, {1, 2}};
+\code
+ *
+ * \see   Dune::Pymor::Parameter, Dune::Pymor::Parametric
+ */
 class ParameterType
 {
 public:
@@ -113,7 +130,7 @@ public:
     ret << "Dune::Pymor::ParameterType(";
     if (dict_.size() == 1) {
       const auto element = dict_.begin();
-      ret << element->first << ", " << element->second;
+      ret << "\"" << element->first << "\", " << element->second;
     } else if (dict_.size() > 1) {
       std::vector< KeyType > kk;
       std::vector< ValueType > vv;
@@ -121,10 +138,10 @@ public:
         kk.emplace_back(element.first);
         vv.emplace_back(element.second);
       }
-      ret << "{";
+      ret << "{\"";
       for (size_t ii = 0; ii < (kk.size() - 1); ++ii)
-        ret << kk[ii] << ", ";
-      ret << kk[kk.size() - 1] << "},\n                            {";
+        ret << kk[ii] << "\", \"";
+      ret << kk[kk.size() - 1] << "\"}, {";
       for (size_t ii = 0; ii < (vv.size() - 1); ++ii)
         ret << vv[ii] << ", ";
       ret << vv[vv.size() - 1] << "}";
@@ -146,7 +163,16 @@ public:
   {
     return dict_.end();
   }
+
+  friend std::ostream& operator<<(std::ostream&, const ParameterType&);
 }; // class ParameterType
+
+
+std::ostream& operator<<(std::ostream& oo, const ParameterType& pp)
+{
+  oo << pp.report();
+  return oo;
+}
 
 
 } // namespace Pymor
