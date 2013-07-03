@@ -66,6 +66,11 @@ public:
   {
     Dune::Exception::message(msg);
   }
+
+  const char* pymorWhat() const
+  {
+    return Dune::Exception::what().c_str();
+  }
 };
 
 namespace Pymor {
