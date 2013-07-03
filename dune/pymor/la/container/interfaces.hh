@@ -67,9 +67,9 @@ public:
    */
   virtual bool almost_equal(const Dune::Pymor::LA::VectorInterface* other,
                             const double /*epsilon*/ = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
   }
 
@@ -85,9 +85,9 @@ public:
    * \param x     Vector that is to be added.
    */
   virtual void axpy(const double /*alpha*/, const Dune::Pymor::LA::VectorInterface* x)
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << x->type() << ")!");
   }
 
@@ -97,9 +97,9 @@ public:
    * \return        The scalar product.
    */
   virtual double dot(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
   }
 
@@ -143,9 +143,9 @@ public:
    * \return        The sum of this and other.
    */
   virtual Dune::Pymor::LA::VectorInterface* add(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
   }
 
@@ -154,9 +154,9 @@ public:
    * \param other The right summand.
    */
   virtual void iadd(const Dune::Pymor::LA::VectorInterface* other)
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
   }
 
@@ -166,9 +166,9 @@ public:
    * \return        The difference between this and other.
    */
   virtual Dune::Pymor::LA::VectorInterface* sub(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
   }
 
@@ -177,9 +177,9 @@ public:
    * \param other The subtrahend.
    */
   virtual void isub(const Dune::Pymor::LA::VectorInterface* other)
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
-    DUNE_PYMOR_THROW(Exception::not_implemented_for_this_combination,
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
   }
 }; // class VectorInterface

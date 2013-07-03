@@ -67,7 +67,7 @@ public:
   //! \copydoc Dune::Pymor::LA::VectorInterface::almost_equal
   virtual bool almost_equal(const ThisType* other,
                             const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
-    throw (Exception::not_implemented_for_this_combination, Exception::sizes_do_not_match)
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -82,7 +82,7 @@ public:
   }
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::axpy
-  virtual void axpy(const double alpha, const ThisType* x) throw (Exception::not_implemented_for_this_combination,
+  virtual void axpy(const double alpha, const ThisType* x) throw (Exception::types_are_not_compatible,
                                                                   Exception::sizes_do_not_match)
   {
     if (dim() != x->dim())
@@ -92,7 +92,7 @@ public:
   } // ... axpy(...)
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::dot
-  virtual double dot(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+  virtual double dot(const ThisType* other) const throw (Exception::types_are_not_compatible,
                                                          Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())
@@ -159,7 +159,7 @@ public:
   } // ... amax(...)
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::add
-  virtual ThisType* add(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+  virtual ThisType* add(const ThisType* other) const throw (Exception::types_are_not_compatible,
                                                             Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())
@@ -171,7 +171,7 @@ public:
   } // ... add(...)
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::iadd
-  virtual void iadd(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
+  virtual void iadd(const ThisType* other) throw (Exception::types_are_not_compatible,
                                                   Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())
@@ -181,7 +181,7 @@ public:
   } // ... iadd(...)
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::sub
-  virtual ThisType* sub(const ThisType* other) const throw (Exception::not_implemented_for_this_combination,
+  virtual ThisType* sub(const ThisType* other) const throw (Exception::types_are_not_compatible,
                                                             Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())
@@ -193,7 +193,7 @@ public:
   } // ... sub(...)
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::isub
-  virtual void isub(const ThisType* other) throw (Exception::not_implemented_for_this_combination,
+  virtual void isub(const ThisType* other) throw (Exception::types_are_not_compatible,
                                                   Exception::sizes_do_not_match)
   {
     if (dim() != other->dim())

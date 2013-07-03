@@ -82,7 +82,7 @@ namespace Exception {
  *        This can be used when dynamically deriving from an interface, see Dune::Pymor::La::VectorInterface for an
  *        example.
  */
-class not_implemented_for_this_combination
+class types_are_not_compatible
   : public Dune::NotImplemented
   , public Dune::PymorException
 {};
