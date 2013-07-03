@@ -1,10 +1,17 @@
 #! /usr/bin/env python
+# This file is part of the dune-pymor project:
+#   https://github.com/pyMor/dune-pymor
+# Copyright Holders: Felix Albrecht, Stephan Rave
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 import pybindgen
 
+from dune.pymor.common import Exceptions
 
-def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
+
+def add_VectorInterface(module, exceptions, name='Dune::Pymor::LA::VectorInterface'):
     assert(isinstance(module, pybindgen.module.Module))
+    assert(isinstance(exceptions, Exceptions))
     assert(name is not None)
     name = str(name)
     assert(len(name) > 0)
@@ -30,7 +37,9 @@ def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
                       pybindgen.retval('bool'),
                       [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False),
                        pybindgen.param('double', 'epsilon')],
-                      is_const=True)
+                      is_const=True,
+                      throw=[exceptions.types_are_not_compatible,
+                             exceptions.sizes_do_not_match])
     Vector.add_method('scal',
                       None,
                       [pybindgen.param('double', 'alpha')])
@@ -65,7 +74,9 @@ def add_VectorInterface(module, name='Dune::Pymor::LA::VectorInterface'):
     Vector.add_method('add',
                       pybindgen.retval(full_name + ' *', caller_owns_return=True),
                       [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)],
-                      is_const=True)
+                      is_const=True,
+                      throw=[exceptions.types_are_not_compatible,
+                             exceptions.sizes_do_not_match])
     Vector.add_method('iadd',
                       None,
                       [pybindgen.param(full_name + ' *', 'other', transfer_ownership=False)])
