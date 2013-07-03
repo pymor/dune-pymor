@@ -103,6 +103,14 @@ class index_out_of_range
   , public Dune::PymorException
 {};
 
+/**
+ * \brief Exception for invalied keys in a dictionary/map context, i.e. an empty string "".
+ */
+class key_is_not_valid
+  : public Dune::RangeError
+  , public Dune::PymorException
+{};
+
 } // namespace Exceptions
 } // namespace Pymor
 } // namespace Dune
