@@ -1,5 +1,10 @@
 #! /usr/bin/env python
 
+# This file is part of the dune-pymor project:
+#   https://github.com/pyMor/dune-pymor
+# Copyright Holders: Felix Albrecht, Stephan Rave
+# License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
 import sys, os
 import pybindgen
 from dune.pymor.core import create_module as create_dune_module
@@ -13,9 +18,9 @@ if __name__ == '__main__':
     includedirs = includedirs[0].split(';')
     generator_filename = os.path.join(outputdir, 'dunepymor_container_example.cc')
     # add dune-pymor constructs
-    module = create_dune_module('lacontainerexample', 'container.hh')
-    module, _ = add_dune_Vector(module, 'Dune::Pymor::LA::DuneDynamicVector')
-    module, _ = add_dune_Vector(module, 'Dune::Pymor::LA::EigenDenseVector')
+    module, exceptions = create_dune_module('lacontainerexample', 'container.hh')
+    module, _ = add_dune_Vector(module, exceptions, 'Dune::Pymor::LA::DuneDynamicVector')
+    module, _ = add_dune_Vector(module, exceptions, 'Dune::Pymor::LA::EigenDenseVector')
     # add user code stuff
     module.add_function('createDuneDynamicVector',
                         pybindgen.retval('Dune::Pymor::LA::DuneDynamicVector *', caller_owns_return=True),
