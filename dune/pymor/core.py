@@ -7,13 +7,15 @@
 
 import pybindgen
 
-from dune.pymor.common import add_PymorExceptions
+from dune.pymor.common import add_Exceptions
 
 
 def create_module(module_name, include_header):
     module = pybindgen.Module(module_name)
     module.add_include('"' + include_header + '"')
+    # add stl container
     module.add_container('std::vector< double >', 'double', 'list')
     module.add_container('std::vector< int >', 'int', 'list')
-    module, exceptions = add_PymorExceptions(module)
+    # add dnue-pymor
+    module, exceptions = add_Exceptions(module)
     return module, exceptions
