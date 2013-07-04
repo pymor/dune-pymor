@@ -3,10 +3,10 @@
 # Copyright Holders: Felix Albrecht, Stephan Rave
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-add_library( dunepymor-example-lacontainer STATIC "container.cc" )
+add_library( dunepymor-example-la-container STATIC "container.cc" )
 
 ADD_EXECUTABLE( examples_la_container "container_main.cc" ${COMMON_HEADER} )
-TARGET_LINK_LIBRARIES( examples_la_container dunepymor-example-lacontainer ${COMMON_LIBS} )
+TARGET_LINK_LIBRARIES( examples_la_container dunepymor-example-la-container ${COMMON_LIBS} )
 
 find_package(PythonLibs)
 find_package(PythonInterp)
@@ -18,7 +18,7 @@ if( PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND python_pybindgen_FOUND )
 
     set(pythonTarget           lacontainerexample)
     set(pythonWrapperGenerator "${CMAKE_CURRENT_SOURCE_DIR}/container.py")
-    set(pythonWrapperCpp       "${CMAKE_CURRENT_BINARY_DIR}/dunepymor_container_example.cc")
+    set(pythonWrapperCpp       "${CMAKE_CURRENT_BINARY_DIR}/lacontainerexample_bindings_generator.cc")
     set_source_files_properties( "${pythonWrapperCpp}" PROPERTIES GENERATED TRUE)
 
     add_custom_command(
@@ -46,7 +46,7 @@ if( PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND python_pybindgen_FOUND )
     include_directories( ${PYTHON_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}")
     add_library( ${pythonTarget} MODULE "${pythonWrapperCpp}" )
     set_target_properties( ${pythonTarget} PROPERTIES PREFIX "" )
-    target_link_libraries( ${pythonTarget} dunepymor-example-lacontainer ${COMMON_LIBS} )
+    target_link_libraries( ${pythonTarget} dunepymor-example-la-container ${COMMON_LIBS} )
 
 else( PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND python_pybindgen_FOUND AND python_pygccxml_FOUND )
     message(STATUS "Python bindings will NOT be created")

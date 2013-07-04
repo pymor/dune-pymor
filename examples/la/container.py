@@ -16,9 +16,10 @@ if __name__ == '__main__':
     assert(len(sys.argv) > 1)
     inputdir, outputdir, includedirs = sys.argv[1], sys.argv[2], sys.argv[3:]
     includedirs = includedirs[0].split(';')
-    generator_filename = os.path.join(outputdir, 'dunepymor_container_example.cc')
+    global_name = 'lacontainerexample'
+    generator_filename = os.path.join(outputdir, global_name + '_bindings_generator.cc')
     # add dune-pymor constructs
-    module, exceptions = create_dune_module('lacontainerexample', 'container.hh')
+    module, exceptions = create_dune_module(global_name, 'container.hh', add_all_of_dune_pymor=False)
     module, _ = add_dune_Vector(module, exceptions, 'Dune::Pymor::LA::DuneDynamicVector')
     module, _ = add_dune_Vector(module, exceptions, 'Dune::Pymor::LA::EigenDenseVector')
     # add user code stuff
