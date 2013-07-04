@@ -29,7 +29,7 @@ TEST(ParameterType, Parameters_Base)
   if (param1 != param3) throw PymorException();
   if (param2 != param4) throw PymorException();
   std::string ss = param1.report();
-  DSC_LOG_DEBUG << ss << std::endl;
+//  DSC_LOG_DEBUG << ss << std::endl;
   std::vector< KeyType > keys = param1.keys();
   if (keys.size() != 1) throw PymorException();
   if (keys[0] != "diffusion") throw PymorException();
@@ -51,7 +51,52 @@ TEST(ParameterType, Parameters_Base)
   if (param1.get("force") != 2) throw PymorException();
   if (param1 != param2) throw PymorException();
   if (!(param1 == param2)) throw PymorException();
-  DSC_LOG_DEBUG << param2 << std::endl;
+//  DSC_LOG_DEBUG << param2 << std::endl;
+}
+
+TEST(Parameter, Parameters_Base)
+{
+  ParameterType type1 = {"diffusion", 1};
+  ParameterType type2 = {{"diffusion", "force"}, {1, 2}};
+  typedef Parameter::KeyType KeyType;
+  typedef Parameter::ValueType ValueType;
+  Parameter param1("diffusion", 1.0);
+  Parameter param2({"diffusion", "force"},
+                   {{1.0}, {1.0, 2.0}});
+  Parameter param3 = {"diffusion", 1.0};
+  Parameter param4 = {{"diffusion", "force"},
+                      {{1.0}, {1.0, 2.0}}};
+  Parameter DUNE_UNUSED(param5)(type1, 1.0);
+  Parameter DUNE_UNUSED(param6)(type1, {1.0});
+  Parameter DUNE_UNUSED(param8)(type2, {{1.0}, {1.0, 2.0}});
+  if (param1.type() != type1) throw PymorException();
+  if (param1 != param3) throw PymorException();
+  if (param2 != param4) throw PymorException();
+  std::string ss = param1.report();
+//  DSC_LOG_DEBUG << ss << std::endl;
+  std::vector< KeyType > keys = param1.keys();
+  if (keys.size() != 1) throw PymorException();
+  if (keys[0] != "diffusion") throw PymorException();
+  if (!param1.hasKey("diffusion")) throw PymorException();
+  std::vector< ValueType > values = param1.values();
+  if (values.size() != 1) throw PymorException();
+  if (values[0].size() != 1) throw PymorException();
+  if (values[0][0] != 1) throw PymorException();
+  if (param1.get("diffusion") != ValueType({1.0})) throw PymorException();
+  if (param1 == param2) throw PymorException();
+  if (!(param1 != param2)) throw PymorException();
+  param1.set("force", {1.0, 2.0});
+  keys = param1.keys();
+  if (keys.size() != 2) throw PymorException();
+  values = param1.values();
+  if (values.size() != 2) throw PymorException();
+  if (!param1.hasKey("diffusion")) throw PymorException();
+  if (!param1.hasKey("force")) throw PymorException();
+  if (param1.get("diffusion") != ValueType({1.0})) throw PymorException();
+  if (param1.get("force") != ValueType({1.0, 2.0})) throw PymorException();
+  if (param1 != param2) throw PymorException();
+  if (!(param1 == param2)) throw PymorException();
+  //  DSC_LOG_DEBUG << param2 << std::endl;
 }
 
 int main(int argc, char** argv)
