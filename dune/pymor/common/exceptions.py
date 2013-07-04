@@ -8,7 +8,7 @@
 import pybindgen
 
 
-class Exceptions():
+class Exceptions(object):
 
     def __init__(self,
                  PymorException,
