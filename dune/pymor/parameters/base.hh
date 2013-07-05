@@ -385,6 +385,18 @@ public:
     return ret.str();
   }
 
+  ValueType serialize() const
+  {
+    ValueType ret;
+    for (auto key : keys()) {
+      const ValueType& vals = get(key);
+      for (auto element : vals) {
+        ret.push_back(element);
+      }
+    }
+    return ret;
+  } // ValueType serialize() const
+
   using BaseType::keys;
   using BaseType::values;
   using BaseType::hasKey;
