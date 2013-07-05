@@ -44,8 +44,20 @@ public:
     return new ThisType(ss);
   }
 
-  //! \copydoc Dune::Pymor::LA::VectorInterface::type
+  /**
+   * \copydoc Dune::Pymor::LA::VectorInterface::type
+   * \return  "dunepymor.vector.eigendense"
+   */
   virtual std::string type() const
+  {
+    return static_type();
+  }
+
+  /**
+   * \brief  "dunepymor.vector.eigendense"
+   * \return "dunepymor.vector.eigendense"
+   */
+  static std::string static_type()
   {
     return "dunepymor.vector.eigendense";
   }

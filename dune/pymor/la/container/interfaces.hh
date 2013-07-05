@@ -29,10 +29,12 @@ module, Vector = add_dune_Vector(module, 'DerivedFoo')
 \endcode
  *        in your python code, where DerivedFoo is a derived class, i.e. Dune::Pymor::LA::DuneDynamicVector and module
  *        is a pybindgen.module.Module.
- * \note  All derived classes are expected to implement the following factory method:
+ * \note  All derived classes are expected to implement the following static methods:
  * \code
 static DerivedFoo* create(const int ss);
+static std::string static_type();
 \endcode
+ *        where static_type() is expected to return the same as type();
  */
 class VectorInterface
 {

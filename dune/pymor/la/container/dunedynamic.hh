@@ -47,8 +47,20 @@ public:
     return new ThisType(ss);
   }
 
-  //! \copydoc Dune::Pymor::LA::VectorInterface::type
+  /**
+   * \copydoc Dune::Pymor::LA::VectorInterface::type
+   * \return  "dunepymor.vector.dunedynamic"
+   */
   virtual std::string type() const
+  {
+    return static_type();
+  }
+
+  /**
+   * \brief  "dunepymor.vector.dunedynamic"
+   * \return "dunepymor.vector.dunedynamic"
+   */
+  static std::string static_type()
   {
     return "dunepymor.vector.dunedynamic";
   }
