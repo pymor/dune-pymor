@@ -398,6 +398,48 @@ private:
 }; // class Parameter
 
 
+/**
+ * \brief Base class for everything that can possibly parametric.
+ *
+ * \attention A derived class Foo has to provide a method
+ *            \code
+Foo* freeze_parameter(const Parameter mu = Parameter()) const
+\endcode
+ *            which returns a nonparametric version of the object, if possible.
+ */
+class Parametric
+{
+public:
+  Parametric()
+    : type_()
+  {}
+
+//  Parametric(const ParameterType& type)
+//    : type_(type)
+//  {}
+
+  template< class... Args >
+  Parametric(Args&& ...args)
+    : type_(std::forward< Args >(args)...)
+  {}
+
+  virtual ~Parametric() {}
+
+  const ParameterType& parameter_type() const
+  {
+    return type_;
+  }
+
+  bool parametric() const
+  {
+    return parameter_type().size() != 0;
+  }
+
+private:
+  ParameterType type_;
+}; // class Parametric
+
+
 } // namespace Pymor
 } // namespace Dune
 
