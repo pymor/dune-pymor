@@ -127,6 +127,14 @@ class wrong_parameter_type
   , public Dune::PymorException
 {};
 
+/**
+ * \brief Exception for nonparametric objects that are treated as if they were parametric.
+ */
+class this_is_not_parametric
+    : public Dune::RangeError
+    , public Dune::PymorException
+  {};
+
 } // namespace Exceptions
 } // namespace Pymor
 } // namespace Dune
