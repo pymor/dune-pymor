@@ -79,7 +79,7 @@ public:
                                                                       Exception::key_is_not_valid,
                                                                       Exception::sizes_do_not_match) = 0;
 
-  ValueType get(const KeyType& key) const throw (Exception::key_is_not_valid)
+  const ValueType& get(const KeyType& key) const throw (Exception::key_is_not_valid)
   {
     const auto result = dict_.find(key);
     if (result == dict_.end()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key does not exist!");
