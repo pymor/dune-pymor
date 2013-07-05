@@ -34,8 +34,8 @@ class DuneDynamicVector
 public:
   typedef DuneDynamicVector             ThisType;
 
-  DuneDynamicVector(const int ss)
-    : BaseType(ss, 0)
+  DuneDynamicVector(const int ss, const double value = 0.0)
+    : BaseType(ss, value)
   {}
 
   DuneDynamicVector(const BaseType& other)

@@ -31,8 +31,8 @@ class EigenDenseVector
 public:
   typedef EigenDenseVector                            ThisType;
 
-  EigenDenseVector(const int ss)
-    : BaseType(ss)
+  EigenDenseVector(const int ss, const double value = 0.0)
+    : BaseType(ss, value)
   {}
 
   EigenDenseVector(const BaseType& other)
