@@ -30,7 +30,7 @@ def add_VectorInterface(module, exceptions, name='Dune::Pymor::LA::VectorInterfa
                       [],
                       is_const=True)
     Vector.add_method('dim',
-                      pybindgen.retval('int'),
+                      pybindgen.retval('unsigned int'),
                       [],
                       is_const=True)
     Vector.add_method('almost_equal',

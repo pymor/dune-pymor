@@ -71,7 +71,7 @@ public:
   }
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::dim
-  virtual int dim() const
+  virtual unsigned int dim() const
   {
     return BaseType::size();
   }
@@ -135,7 +135,7 @@ public:
   virtual std::vector< double > components(const std::vector< int >& component_indices) const
     throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
   {
-    if (int(component_indices.size()) > dim())
+    if (component_indices.size() > dim())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                        "size of component_indices (" << component_indices.size() << ") is larger than this (" << dim() << ")!");
     std::vector< double > values(component_indices.size(), 0);
@@ -144,7 +144,7 @@ public:
       if (component < 0)
         DUNE_PYMOR_THROW(Exception::index_out_of_range,
                          "component_indices[" << ii << "] is negative (" << component << ")!");
-      if (component >= dim())
+      if (component >= int(dim()))
         DUNE_PYMOR_THROW(Exception::index_out_of_range,
                          "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
       values[ii] = BaseType::backend()[component];

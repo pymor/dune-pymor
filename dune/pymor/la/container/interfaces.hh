@@ -58,7 +58,7 @@ public:
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    */
-  virtual int dim() const = 0;
+  virtual unsigned int dim() const = 0;
 
   /**
    * \brief   Check vectors for equality.
