@@ -111,6 +111,22 @@ class key_is_not_valid
   , public Dune::PymorException
 {};
 
+/**
+ * \brief Exception for methods the user has to implement.
+ */
+class you_have_to_implement_this
+  : public Dune::RangeError
+  , public Dune::PymorException
+{};
+
+/**
+ * \brief Exception for a wrong Dune::Pymor::ParameterType .
+ */
+class wrong_parameter_type
+  : public Dune::RangeError
+  , public Dune::PymorException
+{};
+
 } // namespace Exceptions
 } // namespace Pymor
 } // namespace Dune

@@ -15,12 +15,16 @@ class Exceptions(object):
                  types_are_not_compatible,
                  sizes_do_not_match,
                  index_out_of_range,
-                 key_is_not_valid):
+                 key_is_not_valid,
+                 you_have_to_implement_this,
+                 wrong_parameter_type):
         self.PymorException = PymorException
         self.types_are_not_compatible = types_are_not_compatible
         self.sizes_do_not_match = sizes_do_not_match
         self.index_out_of_range = index_out_of_range
         self.key_is_not_valid = key_is_not_valid
+        self.you_have_to_implement_this = you_have_to_implement_this
+        self.wrong_parameter_type = wrong_parameter_type
 
 
 def add_Exceptions(module):
@@ -40,8 +44,16 @@ def add_Exceptions(module):
     key_is_not_valid = namespace.add_exception('key_is_not_valid',
                                                parent=PymorException,
                                                message_rvalue='%(EXC)s.pymorWhat()')
+    you_have_to_implement_this = namespace.add_exception('you_have_to_implement_this',
+                                                         parent=PymorException,
+                                                         message_rvalue='%(EXC)s.pymorWhat()')
+    wrong_parameter_type = namespace.add_exception('wrong_parameter_type',
+                                                   parent=PymorException,
+                                                   message_rvalue='%(EXC)s.pymorWhat()')
     return module, Exceptions(PymorException,
                               types_are_not_compatible,
                               sizes_do_not_match,
                               index_out_of_range,
-                              key_is_not_valid)
+                              key_is_not_valid,
+                              you_have_to_implement_this,
+                              wrong_parameter_type)
