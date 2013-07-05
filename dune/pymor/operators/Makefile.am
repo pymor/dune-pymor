@@ -3,9 +3,7 @@
 # Copyright Holders: Felix Albrecht, Stephan Rave
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-pymorincludedir = $(includedir)/dune/pymor
-pymorinclude_HEADERS = exists.hh
-
-SUBDIRDS = common la operators parameters
+operatorsincludedir = $(includedir)/dune/pymor/operators
+operatorsinclude_HEADERS = eigen.hh interfaces.hh
 
 include $(top_srcdir)/am/global-rules
