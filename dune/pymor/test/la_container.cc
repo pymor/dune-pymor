@@ -11,13 +11,14 @@
 
 #include <dune/stuff/test/test_common.hh>
 
-#include <memory>
-
+#include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
-
 #if HAVE_EIGEN
   #include <dune/pymor/la/container/eigen.hh>
 #endif
+
+using namespace Dune;
+using namespace Dune::Pymor;
 
 typedef testing::Types< Dune::Pymor::LA::DuneDynamicVector
 #if HAVE_EIGEN
@@ -32,7 +33,9 @@ struct VectorTest
   void check() const
   {
     VectorType* vector = VectorType::create(4);
-    const std::string DUNE_UNUSED(type) = vector->type();
+    const std::string type = vector->type();
+    const std::string static_type = vector->static_type();
+    if (type != static_type) DUNE_PYMOR_THROW(PymorException, "");
     const int DUNE_UNUSED(dim) = vector->dim();
     const bool DUNE_UNUSED(almost_equal) = vector->almost_equal(vector);
     vector->scal(1.0);
