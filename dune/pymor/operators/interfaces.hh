@@ -75,8 +75,8 @@ public:
     return 0.0;
   }
 
-//  OperatorInterface* freeze_parameter(const Parameter mu = Parameter()) const
-//    throw (Exception::wrong_parameter_type) = 0;
+  virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::this_is_not_parametric) = 0;
 }; // class OperatorInterface
 
 

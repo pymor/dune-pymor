@@ -107,6 +107,13 @@ public:
     return V->backend().transpose() * BaseType::backend() * U->backend();
   }
 
+  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::this_is_not_parametric)
+  {
+    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
+    return nullptr;
+  }
+
 private:
   static int assert_is_positive(const int ii)
   {
@@ -202,6 +209,13 @@ public:
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
                        "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
     return V->backend().transpose() * BaseType::backend() * U->backend();
+  }
+
+  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::this_is_not_parametric)
+  {
+    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
+    return nullptr;
   }
 
 private:
