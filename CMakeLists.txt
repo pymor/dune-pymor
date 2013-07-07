@@ -33,6 +33,7 @@ include_dir( ${dune-pymor_BINARY_DIR} ${dune-pymor_SOURCE_DIR} )
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/cmake_config.h )
 
 add_dune_modules(
+  pymor
   stuff
   common
 )
