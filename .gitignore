@@ -24,3 +24,9 @@ stamp-h1
 *.project
 *.pydevproject
 *.pyc
+*.deps
+*.libs
+depcomp
+*.lo
+*.o
+*.la
