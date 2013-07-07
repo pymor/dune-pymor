@@ -35,44 +35,48 @@ public:
 
   virtual std::string type_range() const = 0;
 
-  virtual LA::VectorInterface* apply(const LA::VectorInterface* U, const Parameter /*mu*/ = Parameter()) const
+  virtual void apply(const LA::VectorInterface* /*source*/,
+                     LA::VectorInterface* /*range*/,
+                     const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type) = 0;
+
+  virtual LA::VectorInterface* apply(const LA::VectorInterface* source, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type)
   {
-    if (U->type() == type_source())
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "this operator has to be implemented for U of type_source() (" << type_source() << ")!");
     DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "U (" << U->type() << ") is not a compatible source (" << type_source() << ")!");
+                     "U (" << U->type() << ") is not a compatible type_source (" << type_source() << ")!");
+    LA::VectorInterface* ret = LA::createVector(type_range(), dim_range());
+    apply(U, ret, mu);
+    return ret;
   }
 
-  virtual double apply2(const LA::VectorInterface* V,
-                        const LA::VectorInterface* U,
-                        const Parameter /*mu*/ = Parameter()) const
+  virtual double apply2(const LA::VectorInterface* range,
+                        const LA::VectorInterface* source,
+                        const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
-           Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type)
   {
-    if (U->type() == type_source() && V->type() == type_range())
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "this operator has to be implemented for U of type_source() (" << type_source() << ")"
-                       << " and V of type_range() (" << type_range() << ")!");
     std::stringstream msg;
     size_t throw_up = 0;
-    if (U->type() != type_source()) {
-      msg << "U (" << U->type() << ") is not a compatible type_source (" << type_source() << ")";
+    if (source->type() != type_source()) {
+      msg << "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")";
       ++throw_up;
     }
-    if (V->type() != type_range()) {
+    if (range->type() != type_range()) {
       if (throw_up)
         msg << " and ";
-      msg << "V (" << V->type() << ") is not a compatible type_range (" << type_range() << ")";
+      msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
     }
     if (throw_up) DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str() << "!");
-    return 0.0;
+    LA::VectorInterface* tmp = apply(source, tmp, mu);
+    return range->dot(tmp);
   }
 
   virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
