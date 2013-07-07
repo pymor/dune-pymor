@@ -9,6 +9,7 @@
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/la/container/interfaces.hh>
+#include <dune/pymor/la/container.hh>
 
 namespace Dune {
 namespace Pymor {
@@ -50,9 +51,9 @@ public:
            Exception::wrong_parameter_type)
   {
     DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "U (" << U->type() << ") is not a compatible type_source (" << type_source() << ")!");
+                     "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")!");
     LA::VectorInterface* ret = LA::createVector(type_range(), dim_range());
-    apply(U, ret, mu);
+    apply(source, ret, mu);
     return ret;
   }
 
@@ -75,7 +76,7 @@ public:
       msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
     }
     if (throw_up) DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str() << "!");
-    LA::VectorInterface* tmp = apply(source, tmp, mu);
+    LA::VectorInterface* tmp = apply(source, mu);
     return range->dot(tmp);
   }
 
