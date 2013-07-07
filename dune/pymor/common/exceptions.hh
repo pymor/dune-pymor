@@ -135,6 +135,24 @@ class this_is_not_parametric
     , public Dune::PymorException
   {};
 
+/**
+ * \brief Exception for unlogical situations.
+ */
+class this_does_not_make_any_sense
+    : public Dune::RangeError
+    , public Dune::PymorException
+  {};
+
+/**
+ * \brief Exception for calling an object in an unsuitable state, i.e. if an Dune::Pymor::AffinelyDecomposedOperato
+ *        reports hasAffinePart() == false and the user calls affinePart();
+ */
+class requirements_not_met
+    : public Dune::RangeError
+    , public Dune::PymorException
+  {};
+
+
 } // namespace Exceptions
 } // namespace Pymor
 } // namespace Dune
