@@ -4,6 +4,6 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 operatorsincludedir = $(includedir)/dune/pymor/operators
-operatorsinclude_HEADERS = eigen.hh interfaces.hh
+operatorsinclude_HEADERS = affine.hh eigen.hh interfaces.hh
 
 include $(top_srcdir)/am/global-rules
