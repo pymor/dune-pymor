@@ -18,5 +18,5 @@ AC_DEFUN([DUNE_PYMOR_CHECKS])
 # not by dune-pymor itself
 AC_DEFUN([DUNE_PYMOR_CHECK_MODULE],
 [
-  DUNE_CHECK_MODULES([dune-pymor],[pymor/exists.hh])
+  DUNE_CHECK_MODULES([dune-pymor],[pymor/la/container.hh], [Dune::Pymor::LA::availableVectors()])
 ])

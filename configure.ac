@@ -36,6 +36,7 @@ AC_CONFIG_FILES([
   dune/pymor/la/container/Makefile
   dune/pymor/operators/Makefile
   dune/pymor/parameters/Makefile
+  lib/Makefile
   m4/Makefile
   dune-pymor.pc
 ])
