@@ -7,6 +7,7 @@
 #define DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 
 #include <dune/stuff/function/interface.hh>
+#include <dune/stuff/function/expression.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -59,7 +60,44 @@ private:
 }; // class NonparametricWrapper
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols >
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
+class NonparametricExpression
+  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+{
+  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
+  typedef Dune::Stuff::FunctionExpression<  DomainFieldImp, domainDim,
+                                            RangeFieldImp, rangeDimRows, rangeDimCols > ExpressionFunctionType;
+public:
+  typedef typename BaseType::DomainType DomainType;
+  typedef typename BaseType::RangeType  RangeType;
+
+  template< class... Args >
+  NonparametricExpression(Args&& ...args)
+    : BaseType()
+    , expressionFunction_(std::forward< Args >(args)...)
+  {}
+
+  int order() const
+  {
+    return expressionFunction_.order();
+  }
+
+  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
+  {
+    if (mu.type() != Parametric::parameter_type())
+      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
+                       "the type of mu must be trivial (is " << mu.type() << ")!");
+    expressionFunction_.evaluate(x, ret);
+  }
+
+  using BaseType::evaluate;
+
+private:
+  const ExpressionFunctionType expressionFunction_;
+}; // class NonparametricExpression
+
+
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
 class AffineParametricDefault
   : public AffineParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
 {
