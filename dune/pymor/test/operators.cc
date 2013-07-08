@@ -55,6 +55,7 @@ struct LinearOperatorTest
     typedef typename TypePair::second_type  VectorType;
     const size_t dim = 2;
     VectorType* U = new VectorType(dim, 1.0);
+    VectorType* V = new VectorType(dim, 1.0);
     OperatorType* op = createIdentityMatrix(OperatorType(), dim);
     if (!op->linear()) DUNE_PYMOR_THROW(PymorException, "");
     if (op->parametric()) DUNE_PYMOR_THROW(PymorException, "");
@@ -62,7 +63,7 @@ struct LinearOperatorTest
     if (op->dim_range() != dim) DUNE_PYMOR_THROW(PymorException, "");
     if (op->type_source() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
     if (op->type_range() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
-    VectorType* V = op->apply(U);
+    op->apply(U, V);
     if (V->dim() != op->dim_range()) DUNE_PYMOR_THROW(PymorException, "");
     if (!Dune::FloatCmp::eq(V->get(0), 1.0) || !Dune::FloatCmp::eq(V->get(1), 1.0))
       DUNE_PYMOR_THROW(PymorException, "");
