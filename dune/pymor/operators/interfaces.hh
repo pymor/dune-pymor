@@ -42,7 +42,8 @@ public:
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type) = 0;
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met) = 0;
 
   virtual LA::VectorInterface* apply(const LA::VectorInterface* source, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
