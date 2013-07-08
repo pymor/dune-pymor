@@ -3,14 +3,7 @@
 # Copyright Holders: Felix Albrecht, Stephan Rave
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-SUBDIRDS = . common functions la operators parameters
-
-noinst_LTLIBRARIES = libpymor.la
-
-libpymor_la_SOURCES = \
-  la/container.cc \
-  parameters/base.cc
-
-libpymor_la_LIBADD =
+functionsincludedir = $(includedir)/dune/pymor/functions
+functionsinclude_HEADERS = checkerboard.hh default.hh interfaces.hh wrapper.hh
 
 include $(top_srcdir)/am/global-rules
