@@ -437,6 +437,13 @@ public:
     return type_;
   }
 
+protected:
+  ParameterType& parameter_type()
+  {
+    return type_;
+  }
+
+public:
   bool parametric() const
   {
     return parameter_type().size() != 0;
