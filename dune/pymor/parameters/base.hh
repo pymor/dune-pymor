@@ -429,10 +429,6 @@ public:
     : type_()
   {}
 
-//  Parametric(const ParameterType& type)
-//    : type_(type)
-//  {}
-
   template< class... Args >
   Parametric(Args&& ...args)
     : type_(std::forward< Args >(args)...)
@@ -445,13 +441,6 @@ public:
     return type_;
   }
 
-protected:
-  ParameterType& parameter_type()
-  {
-    return type_;
-  }
-
-public:
   bool parametric() const
   {
     return parameter_type().size() != 0;
