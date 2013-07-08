@@ -137,7 +137,7 @@ public:
       linear_ = false;
     if (coeff->parameter_type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "a different parameter types for coeff (" << coeff->parameter_type() << ") and this ("
+                       "different parameter types for coeff (" << coeff->parameter_type() << ") and this ("
                        << Parametric::parameter_type() << ") is not yet supported!");
     components_.push_back(comp);
     coefficients_.push_back(coeff);
