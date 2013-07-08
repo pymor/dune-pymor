@@ -44,19 +44,6 @@ public:
                                                                         Exception::wrong_parameter_type,
                                                                         Exception::requirements_not_met) = 0;
 
-  virtual LA::VectorInterface* apply(const LA::VectorInterface* source, const Parameter mu = Parameter()) const
-    throw (Exception::types_are_not_compatible,
-           Exception::you_have_to_implement_this,
-           Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")!");
-    LA::VectorInterface* ret = LA::createVector(type_range(), dim_range());
-    apply(source, ret, mu);
-    return ret;
-  }
-
   virtual double apply2(const LA::VectorInterface* range,
                         const LA::VectorInterface* source,
                         const Parameter mu = Parameter()) const throw (Exception::types_are_not_compatible,
@@ -83,7 +70,8 @@ public:
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                        "dim of range (" << range->dim() << ") does not match dim_range of this (" << dim_range()
                        << ")!");
-    LA::VectorInterface* tmp = apply(source, mu);
+    LA::VectorInterface* tmp = LA::createVector(type_range(), dim_range());
+    apply(source, tmp, mu);
     return range->dot(tmp);
   }
 
