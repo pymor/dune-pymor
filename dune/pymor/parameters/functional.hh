@@ -68,6 +68,7 @@ public:
     return ret;
   }
 
+private:
   void setup() throw (Exception::sizes_do_not_match)
   {
     // create variables from parameter type
