@@ -38,12 +38,11 @@ public:
 
   virtual void apply(const LA::VectorInterface* /*source*/,
                      LA::VectorInterface* /*range*/,
-                     const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::types_are_not_compatible,
-           Exception::you_have_to_implement_this,
-           Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met) = 0;
+                     const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                        Exception::you_have_to_implement_this,
+                                                                        Exception::sizes_do_not_match,
+                                                                        Exception::wrong_parameter_type,
+                                                                        Exception::requirements_not_met) = 0;
 
   virtual LA::VectorInterface* apply(const LA::VectorInterface* source, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
@@ -60,10 +59,9 @@ public:
 
   virtual double apply2(const LA::VectorInterface* range,
                         const LA::VectorInterface* source,
-                        const Parameter mu = Parameter()) const
-    throw (Exception::types_are_not_compatible,
-           Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
+                        const Parameter mu = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                       Exception::sizes_do_not_match,
+                                                                       Exception::wrong_parameter_type)
   {
     std::stringstream msg;
     size_t throw_up = 0;
@@ -77,12 +75,23 @@ public:
       msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
     }
     if (throw_up) DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str() << "!");
+    if (source->dim() != dim_source())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "dim of source (" << source->dim() << ") does not match dim_source of this (" << dim_source()
+                       << ")!");
+    if (range->dim() != dim_range())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "dim of range (" << range->dim() << ") does not match dim_range of this (" << dim_range()
+                       << ")!");
     LA::VectorInterface* tmp = apply(source, mu);
     return range->dot(tmp);
   }
 
   virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric) = 0;
+    throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this)
+  {
+    DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
+  }
 }; // class OperatorInterface
 
 
