@@ -20,7 +20,7 @@ namespace Functions {
 
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols >
 class ParametricDefault
-  : ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
 {
   typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
 public:
@@ -30,7 +30,7 @@ public:
   typedef typename BaseType::RangeType  RangeType;
 
   ParametricDefault(const NonparametricType* nonparametric)
-    : Parametric()
+    : BaseType()
     , nonparametric_(nonparametric)
   {}
 
@@ -49,8 +49,10 @@ public:
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
                        "the type of mu must be trivial (is " << mu.type() << ")!");
-    nonparametric_->evaluate(r, ret);
+    nonparametric_->evaluate(x, ret);
   }
+
+  using BaseType::evaluate;
 
 private:
   const NonparametricType* nonparametric_;
@@ -109,10 +111,10 @@ public:
     if (size_ == 0) {
       order_ = aff->order();
     } else {
-      if (order < 0 || aff->order() < 0)
+      if (order_ < 0 || aff->order() < 0)
         order_ = -1;
       else
-        order_ = std::max(order, aff->order());
+        order_ = std::max(order_, aff->order());
     }
     affinePart_ = aff;
     hasAffinePart_ = true;
@@ -129,10 +131,10 @@ public:
     if (size_ == 0 && !hasAffinePart_) {
       order_ = comp->order();
     } else {
-      if (order < 0 || comp->order() < 0)
+      if (order_ < 0 || comp->order() < 0)
         order_ = -1;
       else
-        order_ = std::max(order, comp->order());
+        order_ = std::max(order_, comp->order());
     }
     if (coeff->parameter_type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
