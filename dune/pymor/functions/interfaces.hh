@@ -124,6 +124,11 @@ public:
   typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
                                         RangeFieldImp, rangeDimRows, rangeDimCols > ParametricFunctionType;
 
+  template< class... Args >
+  AffineParametricFunctionInterface(Args&& ...args)
+    : ParametricFunctionType(std::forward< Args >(args)...)
+  {}
+
   static const std::string static_id()
   {
     return "affineparametricfunction";
