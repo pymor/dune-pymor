@@ -18,8 +18,8 @@ namespace Pymor {
 namespace Functions {
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols >
-class ParametricDefault
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
+class NonparametricWrapper
   : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
 {
   typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
@@ -29,12 +29,12 @@ public:
   typedef typename BaseType::DomainType DomainType;
   typedef typename BaseType::RangeType  RangeType;
 
-  ParametricDefault(const NonparametricType* nonparametric)
+  NonparametricWrapper(const NonparametricType* nonparametric)
     : BaseType()
     , nonparametric_(nonparametric)
   {}
 
-  ~ParametricDefault()
+  ~NonparametricWrapper()
   {
     delete nonparametric_;
   }
@@ -56,7 +56,7 @@ public:
 
 private:
   const NonparametricType* nonparametric_;
-}; // class ParametricDefault
+}; // class NonparametricWrapper
 
 
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols >
