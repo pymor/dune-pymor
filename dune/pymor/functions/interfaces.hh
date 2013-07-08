@@ -22,14 +22,19 @@ class ParametricFunctionInterface
   : public Parametric
 {
 public:
-  typedef DomainFieldImp                          DomainFieldType;
-  static const unsigned int                       dimDomain = domainDim;
-  typedef Dune::FieldVector< DomainFieldType,  >  DomainType;
+  typedef DomainFieldImp                                  DomainFieldType;
+  static const unsigned int                               dimDomain = domainDim;
+  typedef Dune::FieldVector< DomainFieldType, dimDomain > DomainType;
 
   typedef RangeFieldImp                                                   RangeFieldType;
   static const unsigned int                                               dimRangeRows = rangeDimRows;
   static const unsigned int                                               dimRangeCols = rangeDimCols;
   typedef Dune::FieldMatrix< RangeFieldType, dimRangeRows, dimRangeCols > RangeType;
+
+  template< class... Args >
+  ParametricFunctionInterface(Args&& ...args)
+    : Parametric(std::forward< Args >(args)...)
+  {}
 
   static const std::string static_id()
   {
@@ -66,9 +71,9 @@ class ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, ran
   : public Parametric
 {
 public:
-  typedef DomainFieldImp                          DomainFieldType;
-  static const unsigned int                       dimDomain = domainDim;
-  typedef Dune::FieldVector< DomainFieldType,  >  DomainType;
+  typedef DomainFieldImp                                  DomainFieldType;
+  static const unsigned int                               dimDomain = domainDim;
+  typedef Dune::FieldVector< DomainFieldType, dimDomain > DomainType;
 
   typedef RangeFieldImp                                 RangeFieldType;
   static const unsigned int                             dimRangeRows = rangeDimRows;
