@@ -413,6 +413,14 @@ private:
 Foo* freeze_parameter(const Parameter mu = Parameter()) const
 \endcode
  *            which returns a nonparametric version of the object, if possible.
+ * \attention Any derived class FooInterface which serves as base class should provide a constructor, which forwards
+ *            the creation of the ParameterType to Parametric, i.e. something like
+ *            \code
+template< class... Args >
+FooInterface(Args&& ...args)
+  : Parametric(std::forward< Args >(args)...)
+{}
+\endcode
  */
 class Parametric
 {
