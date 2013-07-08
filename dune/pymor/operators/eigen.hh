@@ -11,6 +11,7 @@
 #include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/la/container/eigen.hh>
+#include <dune/pymor/parameters/base.hh>
 
 #include "interfaces.hh"
 
@@ -174,41 +175,59 @@ public:
     return RangeType::static_type();
   }
 
-  virtual RangeType* apply(const SourceType* U, const Parameter mu = Parameter()) const
-    throw (Exception::types_are_not_compatible,
-           Exception::you_have_to_implement_this,
-           Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
+  virtual void apply(const LA::VectorInterface* source,
+                     LA::VectorInterface* range,
+                     const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                        Exception::you_have_to_implement_this,
+                                                                        Exception::sizes_do_not_match,
+                                                                        Exception::wrong_parameter_type,
+                                                                        Exception::requirements_not_met)
   {
-    if (U->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of U (" << U->dim() << ") does not match dim_source() of this (" << dim_source() << ")!");
-    if (mu.type() != Parameter().type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
-    RangeType* ret = new RangeType(dim_range());
-    ret->backend() = BaseType::backend() * U->backend();
-    return ret;
+    std::stringstream msg;
+    size_t throw_up = 0;
+    if (source->type() != type_source()) {
+      msg << "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")";
+      ++throw_up;
+    }
+    if (range->type() != type_range()) {
+      if (throw_up)
+        msg << " and ";
+      msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
+    }
+    DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
   }
 
-  virtual double apply2(const RangeType* V,
-                        const SourceType* U,
-                        const Parameter mu = Parameter()) const
+  virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met)
+  {
+    if (source->dim() != dim_source())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "dim of source (" << source->dim() << ") does not match dim_source of this ("
+                       << dim_source() << ")!");
+    if (mu.type() != Parametric::parameter_type())
+      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
+                       "since parametric() == false mu has to be empty (is " << mu << ")!");
+    range->backend() = BaseType::backend() * source->backend();
+  }
+
+  virtual double apply2(const SourceType* range, const RangeType* source, const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::sizes_do_not_match,
            Exception::wrong_parameter_type)
   {
-    if (U->dim() != dim_source())
+    if (source->dim() != dim_source())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of U (" << U->dim() << ") does not match dim_source() of this (" << dim_source() << ")!");
-    if (V->dim() != dim_range())
+                       "dim of source (" << source->dim() << ") does not match dim_source of this (" << dim_source()
+                       << ")!");
+    if (range->dim() != dim_range())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of V (" << V->dim() << ") does not match dim_range() of this (" << dim_range() << ")!");
-    if (mu.type() != Parameter().type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
-    return V->backend().transpose() * BaseType::backend() * U->backend();
+                       "dim of range (" << range->dim() << ") does not match dim_range of this (" << dim_range()
+                       << ")!");
+    return range->backend().transpose() * BaseType::backend() * source->backend();
   }
 
   virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
