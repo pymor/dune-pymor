@@ -110,7 +110,10 @@ public:
   typedef typename BaseType::RangeType  RangeType;
 
   AffineParametricDefault(const ParameterType mu = ParameterType())
-    : Parametric(mu)
+    : BaseType(mu)
+    , size_(0)
+    , hasAffinePart_(false)
+    , order_(-1)
   {}
 
   virtual ~AffineParametricDefault()
@@ -136,9 +139,7 @@ public:
   /**
    * \attention This class takes ownership of aff!
    */
-  virtual void register_component(ParametricFunctionType* aff) throw (Exception::this_does_not_make_any_sense,
-                                                                      Exception::sizes_do_not_match,
-                                                                      Exception::types_are_not_compatible)
+  virtual void register_component(const ParametricFunctionType* aff) throw (Exception::this_does_not_make_any_sense)
   {
     if (hasAffinePart_)
       DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
@@ -161,7 +162,8 @@ public:
   /**
    * \attention This class takes ownership of comp and coeff!
    */
-  virtual void register_component(ParametricFunctionType* comp, const ParameterFunctional* coeff)
+  virtual void register_component(const ParametricFunctionType* comp, const ParameterFunctional* coeff)
+    throw (Exception::this_does_not_make_any_sense)
   {
     if (comp->parametric())
       DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
@@ -237,10 +239,36 @@ public:
     return affinePart_;
   }
 
-  virtual evaluate(const DomainType& /*x*/, RangeType& /*ret*/, const Parameter /*mu*/ = Parameter()) const
+  virtual int order() const
   {
-    DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "Felix!");
+    return order_;
   }
+
+  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
+    throw (Exception::wrong_parameter_type, Exception::this_does_not_make_any_sense)
+  {
+    if (mu.type() != Parametric::parameter_type())
+      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
+                       "the type of mu (" << mu.type() << ") does not math the parameter_type of this ("
+                       << Parametric::parameter_type() << ")!");
+    if (!hasAffinePart_ && size_ == 0)
+      DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
+                       "do not call evaluate() if hasAffinePart() == false and size() == 0");
+    RangeType tmpComp(0);
+    double tmpCoeff = 0.0;
+    if (hasAffinePart_)
+      affinePart_->evaluate(x, ret);
+    else
+      ret *= 0.0;
+    for (size_t ii = 0; ii < size_; ++ii) {
+      components_[ii]->evaluate(x, tmpComp);
+      coefficients_[ii]->evaluate(mu, tmpCoeff);
+      tmpComp *= tmpCoeff;
+      ret += tmpComp;
+    }
+  }
+
+  using BaseType::evaluate;
 
 public:
   size_t size_;
@@ -248,7 +276,7 @@ public:
   int order_;
   std::vector< const ParametricFunctionType* > components_;
   std::vector< const ParameterFunctional* > coefficients_;
-  ParameterFunctional* affinePart_;
+  const ParametricFunctionType* affinePart_;
 }; // class AffineParametricDefault
 
 } // namespace Functions
