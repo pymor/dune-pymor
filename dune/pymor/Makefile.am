@@ -8,7 +8,8 @@ SUBDIRDS = . common la operators parameters
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
-  la/container.cc
+  la/container.cc \
+  parameters/base.cc
 
 libpymor_la_LIBADD =
 
