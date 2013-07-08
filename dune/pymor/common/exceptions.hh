@@ -115,7 +115,7 @@ class key_is_not_valid
  * \brief Exception for methods the user has to implement.
  */
 class you_have_to_implement_this
-  : public Dune::RangeError
+  : public Dune::NotImplemented
   , public Dune::PymorException
 {};
 
@@ -131,7 +131,7 @@ class wrong_parameter_type
  * \brief Exception for nonparametric objects that are treated as if they were parametric.
  */
 class this_is_not_parametric
-    : public Dune::RangeError
+    : public Dune::InvalidStateException
     , public Dune::PymorException
   {};
 
@@ -139,7 +139,7 @@ class this_is_not_parametric
  * \brief Exception for unlogical situations.
  */
 class this_does_not_make_any_sense
-    : public Dune::RangeError
+    : public Dune::InvalidStateException
     , public Dune::PymorException
   {};
 
@@ -148,7 +148,7 @@ class this_does_not_make_any_sense
  *        reports hasAffinePart() == false and the user calls affinePart();
  */
 class requirements_not_met
-    : public Dune::RangeError
+    : public Dune::InvalidStateException
     , public Dune::PymorException
   {};
 
