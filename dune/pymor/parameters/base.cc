@@ -9,8 +9,14 @@ namespace Dune {
 namespace Pymor {
 
 
-template< class KeyType, class ValueType >
-std::ostream& operator<<(std::ostream& oo, const KeyValueBase< KeyType, ValueType >& pp)
+std::ostream& operator<<(std::ostream& oo, const ParameterType& pp)
+{
+  oo << pp.report();
+  return oo;
+}
+
+
+std::ostream& operator<<(std::ostream& oo, const Parameter& pp)
 {
   oo << pp.report();
   return oo;

@@ -125,10 +125,6 @@ protected:
 }; // class KeyValueBase
 
 
-template< class KeyType, class ValueType >
-std::ostream& operator<<(std::ostream& oo, const KeyValueBase< KeyType, ValueType >& pp);
-
-
 /**
  * \brief Determines the type of any parameter as a set of components and their length.
  *
@@ -232,6 +228,9 @@ public:
   using BaseType::operator!=;
   using BaseType::size;
 }; // class ParameterType
+
+
+std::ostream& operator<<(std::ostream& oo, const ParameterType& pp);
 
 
 class Parameter
@@ -446,6 +445,9 @@ public:
 private:
   ParameterType type_;
 }; // class Parametric
+
+
+std::ostream& operator<<(std::ostream& oo, const Parameter& pp);
 
 
 } // namespace Pymor
