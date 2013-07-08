@@ -141,13 +141,13 @@ public:
 
   virtual bool hasAffinePart() const = 0;
 
-  ParametricFunctionType* affinePart() const = 0;
+  virtual const ParametricFunctionType* affinePart() const = 0;
 
-  unsigned int size() const = 0;
+  virtual unsigned int size() const = 0;
 
-  ParameterFunctional* coefficient(int ii) const = 0;
+  virtual const ParameterFunctional* coefficient(int ii) const = 0;
 
-  ParametricFunctionType* component(int ii) const = 0;
+  virtual const ParametricFunctionType* component(int ii) const = 0;
 }; // class AffineParametricFunctionInterface
 
 
