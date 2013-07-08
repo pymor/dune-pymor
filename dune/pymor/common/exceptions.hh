@@ -120,7 +120,7 @@ class you_have_to_implement_this
 {};
 
 /**
- * \brief Exception for a wrong Dune::Pymor::ParameterType .
+ * \brief Exception for a wrong Dune::Pymor::ParameterType.
  */
 class wrong_parameter_type
   : public Dune::RangeError
@@ -131,26 +131,34 @@ class wrong_parameter_type
  * \brief Exception for nonparametric objects that are treated as if they were parametric.
  */
 class this_is_not_parametric
-    : public Dune::InvalidStateException
-    , public Dune::PymorException
-  {};
+  : public Dune::InvalidStateException
+  , public Dune::PymorException
+{};
 
 /**
  * \brief Exception for unlogical situations.
  */
 class this_does_not_make_any_sense
-    : public Dune::InvalidStateException
-    , public Dune::PymorException
-  {};
+  : public Dune::InvalidStateException
+  , public Dune::PymorException
+{};
 
 /**
  * \brief Exception for calling an object in an unsuitable state, i.e. if an Dune::Pymor::AffinelyDecomposedOperato
  *        reports hasAffinePart() == false and the user calls affinePart();
  */
 class requirements_not_met
-    : public Dune::InvalidStateException
-    , public Dune::PymorException
-  {};
+  : public Dune::InvalidStateException
+  , public Dune::PymorException
+{};
+
+/**
+ * \brief Exception for wrong input arguments.
+ */
+class wrong_input
+  : public Dune::InvalidStateException
+  , public Dune::PymorException
+{};
 
 
 } // namespace Exceptions
