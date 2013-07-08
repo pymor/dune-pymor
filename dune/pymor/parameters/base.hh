@@ -125,12 +125,8 @@ protected:
 }; // class KeyValueBase
 
 
-//template< class KeyType, class ValueType >
-//std::ostream& operator<<(std::ostream& oo, const KeyValueBase< KeyType, ValueType >& pp)
-//{
-//  oo << pp.report();
-//  return oo;
-//}
+template< class KeyType, class ValueType >
+std::ostream& operator<<(std::ostream& oo, const KeyValueBase< KeyType, ValueType >& pp);
 
 
 /**
