@@ -13,13 +13,14 @@
 
 namespace Dune {
 namespace Pymor {
+namespace Operators {
 
 
-class AffinelyDecomposedOperator
+class AffinelyDecomposed
   : public OperatorInterface
 {
 public:
-  AffinelyDecomposedOperator(const ParameterType& tt = ParameterType())
+  AffinelyDecomposed(const ParameterType& tt = ParameterType())
     : OperatorInterface(tt)
     , linear_(true)
     , size_(0)
@@ -30,7 +31,24 @@ public:
     , type_range_("")
   {}
 
-  ~AffinelyDecomposedOperator()
+  AffinelyDecomposed(OperatorInterface* aff, const ParameterType& tt = ParameterType())
+    throw (Exception::requirements_not_met)
+    : OperatorInterface(tt)
+    , linear_(aff->linear())
+    , size_(0)
+    , hasAffinePart_(true)
+    , dim_source_(aff->dim_source())
+    , dim_range_(aff->dim_range())
+    , type_source_(aff->type_source())
+    , type_range_(aff->type_range())
+    , affinePart_(aff)
+  {
+    if (affinePart_->parametric())
+      DUNE_PYMOR_THROW(Exception::requirements_not_met,
+                       "the affinePart must not be parametric!");
+  }
+
+  virtual ~AffinelyDecomposed()
   {
     if (hasAffinePart_)
       delete affinePart_;
@@ -43,9 +61,9 @@ public:
   /**
    * \attention This class takes ownership of aff!
    */
-  void register_component(const OperatorInterface* aff) throw (Exception::this_does_not_make_any_sense,
-                                                               Exception::sizes_do_not_match,
-                                                               Exception::types_are_not_compatible)
+  virtual void register_component(OperatorInterface* aff) throw (Exception::this_does_not_make_any_sense,
+                                                                 Exception::sizes_do_not_match,
+                                                                 Exception::types_are_not_compatible)
   {
     if (hasAffinePart_)
       DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
@@ -86,7 +104,7 @@ public:
   /**
    * \attention This class takes ownership of comp and coeff!
    */
-  void register_component(const OperatorInterface* comp, const ParameterFunctional* coeff)
+  virtual void register_component(OperatorInterface* comp, const ParameterFunctional* coeff)
   {
     if (comp->parametric())
       DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
@@ -119,14 +137,14 @@ public:
       linear_ = false;
     if (coeff->parameter_type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "a different parameter type for coeff (" << coeff->parameter_type() << ") and this ("
+                       "a different parameter types for coeff (" << coeff->parameter_type() << ") and this ("
                        << Parametric::parameter_type() << ") is not yet supported!");
     components_.push_back(comp);
     coefficients_.push_back(coeff);
     ++size_;
   } // ... register_component(..., ...)
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     return size_;
   }
@@ -134,7 +152,8 @@ public:
   /**
    * \attention The ownership of the component remains with this class!
    */
-  OperatorInterface* component(const int ii) throw (Exception::requirements_not_met, Exception::index_out_of_range)
+  virtual OperatorInterface* component(const int ii) throw (Exception::requirements_not_met,
+                                                            Exception::index_out_of_range)
   {
     if (size() == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -149,8 +168,8 @@ public:
   /**
    * \attention The ownership of the component remains with this class!
    */
-  const OperatorInterface* component(const int ii) const throw (Exception::requirements_not_met,
-                                                                Exception::index_out_of_range)
+  virtual const OperatorInterface* component(const int ii) const throw (Exception::requirements_not_met,
+                                                                        Exception::index_out_of_range)
   {
     if (size() == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -165,8 +184,8 @@ public:
   /**
    * \attention The ownership of the coefficient remains with this class!
    */
-  const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
-                                                                    Exception::index_out_of_range)
+  virtual const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
+                                                                            Exception::index_out_of_range)
   {
     if (size() == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -175,11 +194,11 @@ public:
       DUNE_PYMOR_THROW(Exception::index_out_of_range,
                        "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
                        << size() << "!");
-    return coefficient[ii];
+    return coefficients_[ii];
 
   }
 
-  bool hasAffinePart() const
+  virtual bool hasAffinePart() const
   {
     return hasAffinePart_;
   }
@@ -187,7 +206,7 @@ public:
   /**
    * \attention The ownership of the affinePart remains with this class!
    */
-  OperatorInterface* affinePart() throw(Exception::requirements_not_met)
+  virtual OperatorInterface* affinePart() throw(Exception::requirements_not_met)
   {
     if (!hasAffinePart())
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -198,7 +217,7 @@ public:
   /**
    * \attention The ownership of affinePart() remains in this class!
    */
-  const OperatorInterface* affinePart(const int ii) const
+  virtual const OperatorInterface* affinePart() const throw(Exception::requirements_not_met)
   {
     if (!hasAffinePart())
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -250,15 +269,15 @@ public:
                        << dim_range() << ")!");
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "the type of mu (" << mu.report() << "does not match the parameter_type of this ("
+                       "the type of mu (" << mu.type() << "does not match the parameter_type of this ("
                        << Parametric::parameter_type() << ")!");
     if (size() == 0 && !hasAffinePart_)
-      DUNE_THROW(Exception::requirements_not_met,
+      DUNE_PYMOR_THROW(Exception::requirements_not_met,
                  "do not call apply() if size() == 0 and hasAffinePart() == false!");
     if (hasAffinePart_) {
       affinePart_->apply(source, range);
       if (size_ > 0) {
-        LA::VectorInterface* tmp = LA::createVector(range->type());
+        LA::VectorInterface* tmp = LA::createVector(range->type(), dim_range());
         assert(components_.size() == size_ && "This should not happen!");
         assert(coefficients_.size() == size_ && "This should not happen!");
         for (size_t ii = 0; ii < size_; ++ii) {
@@ -271,9 +290,9 @@ public:
       assert(components_.size() == size_ && "This should not happen!");
       assert(coefficients_.size() == size_ && "This should not happen!");
       components_[0]->apply(source, range);
-      range->scal(coefficients_[0]->evaluate());
+      range->scal(coefficients_[0]->evaluate(mu));
       if (size_ > 1) {
-        LA::VectorInterface* tmp = LA::createVector(range->type());
+        LA::VectorInterface* tmp = LA::createVector(range->type(), dim_range());
         for (size_t ii = 1; ii < size_; ++ii) {
           components_[ii]->apply(source, tmp);
           tmp->scal(coefficients_[ii]->evaluate(mu));
@@ -291,12 +310,13 @@ private:
   unsigned int dim_range_;
   std::string type_source_;
   std::string type_range_;
-  std::vector< const OperatorInterface* > components_;
+  std::vector< OperatorInterface* > components_;
   std::vector< const ParameterFunctional* > coefficients_;
   OperatorInterface* affinePart_;
-}; // class AffinelyDecomposedOperator
+}; // class AffinelyDecomposed
 
 
+} // namespace Operators
 } // namespace Pymor
 } // namespace Dune
 
