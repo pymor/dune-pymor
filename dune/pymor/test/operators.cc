@@ -13,27 +13,45 @@
 
 #include <dune/stuff/test/test_common.hh>
 
-#if HAVE_EIGEN
 #include <dune/common/float_cmp.hh>
 
 #include <dune/pymor/common/exceptions.hh>
-#include <dune/pymor/operators/eigen.hh>
 #include <dune/pymor/operators/default.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
+#include <dune/pymor/operators/dunedynamic.hh>
+#if HAVE_EIGEN
+  #include <dune/pymor/operators/eigen.hh>
+#endif
+
 
 using namespace Dune;
 using namespace Dune::Pymor;
 
-typedef testing::Types< std::pair< Dune::Pymor::Operators::EigenDenseMatrix,
+typedef testing::Types<
+                        std::pair< Dune::Pymor::Operators::DuneDynamic,
+                                   Dune::Pymor::LA::DuneDynamicVector >
+#if HAVE_EIGEN
+                      , std::pair< Dune::Pymor::Operators::EigenDenseMatrix,
                                    Dune::Pymor::LA::EigenDenseVector >
                       , std::pair< Dune::Pymor::Operators::EigenRowMajorSparseMatrix,
                                    Dune::Pymor::LA::EigenDenseVector >
+#endif // HAVE_EIGEN
                       > LinearOperatorTypes;
 
 template< class T >
 T* createIdentityMatrix(const T&);
 
+Dune::Pymor::Operators::DuneDynamic* createIdentityMatrix(const Dune::Pymor::Operators::DuneDynamic&,
+                                                          const size_t dim)
+{
+  Dune::Pymor::Operators::DuneDynamic* ret = new Dune::Pymor::Operators::DuneDynamic(dim, dim);
+  for (size_t ii = 0; ii < dim; ++ii)
+    ret->operator[](ii)[ii] = 1.0;
+  return ret;
+}
+
+#if HAVE_EIGEN
 Dune::Pymor::Operators::EigenDenseMatrix* createIdentityMatrix(const Dune::Pymor::Operators::EigenDenseMatrix&,
                                                                const size_t dim)
 {
@@ -48,6 +66,8 @@ Dune::Pymor::Operators::EigenRowMajorSparseMatrix* createIdentityMatrix(const Du
 {
   return new Dune::Pymor::Operators::EigenRowMajorSparseMatrix(*(Dune::Stuff::LA::createIdentityEigenRowMajorSparseMatrix(dim)));
 }
+#endif // HAVE_EIGEN
+
 
 template< class TypePair >
 struct LinearOperatorTest
@@ -70,7 +90,7 @@ struct LinearOperatorTest
     if (op->type_range() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
     op->apply(U, V);
     if (V->dim() != op->dim_range()) DUNE_PYMOR_THROW(PymorException, "");
-    if (!Dune::FloatCmp::eq(V->get(0), 1.0) || !Dune::FloatCmp::eq(V->get(1), 1.0))
+    if (!Dune::FloatCmp::eq(V->components({0})[0], 1.0) || !Dune::FloatCmp::eq(V->components({1})[0], 1.0))
       DUNE_PYMOR_THROW(PymorException, "");
     const double res = op->apply2(U, V);
     if (!Dune::FloatCmp::eq(res, 2.0)) DUNE_PYMOR_THROW(PymorException, "");
@@ -115,7 +135,7 @@ struct AffineparametricOperatorTest
     if (op.type_range() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
     op.apply(U, V, mu);
     if (V->dim() != op.dim_range()) DUNE_PYMOR_THROW(PymorException, "");
-    if (!Dune::FloatCmp::eq(V->get(0), 3.0) || !Dune::FloatCmp::eq(V->get(1), 3.0))
+    if (!Dune::FloatCmp::eq(V->components({0})[0], 3.0) || !Dune::FloatCmp::eq(V->components({1})[0], 3.0))
       DUNE_PYMOR_THROW(PymorException, "");
     const double res = op.apply2(U, V, mu);
     if (!Dune::FloatCmp::eq(res, 18.0)) DUNE_PYMOR_THROW(PymorException, "");
@@ -144,12 +164,3 @@ int main(int argc, char** argv)
 //    std::cerr << Dune::Stuff::Common::colorStringRed("Unknown exception thrown!") << std::endl;
 //  }
 }
-
-#else // HAVE_EIGEN
-
-int main(int /*argc*/, char** /*argv*/)
-{
-  return 0;
-}
-
-#endif // HAVE_EIGEN
