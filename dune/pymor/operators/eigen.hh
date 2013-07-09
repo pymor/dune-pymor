@@ -7,7 +7,6 @@
 #define DUNE_PYMOR_OPERATORS_EIGEN_HH
 
 #if HAVE_EIGEN
-
 #include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/la/container/eigen.hh>
@@ -239,7 +238,7 @@ public:
     range->backend() = BaseType::backend() * source->backend();
   }
 
-  virtual double apply2(const SourceType* range, const RangeType* source, const Parameter mu = Parameter()) const
+  virtual double apply2(const SourceType* range, const RangeType* source, const Parameter /*mu*/ = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type)
@@ -276,5 +275,4 @@ private:
 } // namespace Dune
 
 #endif // HAVE_EIGEN
-
 #endif // DUNE_PYMOR_OPERATORS_EIGEN_HH
