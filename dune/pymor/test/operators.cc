@@ -14,9 +14,13 @@
 #include <dune/stuff/test/test_common.hh>
 
 #if HAVE_EIGEN
-#include <dune/pymor/operators/eigen.hh>
-#include <dune/pymor/common/exceptions.hh>
 #include <dune/common/float_cmp.hh>
+
+#include <dune/pymor/common/exceptions.hh>
+#include <dune/pymor/operators/eigen.hh>
+#include <dune/pymor/operators/default.hh>
+#include <dune/pymor/parameters/base.hh>
+#include <dune/pymor/parameters/functional.hh>
 
 using namespace Dune;
 using namespace Dune::Pymor;
@@ -59,6 +63,7 @@ struct LinearOperatorTest
     OperatorType* op = createIdentityMatrix(OperatorType(), dim);
     if (!op->linear()) DUNE_PYMOR_THROW(PymorException, "");
     if (op->parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (op->parameter_type() != Parameter().type()) DUNE_PYMOR_THROW(PymorException, "");
     if (op->dim_source() != dim) DUNE_PYMOR_THROW(PymorException, "");
     if (op->dim_range() != dim) DUNE_PYMOR_THROW(PymorException, "");
     if (op->type_source() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
@@ -80,6 +85,51 @@ TYPED_TEST_CASE(LinearOperatorTest, LinearOperatorTypes);
 TYPED_TEST(LinearOperatorTest, OPERATORS) {
   this->check();
 }
+
+
+template< class TypePair >
+struct AffineparametricOperatorTest
+  : public ::testing::Test
+{
+  void check() const
+  {
+    typedef typename TypePair::first_type   OperatorType;
+    typedef typename TypePair::second_type  VectorType;
+    typedef Operators::AffinelyDecomposedDefault< OperatorType > AffineparametricOperatorType;
+    const Parameter mu = {"diffusion", {1.0, 1.0}};
+    AffineparametricOperatorType op(mu.type());
+    const size_t dim = 2;
+    op.register_component(createIdentityMatrix(OperatorType(), dim));
+    op.register_component(createIdentityMatrix(OperatorType(), dim),
+                          new ParameterFunctional(mu.type(), "diffusion[0]"));
+    op.register_component(createIdentityMatrix(OperatorType(), dim),
+                          new ParameterFunctional(mu.type(), "diffusion[1]"));
+    VectorType* U = new VectorType(dim, 1.0);
+    VectorType* V = new VectorType(dim, 1.0);
+    if (!op.linear()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!op.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (op.parameter_type() != mu.type()) DUNE_PYMOR_THROW(PymorException, "");
+    if (op.dim_source() != dim) DUNE_PYMOR_THROW(PymorException, "");
+    if (op.dim_range() != dim) DUNE_PYMOR_THROW(PymorException, "");
+    if (op.type_source() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
+    if (op.type_range() != U->type()) DUNE_PYMOR_THROW(PymorException, "");
+    op.apply(U, V, mu);
+    if (V->dim() != op.dim_range()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!Dune::FloatCmp::eq(V->get(0), 3.0) || !Dune::FloatCmp::eq(V->get(1), 3.0))
+      DUNE_PYMOR_THROW(PymorException, "");
+    const double res = op.apply2(U, V, mu);
+    if (!Dune::FloatCmp::eq(res, 18.0)) DUNE_PYMOR_THROW(PymorException, "");
+    delete V;
+    delete U;
+  }
+}; // struct AffineparametricOperatorTest
+
+
+TYPED_TEST_CASE(AffineparametricOperatorTest, LinearOperatorTypes);
+TYPED_TEST(AffineparametricOperatorTest, OPERATORS) {
+  this->check();
+}
+
 
 int main(int argc, char** argv)
 {
