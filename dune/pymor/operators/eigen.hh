@@ -6,7 +6,7 @@
 #ifndef DUNE_PYMOR_OPERATORS_EIGEN_HH
 #define DUNE_PYMOR_OPERATORS_EIGEN_HH
 
-//#if HAVE_EIGEN
+#if HAVE_EIGEN
 
 #include <dune/stuff/la/container/eigen.hh>
 
@@ -24,9 +24,9 @@ class EigenDenseMatrix
   : public Dune::Stuff::LA::EigenDenseMatrix< double >
   , public Dune::Pymor::OperatorInterface
 {
-  typedef Dune::Stuff::LA::EigenDenseMatrix< double > BaseType;
   typedef Dune::Pymor::OperatorInterface              InterfaceType;
 public:
+  typedef Dune::Stuff::LA::EigenDenseMatrix< double > BaseType;
   typedef EigenDenseMatrix                            ThisType;
   typedef Dune::Pymor::LA::EigenDenseVector           SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector           RangeType;
@@ -275,6 +275,6 @@ private:
 } // namespace Pymor
 } // namespace Dune
 
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN
 
 #endif // DUNE_PYMOR_OPERATORS_EIGEN_HH
