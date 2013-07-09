@@ -59,6 +59,11 @@ public:
     update();
   }
 
+  bool empty() const
+  {
+    return dict_.size() == 0;
+  }
+
   const std::vector< KeyType >& keys() const
   {
     return keys_;
