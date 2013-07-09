@@ -9,7 +9,8 @@ noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
   la/container.cc \
-  parameters/base.cc
+  parameters/base.cc \
+  operators.cc
 
 libpymor_la_LIBADD =
 
