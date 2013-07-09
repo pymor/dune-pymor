@@ -23,6 +23,7 @@
 #if HAVE_EIGEN
   #include <dune/pymor/operators/eigen.hh>
 #endif
+#include <dune/pymor/operators.hh>
 
 
 using namespace Dune;
@@ -39,35 +40,6 @@ typedef testing::Types<
 #endif // HAVE_EIGEN
                       > LinearOperatorTypes;
 
-template< class T >
-T* createIdentityMatrix(const T&);
-
-Dune::Pymor::Operators::DuneDynamic* createIdentityMatrix(const Dune::Pymor::Operators::DuneDynamic&,
-                                                          const size_t dim)
-{
-  Dune::Pymor::Operators::DuneDynamic* ret = new Dune::Pymor::Operators::DuneDynamic(dim, dim);
-  for (size_t ii = 0; ii < dim; ++ii)
-    ret->operator[](ii)[ii] = 1.0;
-  return ret;
-}
-
-#if HAVE_EIGEN
-Dune::Pymor::Operators::EigenDenseMatrix* createIdentityMatrix(const Dune::Pymor::Operators::EigenDenseMatrix&,
-                                                               const size_t dim)
-{
-  Dune::Pymor::Operators::EigenDenseMatrix* ret = new Dune::Pymor::Operators::EigenDenseMatrix(dim, dim);
-  for (size_t ii = 0; ii < dim; ++ii)
-    ret->set(ii, ii, 1.0);
-  return ret;
-}
-
-Dune::Pymor::Operators::EigenRowMajorSparseMatrix* createIdentityMatrix(const Dune::Pymor::Operators::EigenRowMajorSparseMatrix&,
-                                                                        const size_t dim)
-{
-  return new Dune::Pymor::Operators::EigenRowMajorSparseMatrix(*(Dune::Stuff::LA::createIdentityEigenRowMajorSparseMatrix(dim)));
-}
-#endif // HAVE_EIGEN
-
 
 template< class TypePair >
 struct LinearOperatorTest
@@ -80,7 +52,7 @@ struct LinearOperatorTest
     const size_t dim = 2;
     VectorType* U = new VectorType(dim, 1.0);
     VectorType* V = new VectorType(dim, 1.0);
-    OperatorType* op = createIdentityMatrix(OperatorType(), dim);
+    OperatorType* op = createLinearOperator(OperatorType(), dim);
     if (!op->linear()) DUNE_PYMOR_THROW(PymorException, "");
     if (op->parametric()) DUNE_PYMOR_THROW(PymorException, "");
     if (op->parameter_type() != Parameter().type()) DUNE_PYMOR_THROW(PymorException, "");
@@ -119,10 +91,10 @@ struct AffineparametricOperatorTest
     const Parameter mu = {"diffusion", {1.0, 1.0}};
     AffineparametricOperatorType op(mu.type());
     const size_t dim = 2;
-    op.register_component(createIdentityMatrix(OperatorType(), dim));
-    op.register_component(createIdentityMatrix(OperatorType(), dim),
+    op.register_component(createLinearOperator(OperatorType(), dim));
+    op.register_component(createLinearOperator(OperatorType(), dim),
                           new ParameterFunctional(mu.type(), "diffusion[0]"));
-    op.register_component(createIdentityMatrix(OperatorType(), dim),
+    op.register_component(createLinearOperator(OperatorType(), dim),
                           new ParameterFunctional(mu.type(), "diffusion[1]"));
     VectorType* U = new VectorType(dim, 1.0);
     VectorType* V = new VectorType(dim, 1.0);
