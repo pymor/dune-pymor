@@ -8,6 +8,7 @@
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
+#include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/la/container.hh>
 
@@ -81,6 +82,40 @@ public:
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
   }
 }; // class OperatorInterface
+
+
+class AffinelyDecomposedOperatorInterface
+  : public OperatorInterface
+{
+public:
+  template< class... Args >
+  AffinelyDecomposedOperatorInterface(Args&& ...args)
+    : OperatorInterface(std::forward< Args >(args)...)
+  {}
+
+  virtual ~AffinelyDecomposedOperatorInterface() {}
+
+  virtual unsigned int size() const = 0;
+
+  /**
+   * \attention The ownership of the component remains within the class!
+   */
+  virtual const OperatorInterface* component(const int ii) const throw (Exception::requirements_not_met,
+                                                                        Exception::index_out_of_range) = 0;
+
+  /**
+   * \attention The ownership of the coefficient remains within the class!
+   */
+  virtual const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
+                                                                            Exception::index_out_of_range) = 0;
+
+  virtual bool hasAffinePart() const = 0;
+
+  /**
+   * \attention The ownership of the affinePart remains within the class!
+   */
+  virtual const OperatorInterface* affinePart() const throw(Exception::requirements_not_met) = 0;
+}; // class AffinelyDecomposedOperatorInterface
 
 
 } // namespace Pymor
