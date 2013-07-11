@@ -11,7 +11,17 @@ dnl -*- autoconf -*-
 # Additional checks needed to build dune-pymor
 # This macro should be invoked by every module which depends on dune-pymor, as
 # well as by dune-pymor itself
-AC_DEFUN([DUNE_PYMOR_CHECKS])
+AC_DEFUN([DUNE_PYMOR_CHECKS],[
+  PKG_CHECK_MODULES([EIGEN],
+                    [eigen3],
+                    [AC_DEFINE([HAVE_EIGEN],
+                               [1],
+                               [Define wether the eigen includes were found.])],
+                               [AC_MSG_RESULT([Package 'eigen3' was not found in the pkg-config search path.
+Perhaps you should add the directory containing `eigen3.pc'
+to the PKG_CONFIG_PATH environment variable.])])
+  DUNE_CPPFLAGS="$DUNE_CPPFLAGS $EIGEN_CFLAGS"
+])
 
 # Additional checks needed to find dune-pymor
 # This macro should be invoked by every module which depends on dune-pymor, but
