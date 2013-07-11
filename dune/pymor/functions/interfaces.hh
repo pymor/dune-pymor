@@ -51,7 +51,7 @@ public:
     return -1;
   }
 
-  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const = 0;
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const = 0;
 
   virtual RangeType evaluate(const DomainType& x, const Parameter mu = Parameter()) const
   {
@@ -101,7 +101,7 @@ public:
     return -1;
   }
 
-  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const = 0;
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const = 0;
 
   virtual RangeType evaluate(const DomainType& x, const Parameter mu = Parameter()) const
   {

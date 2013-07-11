@@ -45,7 +45,7 @@ public:
     return nonparametric_->order();
   }
 
-  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
   {
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
@@ -82,7 +82,7 @@ public:
     return expressionFunction_.order();
   }
 
-  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
   {
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
@@ -244,7 +244,7 @@ public:
     return order_;
   }
 
-  virtual evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
+  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
     throw (Exception::wrong_parameter_type, Exception::this_does_not_make_any_sense)
   {
     if (mu.type() != Parametric::parameter_type())
