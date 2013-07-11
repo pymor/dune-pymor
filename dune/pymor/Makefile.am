@@ -14,4 +14,6 @@ libpymor_la_SOURCES = \
 
 libpymor_la_LIBADD =
 
+libpymor_la_CPPFLAGS = ${DUNE_CPPFLAGS}
+
 include $(top_srcdir)/am/global-rules
