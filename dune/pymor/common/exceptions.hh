@@ -160,6 +160,14 @@ class wrong_input
   , public Dune::PymorException
 {};
 
+/**
+ * \brief Exception for operators/matrices which are not invertible.
+ */
+class not_invertible
+    : public Dune::InvalidStateException
+    , public Dune::PymorException
+  {};
+
 
 } // namespace Exceptions
 } // namespace Pymor
