@@ -112,11 +112,38 @@ public:
 //                             const Options* options = ) const = 0;
 
   virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this)
+    throw (Exception::this_is_not_parametric,
+           Exception::you_have_to_implement_this,
+           Exception::this_does_not_make_any_sense)
   {
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
   }
 }; // class OperatorInterface
+
+
+class LinearOperatorInterface
+  : public OperatorInterface
+{
+public:
+  template< class... Args >
+  LinearOperatorInterface(Args&& ...args)
+    : OperatorInterface(std::forward< Args >(args)...)
+  {}
+
+  virtual ~LinearOperatorInterface() {}
+
+  virtual bool linear() const
+  {
+    return true;
+  }
+
+  virtual LinearOperatorInterface* copy() const = 0;
+
+  virtual void scal(const double alpha) = 0;
+
+  virtual void axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible) = 0;
+}; // class LinearOperatorInterface
 
 
 class AffinelyDecomposedOperatorInterface

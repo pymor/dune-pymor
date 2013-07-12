@@ -96,11 +96,10 @@ private:
 
 class DuneDynamic
   : public Dune::DynamicMatrix< double >
-  , public OperatorInterface
+  , public LinearOperatorInterface
 {
 public:
   typedef Dune::DynamicMatrix< double >       BaseType;
-  typedef DuneDynamic                         ThisType;
   typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
   typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
 
@@ -175,8 +174,18 @@ public:
            Exception::requirements_not_met,
            Exception::linear_solver_failed);
 
-  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+  virtual DuneDynamic* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric);
+
+  virtual DuneDynamic* copy() const;
+
+  virtual void scal(const double alpha);
+
+  virtual void axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
+
+  virtual void axpy(const double alpha, const DuneDynamic* x) throw (Exception::sizes_do_not_match,
+                                                                     Exception::types_are_not_compatible);
 
 private:
   static int assert_is_positive(const int ii) throw (Exception::index_out_of_range);

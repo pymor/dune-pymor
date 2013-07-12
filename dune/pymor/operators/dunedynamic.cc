@@ -160,17 +160,17 @@ DuneDynamicInverse* DuneDynamicInverse::freeze_parameter(const Parameter /*mu*/)
 
 DuneDynamic::DuneDynamic()
   : BaseType()
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 DuneDynamic::DuneDynamic(const BaseType& other)
   : BaseType(other)
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 DuneDynamic::DuneDynamic(const int rr, const int cc) throw (Exception::index_out_of_range)
   : BaseType(DuneDynamic::assert_is_positive(rr), DuneDynamic::assert_is_positive(cc))
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 bool DuneDynamic::linear() const
@@ -324,12 +324,42 @@ void DuneDynamic::apply_inverse(const RangeType* range,
   delete inverseOp;
 }
 
-
 DuneDynamic* DuneDynamic::freeze_parameter(const Parameter /*mu*/) const
   throw (Exception::this_is_not_parametric)
 {
   DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
   return nullptr;
+}
+
+DuneDynamic* DuneDynamic::copy() const
+{
+  return new DuneDynamic(*this);
+}
+
+void DuneDynamic::scal(const double alpha)
+{
+  BaseType::operator*=(alpha);
+}
+
+void DuneDynamic::axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+  throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
+{
+  DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
+                   "not implemented for arbitrary x!");
+}
+
+void DuneDynamic::axpy(const double alpha, const DuneDynamic* x) throw (Exception::sizes_do_not_match,
+                                                                        Exception::types_are_not_compatible)
+{
+  if (x->dim_range() != dim_range())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_range of x (" << x->dim_range() << ") does not match the dim_range of this ("
+                     << dim_range() << ")!");
+  if (x->dim_source() != dim_source())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_source of x (" << x->dim_source() << ") does not match the dim_source of this ("
+                     << dim_source() << ")!");
+  BaseType::axpy(alpha, *x);
 }
 
 int DuneDynamic::assert_is_positive(const int ii) throw (Exception::index_out_of_range)

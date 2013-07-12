@@ -6,6 +6,8 @@
 #ifndef DUNE_PYMOR_OPERATORS_DEFAULT_HH
 #define DUNE_PYMOR_OPERATORS_DEFAULT_HH
 
+#include <dune/common/typetraits.hh>
+
 #include <dune/pymor/parameters/functional.hh>
 #include "interfaces.hh"
 
@@ -14,29 +16,30 @@ namespace Pymor {
 namespace Operators {
 
 
-template< class OperatorType >
-class AffinelyDecomposedDefault
+template< class LinearOperatorType >
+class LinearAffinelyDecomposedDefault
   : public AffinelyDecomposedOperatorInterface
 {
 public:
-  typedef typename OperatorType::SourceType SourceType;
-  typedef typename OperatorType::RangeType  RangeType;
+  typedef typename LinearOperatorType::SourceType SourceType;
+  typedef typename LinearOperatorType::RangeType  RangeType;
 
-  AffinelyDecomposedDefault(const ParameterType& tt = ParameterType())
+  LinearAffinelyDecomposedDefault(const ParameterType& tt = ParameterType())
     : AffinelyDecomposedOperatorInterface(tt)
-    , linear_(true)
     , size_(0)
     , hasAffinePart_(false)
     , dim_source_(0)
     , dim_range_(0)
     , type_source_("")
     , type_range_("")
-  {}
+  {
+    static_assert(Dune::IsBaseOf< LinearOperatorInterface, LinearOperatorType >::value,
+                  "given LinearOperatorType is not derived from LinearOperatorInterface!");
+  }
 
-  AffinelyDecomposedDefault(OperatorType* aff, const ParameterType& tt = ParameterType())
+  LinearAffinelyDecomposedDefault(LinearOperatorType* aff, const ParameterType& tt = ParameterType())
     throw (Exception::requirements_not_met)
     : AffinelyDecomposedOperatorInterface(tt)
-    , linear_(aff->linear())
     , size_(0)
     , hasAffinePart_(true)
     , dim_source_(aff->dim_source())
@@ -45,12 +48,14 @@ public:
     , type_range_(aff->type_range())
     , affinePart_(aff)
   {
+    static_assert(Dune::IsBaseOf< LinearOperatorInterface, LinearOperatorType >::value,
+                  "given LinearOperatorType is not derived from LinearOperatorInterface!");
     if (affinePart_->parametric())
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
                        "the affinePart must not be parametric!");
   }
 
-  virtual ~AffinelyDecomposedDefault()
+  virtual ~LinearAffinelyDecomposedDefault()
   {
     if (hasAffinePart_)
       delete affinePart_;
@@ -63,7 +68,7 @@ public:
   /**
    * \attention This class takes ownership of aff!
    */
-  void register_component(OperatorType* aff) throw (Exception::this_does_not_make_any_sense,
+  void register_component(LinearOperatorType* aff) throw (Exception::this_does_not_make_any_sense,
                                                     Exception::sizes_do_not_match,
                                                     Exception::types_are_not_compatible)
   {
@@ -78,7 +83,6 @@ public:
       dim_range_ = aff->dim_range();
       type_source_ = aff->type_source();
       type_range_ = aff->type_range();
-      linear_ = aff->linear();
     } else {
       if (aff->dim_source() != dim_source_)
         DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -96,8 +100,6 @@ public:
         DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                          "the type_range of aff (" << aff->type_range() << ") does not match the type_range of this ("
                          << type_range_ << ")!");
-      if (!aff->linear() != linear_)
-        linear_ = false;
     }
     affinePart_ = aff;
     hasAffinePart_ = true;
@@ -106,7 +108,7 @@ public:
   /**
    * \attention This class takes ownership of comp and coeff!
    */
-  void register_component(OperatorType* comp, const ParameterFunctional* coeff)
+  void register_component(LinearOperatorType* comp, const ParameterFunctional* coeff)
     throw (Exception::this_does_not_make_any_sense,
            Exception::sizes_do_not_match,
            Exception::types_are_not_compatible,
@@ -120,7 +122,6 @@ public:
       dim_range_ = comp->dim_range();
       type_source_ = comp->type_source();
       type_range_ = comp->type_range();
-      linear_ = comp->linear();
     } else {
     if (comp->dim_source() != dim_source_)
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -139,8 +140,6 @@ public:
                        "the type_range of comp (" << comp->type_range() << ") does not match the type_range of this ("
                        << type_range_ << ")!");
     }
-    if (!comp->linear())
-      linear_ = false;
     if (coeff->parameter_type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
                        "different parameter types for coeff (" << coeff->parameter_type() << ") and this ("
@@ -155,7 +154,7 @@ public:
     return size_;
   }
 
-  virtual OperatorType* component(const int ii) throw (Exception::requirements_not_met,
+  virtual LinearOperatorType* component(const int ii) throw (Exception::requirements_not_met,
                                                        Exception::index_out_of_range)
   {
     if (size() == 0)
@@ -168,7 +167,7 @@ public:
     return components_[ii];
   }
 
-  virtual const OperatorType* component(const int ii) const throw (Exception::requirements_not_met,
+  virtual const LinearOperatorType* component(const int ii) const throw (Exception::requirements_not_met,
                                                                    Exception::index_out_of_range)
   {
     if (size() == 0)
@@ -200,7 +199,7 @@ public:
     return hasAffinePart_;
   }
 
-  virtual OperatorType* affinePart() throw(Exception::requirements_not_met)
+  virtual LinearOperatorType* affinePart() throw(Exception::requirements_not_met)
   {
     if (!hasAffinePart())
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -208,7 +207,7 @@ public:
     return affinePart_;
   }
 
-  virtual const OperatorType* affinePart() const throw(Exception::requirements_not_met)
+  virtual const LinearOperatorType* affinePart() const throw(Exception::requirements_not_met)
   {
     if (!hasAffinePart())
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -218,7 +217,7 @@ public:
 
   virtual bool linear() const
   {
-    return linear_;
+    return true;
   }
 
   virtual unsigned int dim_source() const
@@ -342,18 +341,69 @@ public:
     return range->dot(tmp);
   }
 
+  virtual const OperatorInterface* invert(const std::string /*type*/ = "",
+                                          const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::not_invertible, Exception::key_is_not_valid)
+  {
+    assert(false);
+    return nullptr;
+  }
+
+  virtual void apply_inverse(const LA::VectorInterface* /*range*/,
+                             LA::VectorInterface* /*source*/,
+                             const std::string /*type*/ = "",
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed)
+  {
+    assert(false);
+  }
+
+  LinearOperatorType* freeze_parameter(const Parameter mu = Parameter()) const
+    throw (Exception::this_is_not_parametric,
+           Exception::you_have_to_implement_this,
+           Exception::this_does_not_make_any_sense)
+  {
+    if (mu.type() != parameter_type())
+      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
+                       "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
+                       << parameter_type() << ")!");
+    if (size() == 0 && !hasAffinePart_)
+      DUNE_PYMOR_THROW(Exception::requirements_not_met,
+                 "do not call freeze_parameter() if size() == 0 and hasAffinePart() == false!");
+    if (components_.size() != size_) DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "");
+    if (coefficients_.size() != size_) DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "");
+    if (hasAffinePart_) {
+      LinearOperatorType* ret = affinePart_->copy();
+      if (size_ > 0)
+        for (size_t ii = 0; ii < size_; ++ii)
+          ret->axpy(coefficients_[ii]->evaluate(mu), components_[ii]);
+      return ret;
+    } else {
+      LinearOperatorType* ret = components_[0]->copy();
+      ret->scal(coefficients_[0]->evaluate(mu));
+      if (size_ > 1)
+        for (size_t ii = 1; ii < size_; ++ii)
+          ret->axpy(coefficients_[ii]->evaluate(mu), components_[ii]);
+      return ret;
+    }
+  }
+
 private:
-  bool linear_;
   unsigned int size_;
   bool hasAffinePart_;
   unsigned int dim_source_;
   unsigned int dim_range_;
   std::string type_source_;
   std::string type_range_;
-  std::vector< OperatorType* > components_;
+  std::vector< LinearOperatorType* > components_;
   std::vector< const ParameterFunctional* > coefficients_;
-  OperatorType* affinePart_;
-}; // class AffinelyDecomposedDefault
+  LinearOperatorType* affinePart_;
+}; // class LinearAffinelyDecomposedDefault
 
 
 } // namespace Operators

@@ -8,7 +8,6 @@
 
 //#if HAVE_EIGEN
 #include <dune/stuff/la/container/eigen.hh>
-#include <dune/stuff/la/solver.hh>
 
 #include <dune/pymor/la/container/eigen.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -99,11 +98,10 @@ private:
 
 class EigenDenseMatrix
   : public Dune::Stuff::LA::EigenDenseMatrix< double >
-  , public OperatorInterface
+  , public LinearOperatorInterface
 {
 public:
   typedef Dune::Stuff::LA::EigenDenseMatrix< double > BaseType;
-  typedef EigenDenseMatrix                            ThisType;
   typedef Dune::Pymor::LA::EigenDenseVector           SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector           RangeType;
 
@@ -112,8 +110,6 @@ public:
   EigenDenseMatrix(const BaseType& other);
 
   EigenDenseMatrix(const int rr, const int cc);
-
-  virtual bool linear() const;
 
   virtual unsigned int dim_source() const;
 
@@ -178,8 +174,18 @@ public:
            Exception::requirements_not_met,
            Exception::linear_solver_failed);
 
-  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+  virtual EigenDenseMatrix* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric);
+
+  virtual EigenDenseMatrix* copy() const;
+
+  virtual void scal(const double alpha);
+
+  virtual void axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
+
+  virtual void axpy(const double alpha, const EigenDenseMatrix* x)
+    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
 
 private:
   static int assert_is_positive(const int ii);
@@ -195,8 +201,8 @@ class EigenRowMajorSparseMatrixInverse
   : public OperatorInterface
 {
 public:
-  typedef Dune::Pymor::LA::EigenDenseVector                     SourceType;
-  typedef Dune::Pymor::LA::EigenDenseVector                     RangeType;
+  typedef Dune::Pymor::LA::EigenDenseVector SourceType;
+  typedef Dune::Pymor::LA::EigenDenseVector RangeType;
 
   EigenRowMajorSparseMatrixInverse(const EigenRowMajorSparseMatrix* op, const std::string type);
 
@@ -266,11 +272,10 @@ private:
 
 class EigenRowMajorSparseMatrix
   : public Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
-  , public OperatorInterface
+  , public LinearOperatorInterface
 {
   typedef Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >  BaseType;
 public:
-  typedef EigenRowMajorSparseMatrix                             ThisType;
   typedef Dune::Pymor::LA::EigenDenseVector                     SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector                     RangeType;
 
@@ -343,8 +348,18 @@ public:
            Exception::requirements_not_met,
            Exception::linear_solver_failed);
 
-  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+  virtual EigenRowMajorSparseMatrix* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric);
+
+  virtual EigenRowMajorSparseMatrix* copy() const;
+
+  virtual void scal(const double alpha);
+
+  virtual void axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
+
+  virtual void axpy(const double alpha, const EigenRowMajorSparseMatrix* x)
+    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
 
 private:
   static int assert_is_positive(const int ii);

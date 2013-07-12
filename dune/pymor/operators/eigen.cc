@@ -205,23 +205,18 @@ EigenDenseMatrixInverse* EigenDenseMatrixInverse::freeze_parameter(const Paramet
 // ============================
 EigenDenseMatrix::EigenDenseMatrix()
   : BaseType()
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 EigenDenseMatrix::EigenDenseMatrix(const BaseType& other)
   : BaseType(other)
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 EigenDenseMatrix::EigenDenseMatrix(const int rr, const int cc)
   : BaseType(assert_is_positive(rr), assert_is_positive(cc))
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
-
-bool EigenDenseMatrix::linear() const
-{
-  return true;
-}
 
 unsigned int EigenDenseMatrix::dim_source() const
 {
@@ -389,6 +384,37 @@ EigenDenseMatrix* EigenDenseMatrix::freeze_parameter(const Parameter /*mu*/) con
 {
   DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
   return nullptr;
+}
+
+EigenDenseMatrix* EigenDenseMatrix::copy() const
+{
+  return new EigenDenseMatrix(*this);
+}
+
+void EigenDenseMatrix::scal(const double alpha)
+{
+  backend() *= alpha;
+}
+
+void EigenDenseMatrix::axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+  throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible)
+{
+  DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
+                   "not implemented for arbitrary x!");
+}
+
+void EigenDenseMatrix::axpy(const double alpha, const EigenDenseMatrix* x) throw (Exception::sizes_do_not_match,
+                                                                                  Exception::types_are_not_compatible)
+{
+  if (x->dim_range() != dim_range())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_range of x (" << x->dim_range() << ") does not match the dim_range of this ("
+                     << dim_range() << ")!");
+  if (x->dim_source() != dim_source())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_source of x (" << x->dim_source() << ") does not match the dim_source of this ("
+                     << dim_source() << ")!");
+  backend() += alpha * x->backend();
 }
 
 int EigenDenseMatrix::assert_is_positive(const int ii)
@@ -630,19 +656,19 @@ EigenRowMajorSparseMatrixInverse* EigenRowMajorSparseMatrixInverse::freeze_param
 // =====================================
 EigenRowMajorSparseMatrix::EigenRowMajorSparseMatrix()
   : BaseType()
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 EigenRowMajorSparseMatrix::EigenRowMajorSparseMatrix(const BaseType& other)
   : BaseType(other)
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 EigenRowMajorSparseMatrix::EigenRowMajorSparseMatrix(const int rr,
                                                      const int cc,
                                                      const Dune::Stuff::LA::SparsityPatternDefault& pattern)
   : BaseType(assert_is_positive(rr), assert_is_positive(cc), pattern)
-  , OperatorInterface()
+  , LinearOperatorInterface()
 {}
 
 bool EigenRowMajorSparseMatrix::linear() const
@@ -810,6 +836,37 @@ EigenRowMajorSparseMatrix* EigenRowMajorSparseMatrix::freeze_parameter(const Par
 {
   DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
   return nullptr;
+}
+
+EigenRowMajorSparseMatrix* EigenRowMajorSparseMatrix::copy() const
+{
+  return new EigenRowMajorSparseMatrix(*this);
+}
+
+void EigenRowMajorSparseMatrix::scal(const double alpha)
+{
+  backend() *= alpha;
+}
+
+void EigenRowMajorSparseMatrix::axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+  throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible)
+{
+  DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
+                   "not implemented for arbitrary x!");
+}
+
+void EigenRowMajorSparseMatrix::axpy(const double alpha, const EigenRowMajorSparseMatrix* x)
+  throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible)
+{
+  if (x->dim_range() != dim_range())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_range of x (" << x->dim_range() << ") does not match the dim_range of this ("
+                     << dim_range() << ")!");
+  if (x->dim_source() != dim_source())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_source of x (" << x->dim_source() << ") does not match the dim_source of this ("
+                     << dim_source() << ")!");
+  backend() += alpha * x->backend();
 }
 
 int EigenRowMajorSparseMatrix::assert_is_positive(const int ii)
