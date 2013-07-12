@@ -13,14 +13,14 @@
 /**
  *  \brief Macro to throw an exception in dune-pymor.
  *
- *  \code
+\code
 #include <dune/pymor/common/exceptions.hh>
 \endcode
  *  \param  E Exception class, derived from Dune::PymorException.
  *  \param  m Message in ostream notation.
  *
  *  Example:
- *  \code
+\code
 if (a.size() != b.size)
   DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                    "size of a (" << a.size() << ") does not match the size of b (" << b.size() << ")!");
@@ -50,7 +50,7 @@ namespace Dune {
  * \brief Common base for all exceptions in dune-pymor.
  *
  *        All dune-pymor exceptions are derived from this class:
- * \code
+\code
 class foo_is_not_bar : public Dune::PymorException {};
 \endcode
  *
@@ -67,6 +67,7 @@ public:
     Dune::Exception::message(msg);
   }
 
+  //! needed for the python bindings
   const char* pymorWhat() const
   {
     return Dune::Exception::what().c_str();
