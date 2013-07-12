@@ -6,8 +6,9 @@
 #ifndef DUNE_PYMOR_OPERATORS_EIGEN_HH
 #define DUNE_PYMOR_OPERATORS_EIGEN_HH
 
-#if HAVE_EIGEN
+//#if HAVE_EIGEN
 #include <dune/stuff/la/container/eigen.hh>
+#include <dune/stuff/la/solver.hh>
 
 #include <dune/pymor/la/container/eigen.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -19,56 +20,28 @@ namespace Pymor {
 namespace Operators {
 
 
-class EigenDenseMatrix
-  : public Dune::Stuff::LA::EigenDenseMatrix< double >
-  , public Dune::Pymor::OperatorInterface
+// forward, needed for EigenDenseMatrixInverse
+class EigenDenseMatrix;
+
+
+class EigenDenseMatrixInverse
+  : public OperatorInterface
 {
-  typedef Dune::Pymor::OperatorInterface              InterfaceType;
 public:
-  typedef Dune::Stuff::LA::EigenDenseMatrix< double > BaseType;
-  typedef EigenDenseMatrix                            ThisType;
   typedef Dune::Pymor::LA::EigenDenseVector           SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector           RangeType;
 
-  EigenDenseMatrix()
-    : BaseType()
-    , InterfaceType()
-  {}
+  EigenDenseMatrixInverse(const EigenDenseMatrix* op, const std::string type) throw (Exception::key_is_not_valid);
 
-  EigenDenseMatrix(const BaseType& other)
-    : BaseType(other)
-    , InterfaceType()
-  {}
+  virtual bool linear() const;
 
-  EigenDenseMatrix(const int rr, const int cc)
-    : BaseType(assert_is_positive(rr), assert_is_positive(cc))
-    , InterfaceType()
-  {}
+  virtual unsigned int dim_source() const;
 
-  virtual bool linear() const
-  {
-    return true;
-  }
+  virtual unsigned int dim_range() const;
 
-  virtual unsigned int dim_source() const
-  {
-    return BaseType::cols();
-  }
+  virtual std::string type_source() const;
 
-  virtual unsigned int dim_range() const
-  {
-    return BaseType::rows();
-  }
-
-  virtual std::string type_source() const
-  {
-    return SourceType::static_type();
-  }
-
-  virtual std::string type_range() const
-  {
-    return RangeType::static_type();
-  }
+  virtual std::string type_range() const;
 
   virtual void apply(const LA::VectorInterface* source,
                      LA::VectorInterface* range,
@@ -76,41 +49,96 @@ public:
                                                                         Exception::you_have_to_implement_this,
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
-                                                                        Exception::requirements_not_met)
-  {
-    std::stringstream msg;
-    size_t throw_up = 0;
-    if (source->type() != type_source()) {
-      msg << "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")";
-      ++throw_up;
-    }
-    if (range->type() != type_range()) {
-      if (throw_up)
-        msg << " and ";
-      msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
-    }
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
-  }
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed);
 
   virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
-  {
-    if (source->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of source (" << source->dim() << ") does not match dim_source of this (" << dim_source()
-                       << ")!");
-    if (range->dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of range (" << range->dim() << ") does not match dim_range of this (" << dim_range()
-                       << ")!");
-    if (mu.type() != Parameter().type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
-    range->backend() = BaseType::backend() * source->backend();
-  }
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  static std::vector< std::string > invert_options() throw(Exception::not_invertible);
+
+  virtual const OperatorInterface* invert(const std::string type = invert_options()[0],
+                                          const Parameter mu = Parameter()) const
+    throw(Exception::not_invertible, Exception::key_is_not_valid);
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string /*type*/ = invert_options()[0],
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual void apply_inverse(const RangeType* range,
+                             SourceType* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual EigenDenseMatrixInverse* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::this_is_not_parametric);
+
+private:
+  const EigenDenseMatrix* op_;
+  const std::string type_;
+}; // class EigenDenseMatrixInverse
+
+
+class EigenDenseMatrix
+  : public Dune::Stuff::LA::EigenDenseMatrix< double >
+  , public OperatorInterface
+{
+public:
+  typedef Dune::Stuff::LA::EigenDenseMatrix< double > BaseType;
+  typedef EigenDenseMatrix                            ThisType;
+  typedef Dune::Pymor::LA::EigenDenseVector           SourceType;
+  typedef Dune::Pymor::LA::EigenDenseVector           RangeType;
+
+  EigenDenseMatrix();
+
+  EigenDenseMatrix(const BaseType& other);
+
+  EigenDenseMatrix(const int rr, const int cc);
+
+  virtual bool linear() const;
+
+  virtual unsigned int dim_source() const;
+
+  virtual unsigned int dim_range() const;
+
+  virtual std::string type_source() const;
+
+  virtual std::string type_range() const;
+
+  virtual void apply(const LA::VectorInterface* source,
+                     LA::VectorInterface* range,
+                     const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                        Exception::you_have_to_implement_this,
+                                                                        Exception::sizes_do_not_match,
+                                                                        Exception::wrong_parameter_type,
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed);
+
+  virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
 
   virtual double apply2(const RangeType* range,
                         const SourceType* source,
@@ -118,86 +146,69 @@ public:
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
-  {
-    if (source->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of U (" << source->dim() << ") does not match dim_source() of this (" << dim_source() << ")!");
-    if (range->dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of V (" << range->dim() << ") does not match dim_range() of this (" << dim_range() << ")!");
-    if (mu.type() != Parameter().type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
-    return range->backend().transpose() * BaseType::backend() * source->backend();
-  }
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  static std::vector< std::string > invert_options() throw(Exception::not_invertible);
+
+  virtual const EigenDenseMatrixInverse* invert(const std::string type = invert_options()[0],
+                                                const Parameter mu = Parameter()) const
+    throw(Exception::not_invertible, Exception::key_is_not_valid);
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string /*type*/ = invert_options()[0],
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual void apply_inverse(const RangeType* range,
+                             SourceType* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
 
   virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric)
-  {
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
-    return nullptr;
-  }
+    throw (Exception::this_is_not_parametric);
 
 private:
-  static int assert_is_positive(const int ii)
-  {
-    if (ii <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
-    return ii;
-  }
+  static int assert_is_positive(const int ii);
 }; // class EigenDenseMatrix
 
 
-class EigenRowMajorSparseMatrix
-  : public Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
-  , public Dune::Pymor::OperatorInterface
+
+// forward, needed in EigenRowMajorSparseMatrixInverse
+class EigenRowMajorSparseMatrix;
+
+
+class EigenRowMajorSparseMatrixInverse
+  : public OperatorInterface
 {
-  typedef Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >  BaseType;
-  typedef Dune::Pymor::OperatorInterface                        InterfaceType;
 public:
-  typedef EigenRowMajorSparseMatrix                             ThisType;
   typedef Dune::Pymor::LA::EigenDenseVector                     SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector                     RangeType;
 
-  EigenRowMajorSparseMatrix()
-    : BaseType()
-    , InterfaceType()
-  {}
+  EigenRowMajorSparseMatrixInverse(const EigenRowMajorSparseMatrix* op, const std::string type);
 
-  EigenRowMajorSparseMatrix(const BaseType& other)
-    : BaseType(other)
-    , InterfaceType()
-  {}
+  virtual bool linear() const;
 
-  EigenRowMajorSparseMatrix(const int rr, const int cc, const Dune::Stuff::LA::SparsityPatternDefault& pattern)
-    : BaseType(assert_is_positive(rr), assert_is_positive(cc), pattern)
-    , InterfaceType()
-  {}
+  virtual unsigned int dim_source() const;
 
-  virtual bool linear() const
-  {
-    return true;
-  }
+  virtual unsigned int dim_range() const;
 
-  virtual unsigned int dim_source() const
-  {
-    return BaseType::cols();
-  }
+  virtual std::string type_source() const;
 
-  virtual unsigned int dim_range() const
-  {
-    return BaseType::rows();
-  }
-
-  virtual std::string type_source() const
-  {
-    return SourceType::static_type();
-  }
-
-  virtual std::string type_range() const
-  {
-    return RangeType::static_type();
-  }
+  virtual std::string type_range() const;
 
   virtual void apply(const LA::VectorInterface* source,
                      LA::VectorInterface* range,
@@ -205,74 +216,144 @@ public:
                                                                         Exception::you_have_to_implement_this,
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
-                                                                        Exception::requirements_not_met)
-  {
-    std::stringstream msg;
-    size_t throw_up = 0;
-    if (source->type() != type_source()) {
-      msg << "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")";
-      ++throw_up;
-    }
-    if (range->type() != type_range()) {
-      if (throw_up)
-        msg << " and ";
-      msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
-    }
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
-  }
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed);
 
   virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
-           Exception::requirements_not_met)
-  {
-    if (source->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of source (" << source->dim() << ") does not match dim_source of this ("
-                       << dim_source() << ")!");
-    if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu << ")!");
-    range->backend() = BaseType::backend() * source->backend();
-  }
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  static std::vector< std::string > invert_options();
+
+  virtual const OperatorInterface* invert(const std::string type = invert_options()[0],
+                                                  const Parameter mu = Parameter()) const
+    throw(Exception::not_invertible, Exception::key_is_not_valid);
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string /*type*/ = invert_options()[0],
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual void apply_inverse(const RangeType* range,
+                             SourceType* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual EigenRowMajorSparseMatrixInverse* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::this_is_not_parametric);
+
+private:
+  const EigenRowMajorSparseMatrix* op_;
+  const std::string type_;
+}; // class EigenRowMajorSparseMatrixInverse
+
+
+class EigenRowMajorSparseMatrix
+  : public Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
+  , public OperatorInterface
+{
+  typedef Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >  BaseType;
+public:
+  typedef EigenRowMajorSparseMatrix                             ThisType;
+  typedef Dune::Pymor::LA::EigenDenseVector                     SourceType;
+  typedef Dune::Pymor::LA::EigenDenseVector                     RangeType;
+
+  EigenRowMajorSparseMatrix();
+
+  EigenRowMajorSparseMatrix(const BaseType& other);
+
+  EigenRowMajorSparseMatrix(const int rr, const int cc, const Dune::Stuff::LA::SparsityPatternDefault& pattern);
+
+  virtual bool linear() const;
+
+  virtual unsigned int dim_source() const;
+
+  virtual unsigned int dim_range() const;
+
+  virtual std::string type_source() const;
+
+  virtual std::string type_range() const;
+
+  virtual void apply(const LA::VectorInterface* source,
+                     LA::VectorInterface* range,
+                     const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                        Exception::you_have_to_implement_this,
+                                                                        Exception::sizes_do_not_match,
+                                                                        Exception::wrong_parameter_type,
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed);
+
+  virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
 
   virtual double apply2(const SourceType* range, const RangeType* source, const Parameter /*mu*/ = Parameter()) const
     throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
-  {
-    if (source->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of source (" << source->dim() << ") does not match dim_source of this (" << dim_source()
-                       << ")!");
-    if (range->dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of range (" << range->dim() << ") does not match dim_range of this (" << dim_range()
-                       << ")!");
-    return range->backend().transpose() * BaseType::backend() * source->backend();
-  }
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  static std::vector< std::string > invert_options();
+
+  virtual const EigenRowMajorSparseMatrixInverse* invert(const std::string type = invert_options()[0],
+                                          const Parameter mu = Parameter()) const
+    throw(Exception::not_invertible, Exception::key_is_not_valid);
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string /*type*/ = invert_options()[0],
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual void apply_inverse(const RangeType* range,
+                             SourceType* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
 
   virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric)
-  {
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
-    return nullptr;
-  }
+    throw (Exception::this_is_not_parametric);
 
 private:
-  static int assert_is_positive(const int ii)
-  {
-    if (ii <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
-    return ii;
-  }
+  static int assert_is_positive(const int ii);
 }; // class EigenRowMajorSparseMatrix
 
 
-} // namespace Operator
+} // namespace Operators
 } // namespace Pymor
 } // namespace Dune
 
-#endif // HAVE_EIGEN
+//#endif // HAVE_EIGEN
 #endif // DUNE_PYMOR_OPERATORS_EIGEN_HH

@@ -11,10 +11,87 @@
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
 #include "interfaces.hh"
+//#include "dunedynamicinverse.hh"
 
 namespace Dune {
 namespace Pymor {
 namespace Operators {
+
+
+class DuneDynamic;
+
+
+class DuneDynamicInverse
+  : public OperatorInterface
+{
+public:
+  typedef DuneDynamicInverse                  ThisType;
+  typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
+  typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
+
+  DuneDynamicInverse(const DuneDynamic* op);
+
+  virtual bool linear() const;
+
+  virtual unsigned int dim_source() const;
+
+  virtual unsigned int dim_range() const;
+
+  virtual std::string type_source() const;
+
+  virtual std::string type_range() const;
+
+  virtual void apply(const LA::VectorInterface* source,
+                     LA::VectorInterface* range,
+                     const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                        Exception::you_have_to_implement_this,
+                                                                        Exception::sizes_do_not_match,
+                                                                        Exception::wrong_parameter_type,
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed);
+
+  virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  static std::vector< std::string > invert_options() throw (Exception::not_invertible);
+
+  virtual const OperatorInterface* invert(const std::string type = invert_options()[0],
+                                          const Parameter mu = Parameter()) const
+    throw(Exception::not_invertible, Exception::key_is_not_valid);
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string /*type*/ = invert_options()[0],
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual void apply_inverse(const RangeType* range,
+                             SourceType* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this);
+
+private:
+  const DuneDynamic* op_;
+}; // class DuneDynamicInverse
 
 
 class DuneDynamic
@@ -27,45 +104,21 @@ public:
   typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
   typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
 
-  DuneDynamic()
-    : BaseType()
-    , OperatorInterface()
-  {}
+  DuneDynamic();
 
-  DuneDynamic(const BaseType& other)
-    : BaseType(other)
-    , OperatorInterface()
-  {}
+  DuneDynamic(const BaseType& other);
 
-  DuneDynamic(const int rr, const int cc)
-    : BaseType(assert_is_positive(rr), assert_is_positive(cc))
-    , OperatorInterface()
-  {}
+  DuneDynamic(const int rr, const int cc) throw (Exception::index_out_of_range);
 
-  virtual bool linear() const
-  {
-    return true;
-  }
+  virtual bool linear() const;
 
-  virtual unsigned int dim_source() const
-  {
-    return BaseType::cols();
-  }
+  virtual unsigned int dim_source() const;
 
-  virtual unsigned int dim_range() const
-  {
-    return BaseType::rows();
-  }
+  virtual unsigned int dim_range() const;
 
-  virtual std::string type_source() const
-  {
-    return SourceType::static_type();
-  }
+  virtual std::string type_source() const;
 
-  virtual std::string type_range() const
-  {
-    return RangeType::static_type();
-  }
+  virtual std::string type_range() const;
 
   virtual void apply(const LA::VectorInterface* source,
                      LA::VectorInterface* range,
@@ -73,41 +126,16 @@ public:
                                                                         Exception::you_have_to_implement_this,
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
-                                                                        Exception::requirements_not_met)
-  {
-    std::stringstream msg;
-    size_t throw_up = 0;
-    if (source->type() != type_source()) {
-      msg << "source (" << source->type() << ") is not a compatible type_source (" << type_source() << ")";
-      ++throw_up;
-    }
-    if (range->type() != type_range()) {
-      if (throw_up)
-        msg << " and ";
-      msg << "range (" << range->type() << ") is not a compatible type_range (" << type_range() << ")";
-    }
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
-  }
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed);
 
   virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
-  {
-    if (source->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of source (" << source->dim() << ") does not match dim_source of this (" << dim_source()
-                       << ")!");
-    if (range->dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "dim of range (" << range->dim() << ") does not match dim_range of this (" << dim_range()
-                       << ")!");
-    if (mu.type() != Parameter().type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
-    BaseType::mv(*source, *range);
-  }
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
 
   virtual double apply2(const RangeType* range,
                         const SourceType* source,
@@ -115,35 +143,43 @@ public:
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type)
-  {
-    if (source->dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of U (" << source->dim() << ") does not match dim_source() of this (" << dim_source() << ")!");
-    if (range->dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "size of V (" << range->dim() << ") does not match dim_range() of this (" << dim_range() << ")!");
-    if (!mu.type().empty())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "since parametric() == false mu has to be empty (is " << mu.report() << ")!");
-    RangeType* tmp = new RangeType(dim_range());
-    BaseType::mv(*source, *tmp);
-    return range->dot(tmp);
-  }
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  static std::vector< std::string > invert_options() throw(Exception::not_invertible);
+
+  virtual const DuneDynamicInverse* invert(const std::string type = invert_options()[0],
+                                           const Parameter mu = Parameter()) const
+    throw(Exception::not_invertible, Exception::key_is_not_valid);
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string /*type*/ = invert_options()[0],
+                             const Parameter /*mu*/ = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
+
+  virtual void apply_inverse(const RangeType* range,
+                             SourceType* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed);
 
   virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric)
-  {
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
-    return nullptr;
-  }
+    throw (Exception::this_is_not_parametric);
 
 private:
-  static int assert_is_positive(const int ii)
-  {
-    if (ii <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
-    return ii;
-  }
+  static int assert_is_positive(const int ii) throw (Exception::index_out_of_range);
 }; // class DuneDynamic
 
 

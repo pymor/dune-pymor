@@ -16,6 +16,12 @@ namespace Dune {
 namespace Pymor {
 
 
+/**
+ * \note  A derived class has to implement the following static method:
+\code
+static std::vector< std::string > invert_options() throw(Exception::not_invertible)
+\endcode
+ */
 class OperatorInterface
   : public Parametric
 {
@@ -43,13 +49,17 @@ public:
                                                                         Exception::you_have_to_implement_this,
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
-                                                                        Exception::requirements_not_met) = 0;
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed) = 0;
 
   virtual double apply2(const LA::VectorInterface* range,
                         const LA::VectorInterface* source,
                         const Parameter mu = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                       Exception::you_have_to_implement_this,
                                                                        Exception::sizes_do_not_match,
-                                                                       Exception::wrong_parameter_type)
+                                                                       Exception::wrong_parameter_type,
+                                                                       Exception::requirements_not_met,
+                                                                       Exception::linear_solver_failed)
   {
     std::stringstream msg;
     size_t throw_up = 0;
@@ -75,6 +85,31 @@ public:
     apply(source, tmp, mu);
     return range->dot(tmp);
   }
+
+//  virtual Options* invert_options(const std::string& type) const = 0;
+
+  virtual const OperatorInterface* invert(const std::string type = "",
+                                          const Parameter mu = Parameter()) const
+    throw (Exception::not_invertible, Exception::key_is_not_valid) = 0;
+
+//  virtual InverseOperatorInterface* invert(const Parameter mu = Parameter(),
+//                                           const Options* = invert_options(invert_options()[0])) const = 0;
+
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string type = "",
+                             const Parameter mu = Parameter()) const
+    throw (Exception::types_are_not_compatible,
+           Exception::you_have_to_implement_this,
+           Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed) = 0;
+
+//  virtual void apply_inverse(const LA::VectorInterface* range,
+//                             const LA::VectorInterface* source,
+//                             const Parameter mu = Parameter(),
+//                             const Options* options = ) const = 0;
 
   virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this)

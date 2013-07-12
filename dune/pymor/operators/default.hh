@@ -35,7 +35,7 @@ public:
 
   AffinelyDecomposedDefault(OperatorType* aff, const ParameterType& tt = ParameterType())
     throw (Exception::requirements_not_met)
-    : OperatorInterface(tt)
+    : AffinelyDecomposedOperatorInterface(tt)
     , linear_(aff->linear())
     , size_(0)
     , hasAffinePart_(true)
@@ -247,7 +247,9 @@ public:
                                                                         Exception::you_have_to_implement_this,
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
-                                                                        Exception::requirements_not_met)
+                                                                        Exception::requirements_not_met,
+                                                                        Exception::linear_solver_failed/*,
+                                                                        Exception::this_does_not_make_any_sense*/)
   {
     std::stringstream msg;
     size_t throw_up = 0;
@@ -271,7 +273,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::this_does_not_make_any_sense)
+           Exception::linear_solver_failed/*,
+           Exception::this_does_not_make_any_sense*/)
   {
     if (source->dim() != dim_source())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -319,8 +322,12 @@ public:
   virtual double apply2(const SourceType* range,
                         const RangeType* source,
                         const Parameter mu = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                       Exception::you_have_to_implement_this,
                                                                        Exception::sizes_do_not_match,
-                                                                       Exception::wrong_parameter_type)
+                                                                       Exception::wrong_parameter_type,
+                                                                       Exception::requirements_not_met,
+                                                                       Exception::linear_solver_failed/*,
+                                                                       Exception::this_does_not_make_any_sense*/)
   {
     if (source->dim() != dim_source())
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
