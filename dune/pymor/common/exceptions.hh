@@ -164,9 +164,17 @@ class wrong_input
  * \brief Exception for operators/matrices which are not invertible.
  */
 class not_invertible
-    : public Dune::InvalidStateException
-    , public Dune::PymorException
-  {};
+  : public Dune::InvalidStateException
+  , public Dune::PymorException
+{};
+
+/**
+ * \brief Exception for linear solvers which did not succeed.
+ */
+class linear_solver_failed
+  : public Dune::InvalidStateException
+  , public Dune::PymorException
+{};
 
 
 } // namespace Exceptions
