@@ -47,7 +47,8 @@ public:
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
                                                                         Exception::requirements_not_met,
-                                                                        Exception::linear_solver_failed);
+                                                                        Exception::linear_solver_failed,
+                                                                        Exception::this_does_not_make_any_sense);
 
   virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
@@ -55,7 +56,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   static std::vector< std::string > invert_options() throw (Exception::not_invertible);
 
@@ -72,7 +74,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   virtual void apply_inverse(const RangeType* range,
                              SourceType* source,
@@ -83,7 +86,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this);
@@ -125,7 +129,8 @@ public:
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
                                                                         Exception::requirements_not_met,
-                                                                        Exception::linear_solver_failed);
+                                                                        Exception::linear_solver_failed,
+                                                                        Exception::this_does_not_make_any_sense);
 
   virtual void apply(const SourceType* source, RangeType* range, const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
@@ -133,7 +138,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   virtual double apply2(const RangeType* range,
                         const SourceType* source,
@@ -143,7 +149,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   static std::vector< std::string > invert_options() throw(Exception::not_invertible);
 
@@ -160,7 +167,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   virtual void apply_inverse(const RangeType* range,
                              SourceType* source,
@@ -171,7 +179,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   virtual DuneDynamicMatrix* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric);

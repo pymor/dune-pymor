@@ -12,9 +12,10 @@ libpymor_la_SOURCES = \
   la/container/eigenvector.cc \
   la/container.cc \
   parameters/base.cc \
-  operators.cc \
+  operators/default.cc \
   operators/dunedynamicmatrix.cc \
   operators/eigen.cc \
+  operators.cc \
   parameters/base.cc \
   parameters/functional.cc
 

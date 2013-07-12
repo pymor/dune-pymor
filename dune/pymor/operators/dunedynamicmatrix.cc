@@ -53,7 +53,8 @@ void DuneDynamicMatrixInverse::apply(const LA::VectorInterface* source,
                                                                           Exception::sizes_do_not_match,
                                                                           Exception::wrong_parameter_type,
                                                                           Exception::requirements_not_met,
-                                                                          Exception::linear_solver_failed)
+                                                                          Exception::linear_solver_failed,
+                                                                          Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -75,7 +76,8 @@ void DuneDynamicMatrixInverse::apply(const SourceType* source, RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -117,7 +119,8 @@ void DuneDynamicMatrixInverse::apply_inverse(const LA::VectorInterface* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -142,7 +145,8 @@ void DuneDynamicMatrixInverse::apply_inverse(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (type != invert_options()[0])
     DUNE_PYMOR_THROW(Exception::key_is_not_valid,
@@ -205,7 +209,8 @@ void DuneDynamicMatrix::apply(const LA::VectorInterface* source,
                                                                    Exception::sizes_do_not_match,
                                                                    Exception::wrong_parameter_type,
                                                                    Exception::requirements_not_met,
-                                                                   Exception::linear_solver_failed)
+                                                                   Exception::linear_solver_failed,
+                                                                   Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -227,7 +232,8 @@ void DuneDynamicMatrix::apply(const SourceType* source, RangeType* range, const 
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -251,7 +257,8 @@ double DuneDynamicMatrix::apply2(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -293,7 +300,8 @@ void DuneDynamicMatrix::apply_inverse(const LA::VectorInterface* range,
                                                                            Exception::sizes_do_not_match,
                                                                            Exception::wrong_parameter_type,
                                                                            Exception::requirements_not_met,
-                                                                           Exception::linear_solver_failed)
+                                                                           Exception::linear_solver_failed,
+                                                                           Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -317,7 +325,8 @@ void DuneDynamicMatrix::apply_inverse(const RangeType* range,
                                                                        Exception::sizes_do_not_match,
                                                                        Exception::wrong_parameter_type,
                                                                        Exception::requirements_not_met,
-                                                                       Exception::linear_solver_failed)
+                                                                       Exception::linear_solver_failed,
+                                                                       Exception::this_does_not_make_any_sense)
 {
   const DuneDynamicMatrixInverse* inverseOp = invert(type, mu);
   inverseOp->apply(range, source);

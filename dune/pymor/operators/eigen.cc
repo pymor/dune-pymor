@@ -79,7 +79,8 @@ void EigenDenseMatrixInverse::apply(const LA::VectorInterface* source,
                                                                          Exception::sizes_do_not_match,
                                                                          Exception::wrong_parameter_type,
                                                                          Exception::requirements_not_met,
-                                                                         Exception::linear_solver_failed)
+                                                                         Exception::linear_solver_failed,
+                                                                         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -101,7 +102,8 @@ void EigenDenseMatrixInverse::apply(const SourceType* source, RangeType* range, 
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -159,7 +161,8 @@ void EigenDenseMatrixInverse::apply_inverse(const LA::VectorInterface* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -184,7 +187,8 @@ void EigenDenseMatrixInverse::apply_inverse(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (type != invert_options()[0])
     DUNE_PYMOR_THROW(Exception::key_is_not_valid,
@@ -245,7 +249,8 @@ void EigenDenseMatrix::apply(const LA::VectorInterface* source,
                                                                   Exception::sizes_do_not_match,
                                                                   Exception::wrong_parameter_type,
                                                                   Exception::requirements_not_met,
-                                                                  Exception::linear_solver_failed)
+                                                                  Exception::linear_solver_failed,
+                                                                  Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -267,7 +272,8 @@ void EigenDenseMatrix::apply(const SourceType* source, RangeType* range, const P
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -291,7 +297,8 @@ double EigenDenseMatrix::apply2(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -347,7 +354,8 @@ void EigenDenseMatrix::apply_inverse(const LA::VectorInterface* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -372,7 +380,8 @@ void EigenDenseMatrix::apply_inverse(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   const EigenDenseMatrixInverse* inverseOp = invert(type, mu);
   inverseOp->apply(range, source);;
@@ -477,7 +486,8 @@ void EigenRowMajorSparseMatrixInverse::apply(const LA::VectorInterface* source,
                                                                                   Exception::sizes_do_not_match,
                                                                                   Exception::wrong_parameter_type,
                                                                                   Exception::requirements_not_met,
-                                                                                  Exception::linear_solver_failed)
+                                                                                  Exception::linear_solver_failed,
+                                                                                  Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -499,7 +509,8 @@ void EigenRowMajorSparseMatrixInverse::apply(const SourceType* source, RangeType
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -610,7 +621,8 @@ void EigenRowMajorSparseMatrixInverse::apply_inverse(const LA::VectorInterface* 
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -635,7 +647,8 @@ void EigenRowMajorSparseMatrixInverse::apply_inverse(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (type != invert_options()[0])
     DUNE_PYMOR_THROW(Exception::key_is_not_valid,
@@ -703,7 +716,8 @@ void EigenRowMajorSparseMatrix::apply(const LA::VectorInterface* source,
                                                                            Exception::sizes_do_not_match,
                                                                            Exception::wrong_parameter_type,
                                                                            Exception::requirements_not_met,
-                                                                           Exception::linear_solver_failed)
+                                                                           Exception::linear_solver_failed,
+                                                                           Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -725,7 +739,8 @@ void EigenRowMajorSparseMatrix::apply(const SourceType* source, RangeType* range
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -743,7 +758,8 @@ double EigenRowMajorSparseMatrix::apply2(const SourceType* range, const RangeTyp
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -799,7 +815,8 @@ void EigenRowMajorSparseMatrix::apply_inverse(const LA::VectorInterface* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -824,7 +841,8 @@ void EigenRowMajorSparseMatrix::apply_inverse(const RangeType* range,
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   const EigenRowMajorSparseMatrixInverse* inverseOp = invert(type, mu);
   inverseOp->apply(range, source);;

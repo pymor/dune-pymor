@@ -50,7 +50,8 @@ public:
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
                                                                         Exception::requirements_not_met,
-                                                                        Exception::linear_solver_failed) = 0;
+                                                                        Exception::linear_solver_failed,
+                                                                        Exception::this_does_not_make_any_sense) = 0;
 
   virtual double apply2(const LA::VectorInterface* range,
                         const LA::VectorInterface* source,
@@ -59,7 +60,8 @@ public:
                                                                        Exception::sizes_do_not_match,
                                                                        Exception::wrong_parameter_type,
                                                                        Exception::requirements_not_met,
-                                                                       Exception::linear_solver_failed)
+                                                                       Exception::linear_solver_failed,
+                                                                       Exception::this_does_not_make_any_sense)
   {
     std::stringstream msg;
     size_t throw_up = 0;
@@ -104,7 +106,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed) = 0;
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense) = 0;
 
 //  virtual void apply_inverse(const LA::VectorInterface* range,
 //                             const LA::VectorInterface* source,
@@ -114,6 +117,7 @@ public:
   virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric,
            Exception::you_have_to_implement_this,
+           Exception::this_does_not_make_any_sense,
            Exception::this_does_not_make_any_sense)
   {
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
