@@ -13,7 +13,8 @@ libpymor_la_SOURCES = \
   operators.cc \
   operators/dunedynamic.cc \
   operators/eigen.cc \
-  parameters/base.cc
+  parameters/base.cc \
+  parameters/functional.cc
 
 libpymor_la_LIBADD =
 
