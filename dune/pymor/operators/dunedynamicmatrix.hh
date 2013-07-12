@@ -9,27 +9,26 @@
 #include <dune/common/dynmatrix.hh>
 
 #include <dune/pymor/common/exceptions.hh>
-#include <dune/pymor/la/container/dunedynamic.hh>
+#include <dune/pymor/la/container/dunedynamicvector.hh>
 #include "interfaces.hh"
-//#include "dunedynamicinverse.hh"
 
 namespace Dune {
 namespace Pymor {
 namespace Operators {
 
 
-class DuneDynamic;
+class DuneDynamicMatrix;
 
 
-class DuneDynamicInverse
+class DuneDynamicMatrixInverse
   : public OperatorInterface
 {
 public:
-  typedef DuneDynamicInverse                  ThisType;
+  typedef DuneDynamicMatrixInverse                  ThisType;
   typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
   typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
 
-  DuneDynamicInverse(const DuneDynamic* op);
+  DuneDynamicMatrixInverse(const DuneDynamicMatrix* op);
 
   virtual bool linear() const;
 
@@ -90,11 +89,11 @@ public:
     throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this);
 
 private:
-  const DuneDynamic* op_;
-}; // class DuneDynamicInverse
+  const DuneDynamicMatrix* op_;
+}; // class DuneDynamicMatrixInverse
 
 
-class DuneDynamic
+class DuneDynamicMatrix
   : public Dune::DynamicMatrix< double >
   , public LinearOperatorInterface
 {
@@ -103,11 +102,11 @@ public:
   typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
   typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
 
-  DuneDynamic();
+  DuneDynamicMatrix();
 
-  DuneDynamic(const BaseType& other);
+  DuneDynamicMatrix(const BaseType& other);
 
-  DuneDynamic(const int rr, const int cc) throw (Exception::index_out_of_range);
+  DuneDynamicMatrix(const int rr, const int cc) throw (Exception::index_out_of_range);
 
   virtual bool linear() const;
 
@@ -148,7 +147,7 @@ public:
 
   static std::vector< std::string > invert_options() throw(Exception::not_invertible);
 
-  virtual const DuneDynamicInverse* invert(const std::string type = invert_options()[0],
+  virtual const DuneDynamicMatrixInverse* invert(const std::string type = invert_options()[0],
                                            const Parameter mu = Parameter()) const
     throw(Exception::not_invertible, Exception::key_is_not_valid);
 
@@ -174,22 +173,22 @@ public:
            Exception::requirements_not_met,
            Exception::linear_solver_failed);
 
-  virtual DuneDynamic* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+  virtual DuneDynamicMatrix* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric);
 
-  virtual DuneDynamic* copy() const;
+  virtual DuneDynamicMatrix* copy() const;
 
   virtual void scal(const double alpha);
 
   virtual void axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
     throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
 
-  virtual void axpy(const double alpha, const DuneDynamic* x) throw (Exception::sizes_do_not_match,
+  virtual void axpy(const double alpha, const DuneDynamicMatrix* x) throw (Exception::sizes_do_not_match,
                                                                      Exception::types_are_not_compatible);
 
 private:
   static int assert_is_positive(const int ii) throw (Exception::index_out_of_range);
-}; // class DuneDynamic
+}; // class DuneDynamicMatrix
 
 
 } // namespace Operators

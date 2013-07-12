@@ -39,7 +39,6 @@ static std::string static_type();
 class VectorInterface
 {
 public:
-
   virtual ~VectorInterface() {}
 
   /**

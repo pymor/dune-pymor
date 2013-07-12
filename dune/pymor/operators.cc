@@ -9,11 +9,11 @@ namespace Dune {
 namespace Pymor {
 
 
-Operators::DuneDynamic* createLinearOperator(const Operators::DuneDynamic&,
-                                             const int dim,
-                                             const bool identity)
+Operators::DuneDynamicMatrix* createLinearOperator(const Operators::DuneDynamicMatrix&,
+                                                   const int dim,
+                                                   const bool identity)
 {
-  Operators::DuneDynamic* ret = new Operators::DuneDynamic(dim, dim);
+  Operators::DuneDynamicMatrix* ret = new Operators::DuneDynamicMatrix(dim, dim);
   if (identity)
     for (int ii = 0; ii < dim; ++ii)
       ret->operator[](ii)[ii] = 1.0;

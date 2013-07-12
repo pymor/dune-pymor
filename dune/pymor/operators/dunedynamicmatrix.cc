@@ -9,51 +9,51 @@
   #include "config.h"
 #endif // HAVE_CMAKE_CONFIG
 
-#include "dunedynamic.hh"
+#include "dunedynamicmatrix.hh"
 
 namespace Dune {
 namespace Pymor {
 namespace Operators {
 
 
-DuneDynamicInverse::DuneDynamicInverse(const DuneDynamic* op)
+DuneDynamicMatrixInverse::DuneDynamicMatrixInverse(const DuneDynamicMatrix* op)
   : OperatorInterface()
   , op_(op)
 {}
 
-bool DuneDynamicInverse::linear() const
+bool DuneDynamicMatrixInverse::linear() const
 {
   return true;
 }
 
-unsigned int DuneDynamicInverse::dim_source() const
+unsigned int DuneDynamicMatrixInverse::dim_source() const
 {
   return op_->dim_range();
 }
 
-unsigned int DuneDynamicInverse::dim_range() const
+unsigned int DuneDynamicMatrixInverse::dim_range() const
 {
   return op_->dim_source();
 }
 
-std::string DuneDynamicInverse::type_source() const
+std::string DuneDynamicMatrixInverse::type_source() const
 {
   return SourceType::static_type();
 }
 
-std::string DuneDynamicInverse::type_range() const
+std::string DuneDynamicMatrixInverse::type_range() const
 {
   return RangeType::static_type();
 }
 
-void DuneDynamicInverse::apply(const LA::VectorInterface* source,
-                               LA::VectorInterface* range,
-                               const Parameter /*mu*/) const throw (Exception::types_are_not_compatible,
-                                                                    Exception::you_have_to_implement_this,
-                                                                    Exception::sizes_do_not_match,
-                                                                    Exception::wrong_parameter_type,
-                                                                    Exception::requirements_not_met,
-                                                                    Exception::linear_solver_failed)
+void DuneDynamicMatrixInverse::apply(const LA::VectorInterface* source,
+                                     LA::VectorInterface* range,
+                                     const Parameter /*mu*/) const throw (Exception::types_are_not_compatible,
+                                                                          Exception::you_have_to_implement_this,
+                                                                          Exception::sizes_do_not_match,
+                                                                          Exception::wrong_parameter_type,
+                                                                          Exception::requirements_not_met,
+                                                                          Exception::linear_solver_failed)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -69,7 +69,7 @@ void DuneDynamicInverse::apply(const LA::VectorInterface* source,
   DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
 }
 
-void DuneDynamicInverse::apply(const SourceType* source, RangeType* range, const Parameter mu) const
+void DuneDynamicMatrixInverse::apply(const SourceType* source, RangeType* range, const Parameter mu) const
   throw (Exception::types_are_not_compatible,
          Exception::you_have_to_implement_this,
          Exception::sizes_do_not_match,
@@ -91,24 +91,24 @@ void DuneDynamicInverse::apply(const SourceType* source, RangeType* range, const
   op_->solve(*range, *source);
 }
 
-std::vector< std::string > DuneDynamicInverse::invert_options() throw (Exception::not_invertible)
+std::vector< std::string > DuneDynamicMatrixInverse::invert_options() throw (Exception::not_invertible)
 {
   return { "exact" };
 }
 
-const OperatorInterface* DuneDynamicInverse::invert(const std::string type, const Parameter mu) const
+const OperatorInterface* DuneDynamicMatrixInverse::invert(const std::string type, const Parameter mu) const
   throw(Exception::not_invertible, Exception::key_is_not_valid)
 {
   if (!mu.type().empty())
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                      "do not call invert with mu = " << mu << " if parametric() == false!");
-  if (type != DuneDynamicInverse::invert_options()[0])
+  if (type != invert_options()[0])
     DUNE_PYMOR_THROW(Exception::key_is_not_valid,
                      "type has to be '" << invert_options()[0] << "' (is " << type << ")!");
   return op_;
 }
 
-void DuneDynamicInverse::apply_inverse(const LA::VectorInterface* range,
+void DuneDynamicMatrixInverse::apply_inverse(const LA::VectorInterface* range,
                                        LA::VectorInterface* source,
                                        const std::string /*type*/,
                                        const Parameter /*mu*/) const
@@ -133,10 +133,10 @@ void DuneDynamicInverse::apply_inverse(const LA::VectorInterface* range,
   DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
 }
 
-void DuneDynamicInverse::apply_inverse(const RangeType* range,
-                                       SourceType* source,
-                                       const std::string type,
-                                       const Parameter mu) const
+void DuneDynamicMatrixInverse::apply_inverse(const RangeType* range,
+                                             SourceType* source,
+                                             const std::string type,
+                                             const Parameter mu) const
   throw (Exception::types_are_not_compatible,
          Exception::you_have_to_implement_this,
          Exception::sizes_do_not_match,
@@ -150,7 +150,7 @@ void DuneDynamicInverse::apply_inverse(const RangeType* range,
   op_->apply(range, source, mu);
 }
 
-DuneDynamicInverse* DuneDynamicInverse::freeze_parameter(const Parameter /*mu*/) const
+DuneDynamicMatrixInverse* DuneDynamicMatrixInverse::freeze_parameter(const Parameter /*mu*/) const
   throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this)
 {
   DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
@@ -158,54 +158,54 @@ DuneDynamicInverse* DuneDynamicInverse::freeze_parameter(const Parameter /*mu*/)
 }
 
 
-DuneDynamic::DuneDynamic()
+DuneDynamicMatrix::DuneDynamicMatrix()
   : BaseType()
   , LinearOperatorInterface()
 {}
 
-DuneDynamic::DuneDynamic(const BaseType& other)
+DuneDynamicMatrix::DuneDynamicMatrix(const BaseType& other)
   : BaseType(other)
   , LinearOperatorInterface()
 {}
 
-DuneDynamic::DuneDynamic(const int rr, const int cc) throw (Exception::index_out_of_range)
-  : BaseType(DuneDynamic::assert_is_positive(rr), DuneDynamic::assert_is_positive(cc))
+DuneDynamicMatrix::DuneDynamicMatrix(const int rr, const int cc) throw (Exception::index_out_of_range)
+  : BaseType(DuneDynamicMatrix::assert_is_positive(rr), DuneDynamicMatrix::assert_is_positive(cc))
   , LinearOperatorInterface()
 {}
 
-bool DuneDynamic::linear() const
+bool DuneDynamicMatrix::linear() const
 {
   return true;
 }
 
-unsigned int DuneDynamic::dim_source() const
+unsigned int DuneDynamicMatrix::dim_source() const
 {
   return BaseType::cols();
 }
 
-unsigned int DuneDynamic::dim_range() const
+unsigned int DuneDynamicMatrix::dim_range() const
 {
   return BaseType::rows();
 }
 
-std::string DuneDynamic::type_source() const
+std::string DuneDynamicMatrix::type_source() const
 {
   return SourceType::static_type();
 }
 
-std::string DuneDynamic::type_range() const
+std::string DuneDynamicMatrix::type_range() const
 {
   return RangeType::static_type();
 }
 
-void DuneDynamic::apply(const LA::VectorInterface* source,
-                        LA::VectorInterface* range,
-                        const Parameter /*mu*/) const throw (Exception::types_are_not_compatible,
-                                                             Exception::you_have_to_implement_this,
-                                                             Exception::sizes_do_not_match,
-                                                             Exception::wrong_parameter_type,
-                                                             Exception::requirements_not_met,
-                                                             Exception::linear_solver_failed)
+void DuneDynamicMatrix::apply(const LA::VectorInterface* source,
+                              LA::VectorInterface* range,
+                              const Parameter /*mu*/) const throw (Exception::types_are_not_compatible,
+                                                                   Exception::you_have_to_implement_this,
+                                                                   Exception::sizes_do_not_match,
+                                                                   Exception::wrong_parameter_type,
+                                                                   Exception::requirements_not_met,
+                                                                   Exception::linear_solver_failed)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -221,7 +221,7 @@ void DuneDynamic::apply(const LA::VectorInterface* source,
   DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
 }
 
-void DuneDynamic::apply(const SourceType* source, RangeType* range, const Parameter mu) const
+void DuneDynamicMatrix::apply(const SourceType* source, RangeType* range, const Parameter mu) const
   throw (Exception::types_are_not_compatible,
          Exception::you_have_to_implement_this,
          Exception::sizes_do_not_match,
@@ -243,9 +243,9 @@ void DuneDynamic::apply(const SourceType* source, RangeType* range, const Parame
   BaseType::mv(*source, *range);
 }
 
-double DuneDynamic::apply2(const RangeType* range,
-                           const SourceType* source,
-                           const Parameter mu) const
+double DuneDynamicMatrix::apply2(const RangeType* range,
+                                 const SourceType* source,
+                                 const Parameter mu) const
   throw (Exception::types_are_not_compatible,
          Exception::you_have_to_implement_this,
          Exception::sizes_do_not_match,
@@ -267,13 +267,13 @@ double DuneDynamic::apply2(const RangeType* range,
   return range->dot(tmp);
 }
 
-std::vector< std::string > DuneDynamic::invert_options() throw (Exception::not_invertible)
+std::vector< std::string > DuneDynamicMatrix::invert_options() throw (Exception::not_invertible)
 {
   return { "superlu" };
 }
 
-const DuneDynamicInverse* DuneDynamic::invert(const std::string type,
-                                              const Parameter mu) const
+const DuneDynamicMatrixInverse* DuneDynamicMatrix::invert(const std::string type,
+                                                          const Parameter mu) const
   throw(Exception::not_invertible, Exception::key_is_not_valid)
 {
   if (!mu.type().empty())
@@ -282,18 +282,18 @@ const DuneDynamicInverse* DuneDynamic::invert(const std::string type,
   if (type != invert_options()[0])
     DUNE_PYMOR_THROW(Exception::key_is_not_valid,
                      "type has to be '" << invert_options()[0] << "' (is " << type << ")!");
-  return new DuneDynamicInverse(this);
+  return new DuneDynamicMatrixInverse(this);
 }
 
-void DuneDynamic::apply_inverse(const LA::VectorInterface* range,
-                                LA::VectorInterface* source,
-                                const std::string /*type*/,
-                                const Parameter /*mu*/) const throw (Exception::types_are_not_compatible,
-                                                                     Exception::you_have_to_implement_this,
-                                                                     Exception::sizes_do_not_match,
-                                                                     Exception::wrong_parameter_type,
-                                                                     Exception::requirements_not_met,
-                                                                     Exception::linear_solver_failed)
+void DuneDynamicMatrix::apply_inverse(const LA::VectorInterface* range,
+                                      LA::VectorInterface* source,
+                                      const std::string /*type*/,
+                                      const Parameter /*mu*/) const throw (Exception::types_are_not_compatible,
+                                                                           Exception::you_have_to_implement_this,
+                                                                           Exception::sizes_do_not_match,
+                                                                           Exception::wrong_parameter_type,
+                                                                           Exception::requirements_not_met,
+                                                                           Exception::linear_solver_failed)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -309,47 +309,47 @@ void DuneDynamic::apply_inverse(const LA::VectorInterface* range,
   DUNE_PYMOR_THROW(Exception::types_are_not_compatible, msg.str());
 }
 
-void DuneDynamic::apply_inverse(const RangeType* range,
-                                SourceType* source,
-                                const std::string type,
-                                const Parameter mu) const throw (Exception::types_are_not_compatible,
-                                                                 Exception::you_have_to_implement_this,
-                                                                 Exception::sizes_do_not_match,
-                                                                 Exception::wrong_parameter_type,
-                                                                 Exception::requirements_not_met,
-                                                                 Exception::linear_solver_failed)
+void DuneDynamicMatrix::apply_inverse(const RangeType* range,
+                                      SourceType* source,
+                                      const std::string type,
+                                      const Parameter mu) const throw (Exception::types_are_not_compatible,
+                                                                       Exception::you_have_to_implement_this,
+                                                                       Exception::sizes_do_not_match,
+                                                                       Exception::wrong_parameter_type,
+                                                                       Exception::requirements_not_met,
+                                                                       Exception::linear_solver_failed)
 {
-  const DuneDynamicInverse* inverseOp = invert(type, mu);
+  const DuneDynamicMatrixInverse* inverseOp = invert(type, mu);
   inverseOp->apply(range, source);
   delete inverseOp;
 }
 
-DuneDynamic* DuneDynamic::freeze_parameter(const Parameter /*mu*/) const
+DuneDynamicMatrix* DuneDynamicMatrix::freeze_parameter(const Parameter /*mu*/) const
   throw (Exception::this_is_not_parametric)
 {
   DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter if parametric() == false!");
   return nullptr;
 }
 
-DuneDynamic* DuneDynamic::copy() const
+DuneDynamicMatrix* DuneDynamicMatrix::copy() const
 {
-  return new DuneDynamic(*this);
+  return new DuneDynamicMatrix(*this);
 }
 
-void DuneDynamic::scal(const double alpha)
+void DuneDynamicMatrix::scal(const double alpha)
 {
   BaseType::operator*=(alpha);
 }
 
-void DuneDynamic::axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
+void DuneDynamicMatrix::axpy(const double /*alpha*/, const LinearOperatorInterface* /*x*/)
   throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
 {
   DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                    "not implemented for arbitrary x!");
 }
 
-void DuneDynamic::axpy(const double alpha, const DuneDynamic* x) throw (Exception::sizes_do_not_match,
-                                                                        Exception::types_are_not_compatible)
+void DuneDynamicMatrix::axpy(const double alpha, const DuneDynamicMatrix* x) throw (Exception::sizes_do_not_match,
+                                                                                    Exception::types_are_not_compatible)
 {
   if (x->dim_range() != dim_range())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -362,7 +362,7 @@ void DuneDynamic::axpy(const double alpha, const DuneDynamic* x) throw (Exceptio
   BaseType::axpy(alpha, *x);
 }
 
-int DuneDynamic::assert_is_positive(const int ii) throw (Exception::index_out_of_range)
+int DuneDynamicMatrix::assert_is_positive(const int ii) throw (Exception::index_out_of_range)
 {
   if (ii <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;

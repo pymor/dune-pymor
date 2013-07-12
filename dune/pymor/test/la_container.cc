@@ -12,7 +12,7 @@
 #include <dune/stuff/test/test_common.hh>
 
 #include <dune/pymor/common/exceptions.hh>
-#include <dune/pymor/la/container/dunedynamic.hh>
+#include <dune/pymor/la/container/dunedynamicvector.hh>
 #if HAVE_EIGEN
   #include <dune/pymor/la/container/eigen.hh>
 #endif

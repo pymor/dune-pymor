@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "operators/dunedynamic.hh"
+#include "operators/dunedynamicmatrix.hh"
 #if HAVE_EIGEN
   #include "operators/eigen.hh"
 #endif
@@ -18,9 +18,9 @@ namespace Dune {
 namespace Pymor {
 
 
-Operators::DuneDynamic* createLinearOperator(const Operators::DuneDynamic&,
-                                             const int dim,
-                                             const bool identity = true);
+Operators::DuneDynamicMatrix* createLinearOperator(const Operators::DuneDynamicMatrix&,
+                                                   const int dim,
+                                                   const bool identity = true);
 
 
 #if HAVE_EIGEN

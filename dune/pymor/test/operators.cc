@@ -20,7 +20,7 @@
 #include <dune/pymor/operators/default.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
-#include <dune/pymor/operators/dunedynamic.hh>
+#include <dune/pymor/operators/dunedynamicmatrix.hh>
 #if HAVE_EIGEN
   #include <dune/pymor/operators/eigen.hh>
 #endif
@@ -31,7 +31,7 @@ using namespace Dune;
 using namespace Dune::Pymor;
 
 typedef testing::Types<
-                        std::pair< Dune::Pymor::Operators::DuneDynamic,
+                        std::pair< Dune::Pymor::Operators::DuneDynamicMatrix,
                                    Dune::Pymor::LA::DuneDynamicVector >
 #if HAVE_EIGEN
                       , std::pair< Dune::Pymor::Operators::EigenDenseMatrix,

@@ -8,10 +8,11 @@ SUBDIRDS = . common functions la operators parameters
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
+  la/container/dunedynamicvector.cc \
   la/container.cc \
   parameters/base.cc \
   operators.cc \
-  operators/dunedynamic.cc \
+  operators/dunedynamicmatrix.cc \
   operators/eigen.cc \
   parameters/base.cc \
   parameters/functional.cc
