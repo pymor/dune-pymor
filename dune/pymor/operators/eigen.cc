@@ -9,7 +9,7 @@
   #include "config.h"
 #endif // HAVE_CMAKE_CONFIG
 
-//#if HAVE_EIGEN
+#if HAVE_EIGEN
 #include <algorithm>
 
 #include <Eigen/Dense>
@@ -880,4 +880,4 @@ int EigenRowMajorSparseMatrix::assert_is_positive(const int ii)
 } // namespace Pymor
 } // namespace Dune
 
-//#endif // HAVE_EIGEN
+#endif // HAVE_EIGEN

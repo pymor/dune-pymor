@@ -3,11 +3,13 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_PYMOR_LA_CONTAINER_DYNAMICVECTOR_HH
-#define DUNE_PYMOR_LA_CONTAINER_DYNAMICVECTOR_HH
+#ifndef DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
+#define DUNE_PYMOR_LA_CONTAINER_EIGEN_HH
 
-#include <dune/common/dynvector.hh>
+#if HAVE_EIGEN
+
 #include <dune/common/float_cmp.hh>
+#include <dune/stuff/la/container/eigen.hh>
 
 #include "interfaces.hh"
 
@@ -17,31 +19,31 @@ namespace LA {
 
 
 /**
- * \brief An implementation of Dune::Pymor::LA::VectorInterface using Dune::DynamicVector< double >.
+ * \brief An implementation of Dune::Pymor::LA::VectorInterface using Dune::Stuff::LA::EigenDenseVector< double >.
  *
  * \see   Dune::Pymor::LA::VectorInterface
  */
-class DuneDynamicVector
-  : public Dune::DynamicVector< double >
+class EigenDenseVector
+  : public Dune::Stuff::LA::EigenDenseVector< double >
   , public Dune::Pymor::LA::VectorInterface
 {
-  typedef Dune::DynamicVector< double > BaseType;
+  typedef Dune::Stuff::LA::EigenDenseVector< double > BaseType;
 public:
-  DuneDynamicVector(const int ss, const double value = 0.0);
+  EigenDenseVector(const int ss, const double value = 0.0);
 
-  DuneDynamicVector(const BaseType& other);
+  EigenDenseVector(const BaseType& other);
 
-  static DuneDynamicVector* create(const int ss);
+  static EigenDenseVector* create(const int ss);
 
   /**
    * \copydoc Dune::Pymor::LA::VectorInterface::type
-   * \return  "dunepymor.vector.dunedynamic"
+   * \return  "dunepymor.vector.eigendense"
    */
   virtual std::string type() const;
 
   /**
-   * \brief  "dunepymor.vector.dunedynamic"
-   * \return "dunepymor.vector.dunedynamic"
+   * \brief  "dunepymor.vector.eigendense"
+   * \return "dunepymor.vector.eigendense"
    */
   static std::string static_type();
 
@@ -52,7 +54,7 @@ public:
   virtual unsigned int dim() const;
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::almost_equal
-  virtual bool almost_equal(const DuneDynamicVector* other,
+  virtual bool almost_equal(const EigenDenseVector* other,
                             const double epsilon = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
     throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match);
 
@@ -60,12 +62,12 @@ public:
   virtual void scal(const double alpha);
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::axpy
-  virtual void axpy(const double alpha, const DuneDynamicVector* x) throw (Exception::types_are_not_compatible,
-                                                                           Exception::sizes_do_not_match);
+  virtual void axpy(const double alpha, const EigenDenseVector* x) throw (Exception::types_are_not_compatible,
+                                                                          Exception::sizes_do_not_match);
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::dot
-  virtual double dot(const DuneDynamicVector* other) const throw (Exception::types_are_not_compatible,
-                                                                  Exception::sizes_do_not_match);
+  virtual double dot(const EigenDenseVector* other) const throw (Exception::types_are_not_compatible,
+                                                                 Exception::sizes_do_not_match);
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::l1_norm
   virtual double l1_norm() const;
@@ -84,25 +86,25 @@ public:
   virtual std::vector< double > amax() const;
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::add
-  virtual DuneDynamicVector* add(const DuneDynamicVector* other) const throw (Exception::types_are_not_compatible,
-                                                                              Exception::sizes_do_not_match);
+  virtual EigenDenseVector* add(const EigenDenseVector* other) const throw (Exception::types_are_not_compatible,
+                                                                            Exception::sizes_do_not_match);
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::iadd
-  virtual void iadd(const DuneDynamicVector* other) throw (Exception::types_are_not_compatible,
-                                                           Exception::sizes_do_not_match);
+  virtual void iadd(const EigenDenseVector* other) throw (Exception::types_are_not_compatible,
+                                                          Exception::sizes_do_not_match);
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::sub
-  virtual DuneDynamicVector* sub(const DuneDynamicVector* other) const throw (Exception::types_are_not_compatible,
-                                                                              Exception::sizes_do_not_match);
+  virtual EigenDenseVector* sub(const EigenDenseVector* other) const throw (Exception::types_are_not_compatible,
+                                                                            Exception::sizes_do_not_match);
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::isub
-  virtual void isub(const DuneDynamicVector* other) throw (Exception::types_are_not_compatible,
-                                                           Exception::sizes_do_not_match);
-}; // class DuneDynamicVector
-
+  virtual void isub(const EigenDenseVector* other) throw (Exception::types_are_not_compatible,
+                                                          Exception::sizes_do_not_match);
+}; // class EigenDenseVector
 
 } // namespace LA
 } // namespace Pymor
 } // namespace Dune
 
-#endif // DUNE_PYMOR_LA_CONTAINER_DYNAMICVECTOR_HH
+#endif // HAVE_EIGEN
+#endif // DUNE_PYMOR_LA_CONTAINER_EIGEN_HH

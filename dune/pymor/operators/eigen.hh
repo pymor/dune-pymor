@@ -9,7 +9,7 @@
 #if HAVE_EIGEN
 #include <dune/stuff/la/container/eigen.hh>
 
-#include <dune/pymor/la/container/eigen.hh>
+#include <dune/pymor/la/container/eigenvector.hh>
 #include <dune/pymor/parameters/base.hh>
 
 #include "interfaces.hh"

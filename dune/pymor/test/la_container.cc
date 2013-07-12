@@ -14,7 +14,7 @@
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/la/container/dunedynamicvector.hh>
 #if HAVE_EIGEN
-  #include <dune/pymor/la/container/eigen.hh>
+  #include <dune/pymor/la/container/eigenvector.hh>
 #endif
 
 using namespace Dune;

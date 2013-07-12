@@ -9,6 +9,7 @@ noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
   la/container/dunedynamicvector.cc \
+  la/container/eigenvector.cc \
   la/container.cc \
   parameters/base.cc \
   operators.cc \

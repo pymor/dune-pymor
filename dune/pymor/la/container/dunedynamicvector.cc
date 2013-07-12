@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#include <dune/stuff/common/float_cmp.hh>
+
 #include "dunedynamicvector.hh"
 
 namespace Dune {

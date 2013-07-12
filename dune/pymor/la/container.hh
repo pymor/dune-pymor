@@ -9,7 +9,7 @@
 #include <dune/pymor/common/exceptions.hh>
 #include "container/interfaces.hh"
 #include "container/dunedynamicvector.hh"
-#include "container/eigen.hh"
+#include "container/eigenvector.hh"
 
 namespace Dune {
 namespace Pymor {
