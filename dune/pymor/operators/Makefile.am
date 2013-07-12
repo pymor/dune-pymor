@@ -6,4 +6,15 @@
 operatorsincludedir = $(includedir)/dune/pymor/operators
 operatorsinclude_HEADERS = default.hh dunedynamicmatrix.hh eigen.hh interfaces.hh
 
+noinst_LTLIBRARIES = libpymoroperators.la
+
+libpymoroperators_la_SOURCES = \
+  default.cc \
+  dunedynamicmatrix.cc \
+  eigen.cc
+
+libpymoroperators_la_LIBADD =
+
+libpymoroperators_la_CPPFLAGS = ${DUNE_CPPFLAGS}
+
 include $(top_srcdir)/am/global-rules

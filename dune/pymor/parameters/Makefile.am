@@ -6,4 +6,14 @@
 parametersincludedir = $(includedir)/dune/pymor
 parametersinclude_HEADERS = base.hh functional.hh
 
+noinst_LTLIBRARIES = libpymorparameters.la
+
+libpymorparameters_la_SOURCES = \
+  base.cc \
+  functional.cc
+
+libpymorparameters_la_LIBADD =
+
+libpymorparameters_la_CPPFLAGS = ${DUNE_CPPFLAGS}
+
 include $(top_srcdir)/am/global-rules
