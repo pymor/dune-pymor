@@ -11,6 +11,7 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([])
 AC_CONFIG_HEADERS([config.h])
 
+AM_INIT_AUTOMAKE([subdir-objects])
 
 # we need no more than the standard DE-stuff
 # this module depends on dune-common

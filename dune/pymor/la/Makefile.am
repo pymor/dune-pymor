@@ -5,14 +5,4 @@
 
 SUBDIRS = container
 
-noinst_LTLIBRARIES = libpymorla.la
-
-libpymorla_la_SOURCES = \
-  container.cc
-
-libpymorla_la_LIBADD = \
-  container/libpymorlacontainer.la
-
-libpymorla_la_CPPFLAGS = ${DUNE_CPPFLAGS}
-
 include $(top_srcdir)/am/global-rules

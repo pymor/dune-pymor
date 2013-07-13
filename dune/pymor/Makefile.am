@@ -11,13 +11,18 @@ SUBDIRDS = . common discretizations functions la operators parameters
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
+  discretizations/interfaces.cc \
+  la/container/dunedynamicvector.cc \
+  la/container/eigenvector.cc \
+  la/container.cc \
+  operators/default.cc \
+  operators/dunedynamicmatrix.cc \
+  operators/eigen.cc \
+  parameters/base.cc \
+  parameters/functional.cc \
   operators.cc
 
-libpymor_la_LIBADD = \
-  discretizations/libpymordiscretizations.la \
-  la/libpymorla.la \
-  operators/libpymoroperators.la \
-  parameters/libpymorparameters.la
+libpymor_la_LIBADD = $(DUNE_LIBS)
 
 libpymor_la_CPPFLAGS = ${DUNE_CPPFLAGS}
 
