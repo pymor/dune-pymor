@@ -99,6 +99,36 @@ TEST(Parameter, Parameters_Base)
   //  DSC_LOG_DEBUG << param2 << std::endl;
 }
 
+TEST(Parametric, Parameters_Base)
+{
+  class Foo
+    : public Parametric
+  {
+  public:
+    Foo()
+      : Parametric()
+    {
+      Parameter muDiffusion = {"diffusion", {1.0, 2.0}};
+      Parameter muForce = {{"first_force", "second_force"},
+                          {{1.0},          {1.0, 2.0, 3.0}}};
+      Parameter mu = {{"diffusion", "first_force", "second_force"},
+                     {{1.0, 2.0},   {1.0},         {1.0, 2.0, 3.0}}};
+      inherit_parameter_type(muDiffusion, "a");
+      inherit_parameter_type(muForce, "b");
+      const ParameterType& typeDiffusion = map_parameter_type("a");
+      if (typeDiffusion != muDiffusion.type()) DUNE_PYMOR_THROW(PymorException, "");
+      const ParameterType& typeForce = map_parameter_type("b");
+      if (typeForce != muForce.type()) DUNE_PYMOR_THROW(PymorException, "");
+      const Parameter mappedMuDiffusion = map_parameter(mu, "a");
+      if (mappedMuDiffusion != muDiffusion) DUNE_PYMOR_THROW(PymorException, "");
+      const Parameter mappedMuForce = map_parameter(mu, "b");
+      if (mappedMuForce != muForce) DUNE_PYMOR_THROW(PymorException, "");
+    }
+  };
+
+  Foo DUNE_UNUSED(foo);
+}
+
 int main(int argc, char** argv)
 {
   test_init(argc, argv);
