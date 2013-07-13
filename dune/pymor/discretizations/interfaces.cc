@@ -29,6 +29,10 @@ StationaryDiscretizationInterface::StationaryDiscretizationInterface(const std::
   : Parametric(kk, vv)
 {}
 
+StationaryDiscretizationInterface::StationaryDiscretizationInterface(const Parametric& pp)
+  : Parametric(pp)
+{}
+
 StationaryDiscretizationInterface::~StationaryDiscretizationInterface()
 {}
 

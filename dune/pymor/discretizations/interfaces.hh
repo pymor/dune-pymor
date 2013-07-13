@@ -34,17 +34,19 @@ public:
                                                                          Exception::index_out_of_range,
                                                                          Exception::sizes_do_not_match);
 
+  StationaryDiscretizationInterface(const Parametric& pp);
+
   virtual ~StationaryDiscretizationInterface();
 
   virtual std::vector< std::string > available_operators() const = 0;
 
-  virtual OperatorInterface* get_operator(const std::string id) const = 0;
+  virtual const OperatorInterface* get_operator(const std::string id) const = 0;
 
   virtual LA::VectorInterface* create_vector() const = 0;
 
   virtual std::vector< std::string > solver_options() const = 0;
 
-  virtual std::string solver_options(std::string context) const = 0;
+  virtual std::string solver_options(const std::string context) const = 0;
 
   virtual void solve(LA::VectorInterface* vector, const Parameter mu = Parameter()) const = 0;
 
