@@ -329,7 +329,7 @@ std::string Parameter::report() const
         ret << "{";
         for (size_t jj = 0; jj < (vv[ii].size() - 1); ++jj)
           ret << vv[ii][jj] << ", ";
-        ret << vv[ii][vv[ii].size() - 1] << "}";
+        ret << vv[ii][vv[ii].size() - 1] << "}, ";
       }
     }
     if (vv[vv.size() - 1].size() == 1) {
@@ -387,6 +387,11 @@ Parametric::Parametric(const std::vector< std::string >& kk,
   : type_(kk, vv)
 {}
 
+Parametric::Parametric(const Parametric& other)
+  : type_(other.type_)
+  , inherits_map_(other.inherits_map_)
+{}
+
 Parametric::~Parametric()
 {}
 
@@ -398,6 +403,98 @@ const ParameterType& Parametric::parameter_type() const
 bool Parametric::parametric() const
 {
   return !parameter_type().empty();
+}
+
+void Parametric::inherit_parameter_type(const Parameter& mu, const std::string id)
+  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
+{
+  inherit_parameter_type(mu.type(), id);
+}
+
+void Parametric::inherit_parameter_type(const ParameterType& tt, const std::string id)
+  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
+{
+  if (id.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "id must not be empty!");
+  if (inherits_map_.find(id) != inherits_map_.end())
+    DUNE_PYMOR_THROW(Exception::key_is_not_valid, "inheriting the same id twice is not yet implemeneted!");
+  inherits_map_[id] = tt;
+  for (auto key : tt.keys()) {
+    if (type_.hasKey(key) && (type_.get(key) != tt.get(key)))
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "the size for key '" << key << "' in tt (" << tt.get(key)
+                       << ") does not match the size for '" << key << "' in this parameter_type ("
+                       << type_.get(key) << ")!");
+    else
+      type_.set(key, tt.get(key));
+  }
+}
+
+Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) const
+  throw (Exception::key_is_not_valid, Exception::requirements_not_met)
+{
+  if (inherits_map_.empty())
+    DUNE_PYMOR_THROW(Exception::requirements_not_met, "there is nothing to map!");
+  const auto result = inherits_map_.find(id);
+  if (result == inherits_map_.end()) {
+    std::stringstream msg;
+    msg << "id has to be one of {";
+    size_t count = 0;
+    const auto itEnd = inherits_map_.end();
+    auto it = inherits_map_.begin();
+    if (inherits_map_.size() > 1) {
+      for (; it != itEnd; ++it) {
+        if (count < inherits_map_.size() - 1) {
+          msg << "'" << it->first << "', ";
+          ++count;
+        } else {
+          ++it;
+          break;
+        }
+      }
+    }
+    msg << "'" << it->first << "'} (is '" << id << "')!";
+    DUNE_PYMOR_THROW(Exception::key_is_not_valid, msg.str());
+  }
+  const ParameterType& localType = result->second;
+  Parameter muLocal;
+  for (auto key : localType.keys())
+    muLocal.set(key, mu.get(key));
+  return muLocal;
+}
+
+const ParameterType& Parametric::map_parameter_type(const std::string id) const throw (Exception::key_is_not_valid,
+                                                                                       Exception::requirements_not_met)
+{
+  if (inherits_map_.empty())
+    DUNE_PYMOR_THROW(Exception::requirements_not_met, "there is nothing to map!");
+  const auto result = inherits_map_.find(id);
+  if (result == inherits_map_.end()) {
+    std::stringstream msg;
+    msg << "id has to be one of {";
+    size_t count = 0;
+    const auto itEnd = inherits_map_.end();
+    auto it = inherits_map_.begin();
+    if (inherits_map_.size() > 1) {
+      for (; it != itEnd; ++it) {
+        if (count < inherits_map_.size() - 1) {
+          msg << "'" << it->first << "', ";
+          ++count;
+        } else {
+          ++it;
+          break;
+        }
+      }
+    }
+    msg << "'" << it->first << "'} (is '" << id << "')!";
+    DUNE_PYMOR_THROW(Exception::key_is_not_valid, msg.str());
+  }
+  return result->second;
+}
+
+void Parametric::replace_parameter_type(const ParameterType tt)
+{
+  inherits_map_.clear();
+  type_ = tt;
 }
 
 

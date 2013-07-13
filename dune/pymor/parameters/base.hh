@@ -206,14 +206,32 @@ public:
                                                   Exception::index_out_of_range,
                                                   Exception::sizes_do_not_match);
 
+  Parametric(const Parametric& other);
+
   virtual ~Parametric();
 
   const ParameterType& parameter_type() const;
 
   bool parametric() const;
 
+protected:
+  void inherit_parameter_type(const ParameterType& tt, const std::string id) throw (Exception::sizes_do_not_match,
+                                                                                    Exception::key_is_not_valid);
+
+  void inherit_parameter_type(const Parameter& mu, const std::string id) throw (Exception::sizes_do_not_match,
+                                                                                Exception::key_is_not_valid);
+
+  const ParameterType& map_parameter_type(const std::string id) const throw (Exception::key_is_not_valid,
+                                                                             Exception::requirements_not_met);
+
+  Parameter map_parameter(const Parameter& mu, const std::string id) const throw (Exception::key_is_not_valid,
+                                                                                  Exception::requirements_not_met);
+
+  void replace_parameter_type(const ParameterType tt = ParameterType());
+
 private:
   ParameterType type_;
+  std::map< std::string, ParameterType > inherits_map_;
 }; // class Parametric
 
 
