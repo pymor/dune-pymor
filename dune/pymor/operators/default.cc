@@ -161,7 +161,7 @@ LinearOperatorType* LinearAffinelyDecomposedDefault< LinearOperatorType >::compo
   if (size() == 0)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                      "do not call component(ii) if size() == 0!");
-  if (ii < 0 || ii >= size())
+  if (ii < 0 || ii >= int(size()))
     DUNE_PYMOR_THROW(Exception::index_out_of_range,
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
                      << size() << "!");
@@ -175,7 +175,7 @@ const LinearOperatorType* LinearAffinelyDecomposedDefault< LinearOperatorType >:
   if (size() == 0)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                      "do not call component(ii) if size() == 0!");
-  if (ii < 0 || ii >= size())
+  if (ii < 0 || ii >= int(size()))
     DUNE_PYMOR_THROW(Exception::index_out_of_range,
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
                      << size() << "!");
@@ -189,7 +189,7 @@ const ParameterFunctional* LinearAffinelyDecomposedDefault< LinearOperatorType >
   if (size() == 0)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                      "do not call coefficient(ii) if size() == 0!");
-  if (ii < 0 || ii >= size())
+  if (ii < 0 || ii >= int(size()))
     DUNE_PYMOR_THROW(Exception::index_out_of_range,
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
                      << size() << "!");
