@@ -13,6 +13,7 @@
 #include <dune/common/float_cmp.hh>
 
 #include <dune/pymor/common/exceptions.hh>
+#include <dune/pymor/functionals/interfaces.hh>
 
 namespace Dune {
 namespace Pymor {
@@ -37,6 +38,7 @@ static std::string static_type();
  *        where static_type() is expected to return the same as type();
  */
 class VectorInterface
+  : public Dune::Pymor::FunctionalInterface
 {
 public:
   virtual ~VectorInterface() {}
@@ -58,6 +60,8 @@ public:
    * \return  The dimension of the vector.
    */
   virtual unsigned int dim() const = 0;
+
+  virtual VectorInterface* copy() const = 0;
 
   /**
    * \brief   Check vectors for equality.
@@ -182,6 +186,39 @@ public:
   {
     DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
                      "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
+  }
+
+  virtual bool linear() const
+  {
+    return true;
+  }
+
+  virtual unsigned int dim_source() const
+  {
+    return dim();
+  }
+
+  virtual std::string type_source() const
+  {
+    return type();
+  }
+
+  virtual double apply(const LA::VectorInterface* source,
+                       const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                          Exception::you_have_to_implement_this,
+                                                                          Exception::sizes_do_not_match,
+                                                                          Exception::wrong_parameter_type,
+                                                                          Exception::requirements_not_met,
+                                                                          Exception::linear_solver_failed,
+                                                                          Exception::this_does_not_make_any_sense)
+  {
+    if (source->type() == type_source())
+      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
+    else
+      DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
+                       "the type of source (" << source->type() << ") does not match the type_source of this ("
+                       << type_source() << ")!");
+    return 0.0;
   }
 }; // class VectorInterface
 

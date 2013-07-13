@@ -29,6 +29,8 @@ class EigenDenseVector
 {
   typedef Dune::Stuff::LA::EigenDenseVector< double > BaseType;
 public:
+  typedef EigenDenseVector SourceType;
+
   EigenDenseVector(const int ss, const double value = 0.0);
 
   EigenDenseVector(const BaseType& other);
@@ -49,6 +51,8 @@ public:
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::compatibleTypes
   virtual std::vector< std::string > compatibleTypes() const;
+
+  virtual EigenDenseVector* copy() const;
 
   //! \copydoc Dune::Pymor::LA::VectorInterface::dim
   virtual unsigned int dim() const;
@@ -100,6 +104,15 @@ public:
   //! \copydoc Dune::Pymor::LA::VectorInterface::isub
   virtual void isub(const EigenDenseVector* other) throw (Exception::types_are_not_compatible,
                                                           Exception::sizes_do_not_match);
+
+  virtual double apply(const EigenDenseVector* source,
+                       const Parameter mu = Parameter()) const throw (Exception::types_are_not_compatible,
+                                                                      Exception::you_have_to_implement_this,
+                                                                      Exception::sizes_do_not_match,
+                                                                      Exception::wrong_parameter_type,
+                                                                      Exception::requirements_not_met,
+                                                                      Exception::linear_solver_failed,
+                                                                      Exception::this_does_not_make_any_sense);
 }; // class EigenDenseVector
 
 } // namespace LA

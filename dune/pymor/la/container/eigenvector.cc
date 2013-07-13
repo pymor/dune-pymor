@@ -48,6 +48,11 @@ std::vector< std::string > EigenDenseVector::compatibleTypes() const
   return { type() };
 }
 
+EigenDenseVector* EigenDenseVector::copy() const
+{
+  return new EigenDenseVector(*this);
+}
+
 unsigned int EigenDenseVector::dim() const
 {
   return BaseType::size();
@@ -176,6 +181,22 @@ void EigenDenseVector::isub(const EigenDenseVector* other) throw (Exception::typ
                      "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
   BaseType::backend() -= other->backend();
 } // ... isub(...)
+
+double EigenDenseVector::apply(const EigenDenseVector* source,
+                               const Parameter mu) const throw (Exception::types_are_not_compatible,
+                                                                Exception::you_have_to_implement_this,
+                                                                Exception::sizes_do_not_match,
+                                                                Exception::wrong_parameter_type,
+                                                                Exception::requirements_not_met,
+                                                                Exception::linear_solver_failed,
+                                                                Exception::this_does_not_make_any_sense)
+{
+  if (!mu.empty())
+    DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "since parametric() == false, mu has to be empty (is "
+                     << mu << ")!");
+  return dot(source);
+}
+
 
 } // namespace LA
 } // namespace Pymor

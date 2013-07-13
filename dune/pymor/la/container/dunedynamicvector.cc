@@ -44,6 +44,11 @@ std::vector< std::string > DuneDynamicVector::compatibleTypes() const
   return { type() };
 }
 
+DuneDynamicVector* DuneDynamicVector::copy() const
+{
+  return new DuneDynamicVector(*this);
+}
+
 unsigned int DuneDynamicVector::dim() const
 {
   return BaseType::size();
@@ -178,6 +183,21 @@ void DuneDynamicVector::isub(const DuneDynamicVector* other) throw (Exception::t
   for (size_t ii = 0; ii < dim(); ++ii)
     BaseType::operator[](ii) -= other->operator[](ii);
 } // ... isub(...)
+
+double DuneDynamicVector::apply(const DuneDynamicVector* source,
+                                const Parameter mu) const throw (Exception::types_are_not_compatible,
+                                                                 Exception::you_have_to_implement_this,
+                                                                 Exception::sizes_do_not_match,
+                                                                 Exception::wrong_parameter_type,
+                                                                 Exception::requirements_not_met,
+                                                                 Exception::linear_solver_failed,
+                                                                 Exception::this_does_not_make_any_sense)
+{
+  if (!mu.empty())
+    DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "since parametric() == false, mu has to be empty (is "
+                     << mu << ")!");
+  return dot(source);
+}
 
 
 } // namespace LA
