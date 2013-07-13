@@ -157,7 +157,7 @@ class requirements_not_met
  * \brief Exception for wrong input arguments.
  */
 class wrong_input
-  : public Dune::InvalidStateException
+  : public Dune::RangeError
   , public Dune::PymorException
 {};
 
@@ -165,7 +165,7 @@ class wrong_input
  * \brief Exception for operators/matrices which are not invertible.
  */
 class not_invertible
-  : public Dune::InvalidStateException
+  : public Dune::MathError
   , public Dune::PymorException
 {};
 
@@ -173,7 +173,15 @@ class not_invertible
  * \brief Exception for linear solvers which did not succeed.
  */
 class linear_solver_failed
-  : public Dune::InvalidStateException
+  : public Dune::MathError
+  , public Dune::PymorException
+{};
+
+/**
+ * \brief Exception for input/output errors.
+ */
+class io_error
+  : public Dune::IOError
   , public Dune::PymorException
 {};
 
