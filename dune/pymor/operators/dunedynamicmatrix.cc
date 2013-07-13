@@ -173,7 +173,7 @@ DuneDynamicMatrix::DuneDynamicMatrix(const BaseType& other)
 {}
 
 DuneDynamicMatrix::DuneDynamicMatrix(const int rr, const int cc) throw (Exception::index_out_of_range)
-  : BaseType(DuneDynamicMatrix::assert_is_positive(rr), DuneDynamicMatrix::assert_is_positive(cc))
+  : BaseType(DuneDynamicMatrix::assert_is_positive(rr), DuneDynamicMatrix::assert_is_positive(cc), 0.0)
   , LinearOperatorInterface()
 {}
 

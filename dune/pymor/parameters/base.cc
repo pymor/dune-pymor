@@ -35,8 +35,8 @@ KeyValueBase< KeyType, ValueType >::KeyValueBase(const KeyType& kk, const ValueT
 
 template< class KeyType, class ValueType >
 KeyValueBase< KeyType, ValueType >::KeyValueBase(const std::vector< KeyType >& kk,
-                           const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                                      Exception::sizes_do_not_match)
+                                                 const std::vector< ValueType >& vv)
+  throw (Exception::key_is_not_valid, Exception::sizes_do_not_match)
 {
   if (kk.size() != vv.size())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
