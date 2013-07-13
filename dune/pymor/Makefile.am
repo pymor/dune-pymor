@@ -6,12 +6,13 @@
 pymorincludedir = $(includedir)/dune/pymor/
 pymorinclude_HEADERS = operators.hh
 
-SUBDIRDS = . common discretizations functions la operators parameters
+SUBDIRDS = . common discretizations functionals functions la operators parameters
 
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
   discretizations/interfaces.cc \
+  functionals/default.cc \
   la/container/dunedynamicvector.cc \
   la/container/eigenvector.cc \
   la/container.cc \
