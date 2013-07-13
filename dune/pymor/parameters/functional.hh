@@ -27,7 +27,11 @@ class ParameterFunctional
 public:
   ParameterFunctional(const ParameterType& tt, const std::string& exp);
 
+  ParameterFunctional(const ParameterFunctional& other);
+
   ~ParameterFunctional();
+
+  ParameterFunctional& operator=(const ParameterFunctional& other);
 
   const std::string& expression() const;
 

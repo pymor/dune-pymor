@@ -22,9 +22,27 @@ ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::str
   setup();
 }
 
+ParameterFunctional::ParameterFunctional(const ParameterFunctional& other)
+  : Parametric(other.parameter_type())
+  , expression_(other.expression_)
+{
+  setup();
+}
+
 ParameterFunctional::~ParameterFunctional()
 {
   cleanup();
+}
+
+ParameterFunctional& ParameterFunctional::operator=(const ParameterFunctional& other)
+{
+  if (this != &other) {
+    cleanup();
+    replace_parameter_type(other.parameter_type());
+    expression_ = other.expression_;
+    setup();
+  }
+  return *this;
 }
 
 const std::string& ParameterFunctional::expression() const
