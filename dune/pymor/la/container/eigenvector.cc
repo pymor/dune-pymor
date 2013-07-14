@@ -28,11 +28,6 @@ EigenDenseVector::EigenDenseVector(const BaseType& other)
   : BaseType(other)
 {}
 
-EigenDenseVector* EigenDenseVector::create(const int ss)
-{
-  return new EigenDenseVector(ss);
-}
-
 std::string EigenDenseVector::type() const
 {
   return "dunepymor.vector.eigendense";
@@ -41,11 +36,6 @@ std::string EigenDenseVector::type() const
 std::string EigenDenseVector::static_type()
 {
   return "dunepymor.vector.eigendense";
-}
-
-std::vector< std::string > EigenDenseVector::compatibleTypes() const
-{
-  return { type() };
 }
 
 EigenDenseVector* EigenDenseVector::copy() const

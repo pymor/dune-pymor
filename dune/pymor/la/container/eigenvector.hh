@@ -35,8 +35,6 @@ public:
 
   EigenDenseVector(const BaseType& other);
 
-  static EigenDenseVector* create(const int ss);
-
   /**
    * \copydoc Dune::Pymor::LA::VectorInterface::type
    * \return  "dunepymor.vector.eigendense"
@@ -48,9 +46,6 @@ public:
    * \return "dunepymor.vector.eigendense"
    */
   static std::string static_type();
-
-  //! \copydoc Dune::Pymor::LA::VectorInterface::compatibleTypes
-  virtual std::vector< std::string > compatibleTypes() const;
 
   virtual EigenDenseVector* copy() const;
 

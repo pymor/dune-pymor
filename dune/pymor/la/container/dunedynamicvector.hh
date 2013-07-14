@@ -33,8 +33,6 @@ public:
 
   DuneDynamicVector(const BaseType& other);
 
-  static DuneDynamicVector* create(const int ss);
-
   /**
    * \copydoc Dune::Pymor::LA::VectorInterface::type
    * \return  "dunepymor.vector.dunedynamic"
@@ -46,9 +44,6 @@ public:
    * \return "dunepymor.vector.dunedynamic"
    */
   static std::string static_type();
-
-  //! \copydoc Dune::Pymor::LA::VectorInterface::compatibleTypes
-  virtual std::vector< std::string > compatibleTypes() const;
 
   virtual DuneDynamicVector* copy() const;
 

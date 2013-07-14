@@ -24,11 +24,6 @@ DuneDynamicVector::DuneDynamicVector(const BaseType& other)
   : BaseType(other)
 {}
 
-DuneDynamicVector* DuneDynamicVector::create(const int ss)
-{
-  return new DuneDynamicVector(ss);
-}
-
 std::string DuneDynamicVector::type() const
 {
   return "dunepymor.vector.dunedynamic";
@@ -37,11 +32,6 @@ std::string DuneDynamicVector::type() const
 std::string DuneDynamicVector::static_type()
 {
   return "dunepymor.vector.dunedynamic";
-}
-
-std::vector< std::string > DuneDynamicVector::compatibleTypes() const
-{
-  return { type() };
 }
 
 DuneDynamicVector* DuneDynamicVector::copy() const
@@ -146,7 +136,7 @@ DuneDynamicVector* DuneDynamicVector::add(const DuneDynamicVector* other) const
   if (dim() != other->dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
-  DuneDynamicVector* result = create(other->dim());
+  DuneDynamicVector* result = new DuneDynamicVector(other->dim());
   for (size_t ii = 0; ii < dim(); ++ii)
     result->operator[](ii) = BaseType::operator[](ii) + other->operator[](ii);
   return result;
@@ -168,7 +158,7 @@ DuneDynamicVector* DuneDynamicVector::sub(const DuneDynamicVector* other) const
   if (dim() != other->dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "size of other (" << other->dim() << ") does not match size of this (" << dim() << ")!");
-  DuneDynamicVector* result = create(other->dim());
+  DuneDynamicVector* result = new DuneDynamicVector(other->dim());
   for (size_t ii = 0; ii < dim(); ++ii)
     result->operator[](ii) = BaseType::operator[](ii) - other->operator[](ii);
   return result;
