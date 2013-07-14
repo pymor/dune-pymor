@@ -13,6 +13,7 @@ noinst_LTLIBRARIES = libpymor.la
 libpymor_la_SOURCES = \
   discretizations/interfaces.cc \
   functionals/default.cc \
+  functionals/interfaces.cc \
   la/container/dunedynamicvector.cc \
   la/container/eigenvector.cc \
   la/container/interfaces.cc \

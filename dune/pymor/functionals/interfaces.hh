@@ -13,6 +13,7 @@
 namespace Dune {
 namespace Pymor {
 
+// forward, include is below
 namespace LA {
 class VectorInterface;
 }
@@ -21,12 +22,21 @@ class FunctionalInterface
   : public Parametric
 {
 public:
-  template< class... Args >
-  FunctionalInterface(Args&& ...args)
-    : Parametric(std::forward< Args >(args)...)
-  {}
+  FunctionalInterface();
 
-  virtual ~FunctionalInterface() {}
+  FunctionalInterface(const Parametric& other);
+
+  FunctionalInterface(const ParameterType& tt);
+
+  FunctionalInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
+                                                                   Exception::index_out_of_range);
+
+  FunctionalInterface(const std::vector< std::string >& kk,
+                      const std::vector< int >& vv) throw (Exception::key_is_not_valid,
+                                                           Exception::index_out_of_range,
+                                                           Exception::sizes_do_not_match);
+
+  virtual ~FunctionalInterface();
 
   virtual bool linear() const = 0;
 
@@ -46,11 +56,7 @@ public:
   virtual FunctionalInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric,
            Exception::you_have_to_implement_this,
-           Exception::this_does_not_make_any_sense,
-           Exception::this_does_not_make_any_sense)
-  {
-    DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
-  }
+           Exception::this_does_not_make_any_sense);
 }; // class FunctionalInterface
 
 
@@ -58,12 +64,21 @@ class AffinelyDecomposedFunctionalInterface
   : public FunctionalInterface
 {
 public:
-  template< class... Args >
-  AffinelyDecomposedFunctionalInterface(Args&& ...args)
-    : FunctionalInterface(std::forward< Args >(args)...)
-  {}
+  AffinelyDecomposedFunctionalInterface();
 
-  virtual ~AffinelyDecomposedFunctionalInterface() {}
+  AffinelyDecomposedFunctionalInterface(const Parametric& other);
+
+  AffinelyDecomposedFunctionalInterface(const ParameterType& tt);
+
+  AffinelyDecomposedFunctionalInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
+                                                                                     Exception::index_out_of_range);
+
+  AffinelyDecomposedFunctionalInterface(const std::vector< std::string >& kk,
+                                        const std::vector< int >& vv) throw (Exception::key_is_not_valid,
+                                                                             Exception::index_out_of_range,
+                                                                             Exception::sizes_do_not_match);
+
+  virtual ~AffinelyDecomposedFunctionalInterface();
 
   virtual unsigned int num_components() const = 0;
 

@@ -169,7 +169,6 @@ const ParameterFunctional* LinearAffinelyDecomposedDefault< LinearFunctionalType
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and num_components() = "
                      << size_ << "!");
   return coefficients_[ii];
-
 }
 
 template< class LinearFunctionalType >
