@@ -30,9 +30,8 @@ module, Vector = add_dune_Vector(module, 'DerivedFoo')
 \endcode
  *        in your python code, where DerivedFoo is a derived class, i.e. Dune::Pymor::LA::DuneDynamicVector and module
  *        is a pybindgen.module.Module.
- * \note  All derived classes are expected to implement the following static methods:
+ * \note  All derived classes are expected to implement the following static method:
  * \code
-static DerivedFoo* create(const int ss);
 static std::string static_type();
 \endcode
  *        where static_type() is expected to return the same as type();
@@ -41,19 +40,13 @@ class VectorInterface
   : public Dune::Pymor::FunctionalInterface
 {
 public:
-  virtual ~VectorInterface() {}
+  virtual ~VectorInterface();
 
   /**
    * \brief   A unique (per class, not per instance) identifier.
    * \return  A unique (per class, not per instance) identifier.
    */
   virtual std::string type() const = 0;
-
-  /**
-   * \brief   A list of types which are compatible.
-   * \return  A list of types which are compatible.
-   */
-  virtual std::vector< std::string > compatibleTypes() const = 0;
 
   /**
    * \brief   The dimension of the vector.
@@ -72,11 +65,7 @@ public:
    */
   virtual bool almost_equal(const Dune::Pymor::LA::VectorInterface* other,
                             const double /*epsilon*/ = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
   /**
    * \brief BLAS SCAL operation (in-place sclar multiplication).
@@ -90,11 +79,7 @@ public:
    * \param x     Vector that is to be added.
    */
   virtual void axpy(const double /*alpha*/, const Dune::Pymor::LA::VectorInterface* x)
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << x->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
   /**
    * \brief   Computes the scalar products between two vectors.
@@ -102,11 +87,7 @@ public:
    * \return        The scalar product.
    */
   virtual double dot(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
   /**
    * \brief   The l1-norm of the vector.
@@ -148,22 +129,14 @@ public:
    * \return        The sum of this and other.
    */
   virtual Dune::Pymor::LA::VectorInterface* add(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
   /**
    * \brief Inplace variant of add().
    * \param other The right summand.
    */
   virtual void iadd(const Dune::Pymor::LA::VectorInterface* other)
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
   /**
    * \brief   Subtracts two vectors.
@@ -171,37 +144,20 @@ public:
    * \return        The difference between this and other.
    */
   virtual Dune::Pymor::LA::VectorInterface* sub(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
   /**
    * \brief Inplace variant of sub().
    * \param other The subtrahend.
    */
   virtual void isub(const Dune::Pymor::LA::VectorInterface* other)
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match)
-  {
-    DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                     "this (" << type() << ") is not compatible with other (" << other->type() << ")!");
-  }
+    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
 
-  virtual bool linear() const
-  {
-    return true;
-  }
+  virtual bool linear() const;
 
-  virtual unsigned int dim_source() const
-  {
-    return dim();
-  }
+  virtual unsigned int dim_source() const;
 
-  virtual std::string type_source() const
-  {
-    return type();
-  }
+  virtual std::string type_source() const;
 
   virtual double apply(const LA::VectorInterface* source,
                        const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
@@ -210,16 +166,7 @@ public:
                                                                           Exception::wrong_parameter_type,
                                                                           Exception::requirements_not_met,
                                                                           Exception::linear_solver_failed,
-                                                                          Exception::this_does_not_make_any_sense)
-  {
-    if (source->type() == type_source())
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");
-    else
-      DUNE_PYMOR_THROW(Exception::types_are_not_compatible,
-                       "the type of source (" << source->type() << ") does not match the type_source of this ("
-                       << type_source() << ")!");
-    return 0.0;
-  }
+                                                                          Exception::this_does_not_make_any_sense);
 }; // class VectorInterface
 
 

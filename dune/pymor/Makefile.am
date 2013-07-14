@@ -15,6 +15,7 @@ libpymor_la_SOURCES = \
   functionals/default.cc \
   la/container/dunedynamicvector.cc \
   la/container/eigenvector.cc \
+  la/container/interfaces.cc \
   la/container.cc \
   operators/default.cc \
   operators/dunedynamicmatrix.cc \
