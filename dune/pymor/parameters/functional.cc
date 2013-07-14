@@ -16,6 +16,7 @@ namespace Pymor {
 
 
 ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::string& exp)
+   throw (Exception::sizes_do_not_match)
   : Parametric(tt)
   , expression_(exp)
 {
@@ -23,6 +24,7 @@ ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::str
 }
 
 ParameterFunctional::ParameterFunctional(const ParameterFunctional& other)
+   throw (Exception::sizes_do_not_match)
   : Parametric(other.parameter_type())
   , expression_(other.expression_)
 {
@@ -35,6 +37,7 @@ ParameterFunctional::~ParameterFunctional()
 }
 
 ParameterFunctional& ParameterFunctional::operator=(const ParameterFunctional& other)
+   throw (Exception::sizes_do_not_match)
 {
   if (this != &other) {
     cleanup();

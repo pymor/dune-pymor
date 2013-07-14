@@ -25,13 +25,13 @@ class ParameterFunctional
   : public Parametric
 {
 public:
-  ParameterFunctional(const ParameterType& tt, const std::string& exp);
+  ParameterFunctional(const ParameterType& tt, const std::string& exp) throw (Exception::sizes_do_not_match);
 
-  ParameterFunctional(const ParameterFunctional& other);
+  ParameterFunctional(const ParameterFunctional& other) throw (Exception::sizes_do_not_match);
 
   ~ParameterFunctional();
 
-  ParameterFunctional& operator=(const ParameterFunctional& other);
+  ParameterFunctional& operator=(const ParameterFunctional& other) throw (Exception::sizes_do_not_match);
 
   const std::string& expression() const;
 
