@@ -21,8 +21,9 @@ class LinearAffinelyDecomposedDefault
   : public AffinelyDecomposedOperatorInterface
 {
 public:
-  typedef typename LinearOperatorType::SourceType SourceType;
-  typedef typename LinearOperatorType::RangeType  RangeType;
+  typedef typename LinearOperatorType::InverseType  InverseType;
+  typedef typename LinearOperatorType::SourceType   SourceType;
+  typedef typename LinearOperatorType::RangeType    RangeType;
 
   LinearAffinelyDecomposedDefault();
 
@@ -80,8 +81,8 @@ public:
                                                                         Exception::sizes_do_not_match,
                                                                         Exception::wrong_parameter_type,
                                                                         Exception::requirements_not_met,
-                                                                        Exception::linear_solver_failed/*,
-                                                                        Exception::this_does_not_make_any_sense*/);
+                                                                        Exception::linear_solver_failed,
+                                                                        Exception::this_does_not_make_any_sense);
 
   virtual void apply(const SourceType* source,
                      RangeType* range,
@@ -91,8 +92,8 @@ public:
            Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
-           Exception::linear_solver_failed/*,
-           Exception::this_does_not_make_any_sense*/);
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
 
   virtual double apply2(const SourceType* range,
                         const RangeType* source,
@@ -106,14 +107,14 @@ public:
 
   static std::vector< std::string > invert_options();
 
-  virtual const OperatorInterface* invert(const std::string /*type*/ = invert_options()[0],
-                                          const Parameter /*mu*/ = Parameter()) const
+  virtual const InverseType* invert(const std::string type = invert_options()[0],
+                                    const Parameter mu = Parameter()) const
     throw (Exception::not_invertible, Exception::key_is_not_valid);
 
-  virtual void apply_inverse(const LA::VectorInterface* /*range*/,
-                             LA::VectorInterface* /*source*/,
-                             const std::string /*type*/ = invert_options()[0],
-                             const Parameter /*mu*/ = Parameter()) const
+  virtual void apply_inverse(const LA::VectorInterface* range,
+                             LA::VectorInterface* source,
+                             const std::string type = invert_options()[0],
+                             const Parameter mu = Parameter()) const
     throw (Exception::types_are_not_compatible,
            Exception::you_have_to_implement_this,
            Exception::sizes_do_not_match,
@@ -137,6 +138,7 @@ private:
   std::vector< LinearOperatorType* > components_;
   std::vector< const ParameterFunctional* > coefficients_;
   LinearOperatorType* affinePart_;
+  mutable std::vector< const LinearOperatorType* > frozenOperators_;
 }; // class LinearAffinelyDecomposedDefault
 
 

@@ -64,6 +64,8 @@ LinearAffinelyDecomposedDefault< LinearOperatorType >::~LinearAffinelyDecomposed
     delete element;
   for (auto& element : coefficients_)
     delete element;
+  for (auto& element : frozenOperators_)
+    delete element;
 }
 
 template< class LinearOperatorType >
@@ -259,8 +261,8 @@ void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply(const LA::Vect
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed/*,
-         Exception::this_does_not_make_any_sense*/)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   std::stringstream msg;
   size_t throw_up = 0;
@@ -285,8 +287,8 @@ void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply(const SourceTy
          Exception::sizes_do_not_match,
          Exception::wrong_parameter_type,
          Exception::requirements_not_met,
-         Exception::linear_solver_failed/*,
-         Exception::this_does_not_make_any_sense*/)
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
 {
   if (source->dim() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -365,19 +367,25 @@ std::vector< std::string > LinearAffinelyDecomposedDefault< LinearOperatorType >
 }
 
 template< class LinearOperatorType >
-const OperatorInterface* LinearAffinelyDecomposedDefault< LinearOperatorType >::invert(const std::string /*type*/,
-                                                                                       const Parameter /*mu*/) const
+const typename LinearAffinelyDecomposedDefault< LinearOperatorType >::InverseType*
+LinearAffinelyDecomposedDefault< LinearOperatorType >::invert(const std::string type, const Parameter mu) const
   throw (Exception::not_invertible, Exception::key_is_not_valid)
 {
-  assert(false);
-  return nullptr;
+  if (mu.type() != parameter_type())
+    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
+                     "calling invert() on an LinearAffinelyDecomposedDefault is only supported for a fixed mu"
+                     << " and the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
+                     << parameter_type() << ")!");
+  const LinearOperatorType* frozen_operator = freeze_parameter(mu);
+  return frozen_operator->invert(type);
+  frozenOperators_.push_back(frozen_operator);
 }
 
 template< class LinearOperatorType >
-void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply_inverse(const LA::VectorInterface* /*range*/,
-                                                                          LA::VectorInterface* /*source*/,
-                                                                          const std::string /*type*/,
-                                                                          const Parameter /*mu*/) const
+void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply_inverse(const LA::VectorInterface* range,
+                                                                          LA::VectorInterface* source,
+                                                                          const std::string type,
+                                                                          const Parameter mu) const
 throw (Exception::types_are_not_compatible,
        Exception::you_have_to_implement_this,
        Exception::sizes_do_not_match,
@@ -386,7 +394,9 @@ throw (Exception::types_are_not_compatible,
        Exception::linear_solver_failed,
        Exception::this_does_not_make_any_sense)
 {
-  assert(false);
+  const InverseType* inverseOp = invert(type, mu);
+  inverseOp->apply(range, source);
+  delete inverseOp;
 }
 
 template< class LinearOperatorType >
