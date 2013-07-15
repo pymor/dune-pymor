@@ -17,7 +17,7 @@ namespace Dune {
 namespace Pymor {
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols >
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
 class ParametricFunctionInterface
   : public Parametric
 {
@@ -31,38 +31,28 @@ public:
   static const unsigned int                                               dimRangeCols = rangeDimCols;
   typedef Dune::FieldMatrix< RangeFieldType, dimRangeRows, dimRangeCols > RangeType;
 
-  template< class... Args >
-  ParametricFunctionInterface(Args&& ...args)
-    : Parametric(std::forward< Args >(args)...)
-  {}
+  ParametricFunctionInterface();
 
-  static const std::string static_id()
-  {
-    return "parametricfunction";
-  }
+  ParametricFunctionInterface(const ParameterType& tt);
 
-  virtual std::string id() const
-  {
-    return static_id();
-  }
+  ParametricFunctionInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
+                                                                           Exception::index_out_of_range);
 
-  virtual int order() const
-  {
-    return -1;
-  }
+  ParametricFunctionInterface(const std::vector< std::string >& kk,
+                              const std::vector< int >& vv) throw (Exception::key_is_not_valid,
+                                                                   Exception::index_out_of_range,
+                                                                   Exception::sizes_do_not_match);
+
+  ParametricFunctionInterface(const Parametric& other);
+
+  virtual std::string name() const;
+
+  virtual int order() const;
 
   virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const = 0;
 
   virtual RangeType evaluate(const DomainType& x, const Parameter mu = Parameter()) const
-  {
-    if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
-                       << Parametric::parameter_type() << ")!");
-    RangeType ret;
-    evaluate(x, ret, mu);
-    return ret;
-  }
+    throw (Exception::wrong_parameter_type);
 }; // class ParametricFunctionInterface
 
 
@@ -81,42 +71,32 @@ public:
   static const unsigned int                             dimRange = 1;
   typedef Dune::FieldVector< RangeFieldType, dimRange > RangeType;
 
-  template< class... Args >
-  ParametricFunctionInterface(Args&& ...args)
-    : Parametric(std::forward< Args >(args)...)
-  {}
+  ParametricFunctionInterface();
 
-  static const std::string static_id()
-  {
-    return "parametricfunction";
-  }
+  ParametricFunctionInterface(const ParameterType& tt);
 
-  virtual std::string id() const
-  {
-    return static_id();
-  }
+  ParametricFunctionInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
+                                                                           Exception::index_out_of_range);
 
-  virtual int order() const
-  {
-    return -1;
-  }
+  ParametricFunctionInterface(const std::vector< std::string >& kk,
+                              const std::vector< int >& vv) throw (Exception::key_is_not_valid,
+                                                                   Exception::index_out_of_range,
+                                                                   Exception::sizes_do_not_match);
+
+  ParametricFunctionInterface(const Parametric& other);
+
+  virtual std::string name() const;
+
+  virtual int order() const;
 
   virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const = 0;
 
   virtual RangeType evaluate(const DomainType& x, const Parameter mu = Parameter()) const
-  {
-    if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                       "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
-                       << Parametric::parameter_type() << ")!");
-    RangeType ret;
-    evaluate(x, ret, mu);
-    return ret;
-  }
+    throw (Exception::wrong_parameter_type);
 }; // class ParametricFunctionInterface< ..., 1 >
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols >
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
 class AffineParametricFunctionInterface
   : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
 {
@@ -124,26 +104,27 @@ public:
   typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
                                         RangeFieldImp, rangeDimRows, rangeDimCols > ParametricFunctionType;
 
-  template< class... Args >
-  AffineParametricFunctionInterface(Args&& ...args)
-    : ParametricFunctionType(std::forward< Args >(args)...)
-  {}
+  AffineParametricFunctionInterface();
 
-  static const std::string static_id()
-  {
-    return "affineparametricfunction";
-  }
+  AffineParametricFunctionInterface(const ParameterType& tt);
 
-  virtual std::string id() const
-  {
-    return static_id();
-  }
+  AffineParametricFunctionInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
+                                                                                 Exception::index_out_of_range);
+
+  AffineParametricFunctionInterface(const std::vector< std::string >& kk,
+                                    const std::vector< int >& vv) throw (Exception::key_is_not_valid,
+                                                                         Exception::index_out_of_range,
+                                                                         Exception::sizes_do_not_match);
+
+  AffineParametricFunctionInterface(const Parametric& other);
+
+  virtual std::string name() const;
 
   virtual bool hasAffinePart() const = 0;
 
   virtual const ParametricFunctionType* affinePart() const = 0;
 
-  virtual unsigned int size() const = 0;
+  virtual unsigned int num_components() const = 0;
 
   virtual const ParameterFunctional* coefficient(int ii) const = 0;
 
