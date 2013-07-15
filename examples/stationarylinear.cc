@@ -14,7 +14,7 @@ namespace Example {
 
 const size_t AnalyticalProblem::dim = 4;
 
-AnalyticalProblem::AnalyticalProblem() throw (Dune::Pymor::Exception::wrong_input)
+AnalyticalProblem::AnalyticalProblem()
   : Dune::Pymor::Parametric()
 {
   // build the data functions
@@ -192,6 +192,7 @@ std::vector< std::string > SimpleDiscretization::available_operators() const
 }
 
 const SimpleDiscretization::OperatorType* SimpleDiscretization::get_operator(const std::string id) const
+  throw (Dune::Pymor::Exception::key_is_not_valid)
 {
   if (id != "lhs")
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid, "id has to be 'lhs' (is " << id << ")!");
@@ -204,6 +205,7 @@ std::vector< std::string > SimpleDiscretization::available_functionals() const
 }
 
 const SimpleDiscretization::FunctionalType* SimpleDiscretization::get_functional(const std::string id) const
+  throw (Dune::Pymor::Exception::key_is_not_valid)
 {
   if (id != "rhs")
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid, "id has to be 'rhs' (is " << id << ")!");
@@ -221,6 +223,7 @@ std::vector< std::string > SimpleDiscretization::solver_options() const
 }
 
 std::string SimpleDiscretization::solver_options(const std::string context) const
+  throw (Dune::Pymor::Exception::key_is_not_valid)
 {
   if (context != solver_options()[0])
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid,

@@ -10,6 +10,7 @@
 #include <dune/pymor/discretizations/interfaces.hh>
 #include <dune/pymor/la/container/dunedynamicvector.hh>
 #include <dune/pymor/operators/dunedynamicmatrix.hh>
+#include <dune/pymor/operators/eigen.hh>
 #include <dune/pymor/operators/default.hh>
 #include <dune/pymor/functions/default.hh>
 #include <dune/pymor/functionals/default.hh>
@@ -26,7 +27,7 @@ public:
 
   static const size_t dim;
 
-  AnalyticalProblem() throw (Dune::Pymor::Exception::wrong_input);
+  AnalyticalProblem();
 
   ~AnalyticalProblem();
 
@@ -66,17 +67,20 @@ public:
 
   virtual std::vector< std::string > available_operators() const;
 
-  virtual const OperatorType* get_operator(const std::string id) const;
+  virtual const OperatorType* get_operator(const std::string id) const
+    throw (Dune::Pymor::Exception::key_is_not_valid);
 
   virtual std::vector< std::string > available_functionals() const;
 
-  virtual const FunctionalType* get_functional(const std::string id) const;
+  virtual const FunctionalType* get_functional(const std::string id) const
+    throw (Dune::Pymor::Exception::key_is_not_valid);
 
   virtual VectorType* create_vector() const;
 
   virtual std::vector< std::string > solver_options() const;
 
-  virtual std::string solver_options(const std::string context) const;
+  virtual std::string solver_options(const std::string context) const
+    throw (Dune::Pymor::Exception::key_is_not_valid);
 
   virtual void solve(Dune::Pymor::LA::VectorInterface* vector,
                      const Dune::Pymor::Parameter /*mu*/ = Dune::Pymor::Parameter()) const
