@@ -5,4 +5,5 @@
 
 from __future__ import absolute_import
 
-from .base import add_ParameterType
+from .base import inject_ParameterType, inject_Parameter, inject_Parametric
+from .functional import inject_ParameterFunctional

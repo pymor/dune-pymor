@@ -42,7 +42,7 @@ public:
 
   static const std::string static_id()
   {
-    return "affineparametricfunction.checkerboard";
+    return "dunepymor.affineparametricfunction.checkerboard";
   }
 
   virtual std::string id() const
@@ -53,7 +53,7 @@ public:
   Checkerboard(const DomainType& lowLeft,
                const DomainType& upRight,
                const std::vector< size_t >& numElements,
-               const std::string parameterName = static_id())
+               const std::string parameterName = "dunepymor.affineparametricfunction.checkerboard")
     : Parametric()
   {
     // check input
