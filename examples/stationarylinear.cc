@@ -20,8 +20,7 @@ AnalyticalProblem::AnalyticalProblem() throw (Dune::Pymor::Exception::wrong_inpu
   // build the data functions
   // * diffusion
   const Dune::Pymor::ParameterType muDiffusion = {"diffusion", dim};
-  diffusion_ = new FunctionType(muDiffusion);
-  diffusion_->register_component(new ExpressionFunctionType("x", "1.0"));
+  diffusion_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
   for (size_t ii = 0; ii < dim; ++ii)
     diffusion_->register_component(new ExpressionFunctionType("x", "1.0"),
                                    new Dune::Pymor::ParameterFunctional(muDiffusion,
@@ -30,7 +29,7 @@ AnalyticalProblem::AnalyticalProblem() throw (Dune::Pymor::Exception::wrong_inpu
   inherit_parameter_type(muDiffusion, "diffusion");
   // * force
   const Dune::Pymor::ParameterType muForce = {"force", dim};
-  force_ = new FunctionType(muForce);
+  force_ = new FunctionType();
   force_->register_component(new ExpressionFunctionType("x", "1.0"));
   for (size_t ii = 0; ii < dim; ++ii)
     force_->register_component(new ExpressionFunctionType("x", "1.0"),
@@ -40,8 +39,7 @@ AnalyticalProblem::AnalyticalProblem() throw (Dune::Pymor::Exception::wrong_inpu
   inherit_parameter_type(muForce, "force");
   // * dirichlet
   const Dune::Pymor::ParameterType muDirichlet = {"dirichlet", dim};
-  dirichlet_ = new FunctionType(muDirichlet);
-  dirichlet_->register_component(new ExpressionFunctionType("x", "1.0"));
+  dirichlet_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
   for (size_t ii = 0; ii < dim; ++ii)
     dirichlet_->register_component(new ExpressionFunctionType("x", "1.0"),
                                    new Dune::Pymor::ParameterFunctional(muDirichlet,
@@ -50,8 +48,7 @@ AnalyticalProblem::AnalyticalProblem() throw (Dune::Pymor::Exception::wrong_inpu
   inherit_parameter_type(muDirichlet, "dirichlet");
   // * neumann
   const Dune::Pymor::ParameterType muNeumann = {"neumann", dim};
-  neumann_ = new FunctionType(muNeumann);
-  neumann_->register_component(new ExpressionFunctionType("x", "1.0"));
+  neumann_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
   for (size_t ii = 0; ii < dim; ++ii)
     neumann_->register_component(new ExpressionFunctionType("x", "1.0"),
                                  new Dune::Pymor::ParameterFunctional(muNeumann,
@@ -97,13 +94,12 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   : BaseType()
   , problem_(prob)
   , dim_(prob->dim)
+  , op_(new OperatorType())
 {
   // left hand side
   // * diffusion operator
   const auto& diffusion = *(problem_->diffusion());
-  assert(int(diffusion.size()) == dim_);
-  const auto& muDiffusion = diffusion.parameter_type();
-  op_ = new OperatorType(muDiffusion);
+  assert(int(diffusion.num_components()) == dim_);
   for (int ii = 0; ii < dim_; ++ii) {
     OperatorComponentType* comp = new OperatorComponentType(dim_, dim_);
     comp->operator[](ii)[ii] = 1.0;
@@ -119,11 +115,11 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   inherit_parameter_type(op_->parameter_type(), "lhs");
   // right hand side
   const auto& force = *(problem_->force());
-  assert(int(force.size()) == dim_);
+  assert(int(force.num_components()) == dim_);
   const auto& dirichlet = *(problem_->dirichlet());
-  assert(int(dirichlet.size()) == dim_);
+  assert(int(dirichlet.num_components()) == dim_);
   const auto& neumann = *(problem_->neumann());
-  assert(int(neumann.size()) == dim_);
+  assert(int(neumann.num_components()) == dim_);
   func_ = new FunctionalType();
   VectorType* aff;
   const VectorType* ones = new VectorType(dim_, 1.0);
@@ -132,7 +128,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   // * force
   if (force.hasAffinePart())
     aff->iadd(ones);
-  for (size_t qq = 0; qq < force.size(); ++qq) {
+  for (size_t qq = 0; qq < force.num_components(); ++qq) {
     VectorType* comp = new VectorType(dim_);
     comp->operator[](qq) = 1.0;
     func_->register_component(comp,
@@ -141,7 +137,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   // * neumann
   if (neumann.hasAffinePart())
     aff->iadd(ones);
-  for (size_t qq = 0; qq < neumann.size(); ++qq) {
+  for (size_t qq = 0; qq < neumann.num_components(); ++qq) {
     VectorType* comp = new VectorType(dim_);
     comp->operator[](qq) = 1.0;
     func_->register_component(comp,
@@ -154,7 +150,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
       op_->affinePart()->apply(ones, tmp);
       aff->iadd(tmp);
     }
-    for (size_t qq = 0; qq < dirichlet.size(); ++qq) {
+    for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
       VectorType* comp = create_vector();
       comp->operator[](qq) = 1.0;
       func_->register_component(comp,
@@ -166,8 +162,8 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
     diffusionDirichletMu.set(key, diffusion.parameter_type().get(key));
   for (auto key : dirichlet.parameter_type().keys())
     diffusionDirichletMu.set(key, dirichlet.parameter_type().get(key));
-  for (size_t pp = 0; pp < diffusion.size(); ++pp) {
-    for (size_t qq = 0; qq < dirichlet.size(); ++qq) {
+  for (size_t pp = 0; pp < diffusion.num_components(); ++pp) {
+    for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
       VectorType* comp = create_vector();
       VectorType* dirichletComp = create_vector();
       dirichletComp->operator[](qq) = 1.0;
@@ -291,7 +287,7 @@ void SimpleDiscretization::visualize(const VectorType* vector,
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
                      "size of vector has to be " << dim_ << " is (" << vector->dim() << ")!");
   if (filename.empty())
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_input, "filename musto not be empty!");
+    DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_input, "filename must not be empty!");
   std::ofstream file;
   file.open(filename);
   if (!file.is_open())
