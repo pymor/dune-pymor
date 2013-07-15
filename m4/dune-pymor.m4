@@ -28,5 +28,5 @@ to the PKG_CONFIG_PATH environment variable.])])
 # not by dune-pymor itself
 AC_DEFUN([DUNE_PYMOR_CHECK_MODULE],
 [
-  DUNE_CHECK_MODULES([dune-pymor],[pymor/la/container.hh], [Dune::Pymor::LA::availableVectors()])
+  DUNE_CHECK_MODULES([dune-pymor],[pymor/parameters/base.hh], [Dune::Pymor::Parameter()])
 ])
