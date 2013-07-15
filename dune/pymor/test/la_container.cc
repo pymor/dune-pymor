@@ -32,7 +32,7 @@ struct VectorTest
 {
   void check() const
   {
-    VectorType* vector = VectorType::create(4);
+    VectorType* vector = new VectorType(4);
     const std::string type = vector->type();
     const std::string static_type = vector->static_type();
     if (type != static_type) DUNE_PYMOR_THROW(PymorException, "");

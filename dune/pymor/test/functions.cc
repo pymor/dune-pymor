@@ -15,6 +15,7 @@
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/functions/default.hh>
+//#include <dune/pymor/functions/checkerboard.hh>
 
 
 using namespace Dune;
@@ -62,7 +63,13 @@ struct NonparametricWrapperTest
 }; // struct NonparametricWrapperTest
 
 
-TEST(NonparametricExpressionTest, FUNCTIONS)
+TYPED_TEST_CASE(NonparametricWrapperTest, NonparametricFunctions);
+TYPED_TEST(NonparametricWrapperTest, Functions) {
+  this->check();
+}
+
+
+TEST(NonparametricExpressionTest, Functions)
 {
   typedef Functions::NonparametricExpression< double, 2, double, 1 > NonparametricExpressionType;
   NonparametricExpressionType function("x", "x[0] + x[1]");
@@ -76,19 +83,18 @@ TEST(NonparametricExpressionTest, FUNCTIONS)
 }
 
 
-TEST(AffineParametricDefaultTest, FUNCTIONS)
+TEST(AffineParametricDefaultTest, Functions)
 {
   typedef Functions::AffineParametricDefault< double, 3, double, 1 > AffineParametricDefaultType;
   typedef Functions::NonparametricExpression< double, 3, double, 1 > NonparametricExpressionType;
   const Parameter mu = {"diffusion", {1.0, 1.0}};
-  AffineParametricDefaultType function(mu.type());
-  function.register_component(new NonparametricExpressionType("x", "x[0]", 1));
+  AffineParametricDefaultType function(new NonparametricExpressionType("x", "x[0]", 1));
   function.register_component(new NonparametricExpressionType("x", "x[1]", 1),
                               new ParameterFunctional(mu.type(), "diffusion[0]"));
   function.register_component(new NonparametricExpressionType("x", "x[2]", 1),
                               new ParameterFunctional(mu.type(), "diffusion[1]"));
   if (!function.hasAffinePart()) DUNE_PYMOR_THROW(PymorException, "");
-  if (function.size() != 2) DUNE_PYMOR_THROW(PymorException, "");
+  if (function.num_components() != 2) DUNE_PYMOR_THROW(PymorException, "");
   if (!function.parametric()) DUNE_PYMOR_THROW(PymorException, "");
   if (function.parameter_type() != mu.type()) DUNE_PYMOR_THROW(PymorException, "");
   if (function.order() != 1) DUNE_PYMOR_THROW(PymorException, "");
@@ -99,29 +105,23 @@ TEST(AffineParametricDefaultTest, FUNCTIONS)
   AffineParametricDefaultType function2;
   function2.register_component(new NonparametricExpressionType("x", "x[0]", 1));
   if (!function2.hasAffinePart()) DUNE_PYMOR_THROW(PymorException, "");
-  if (function2.size() != 0) DUNE_PYMOR_THROW(PymorException, "");
+  if (function2.num_components() != 0) DUNE_PYMOR_THROW(PymorException, "");
   if (function2.parametric()) DUNE_PYMOR_THROW(PymorException, "");
   if (function2.parameter_type() != Parameter().type()) DUNE_PYMOR_THROW(PymorException, "");
   if (function2.order() != 1) DUNE_PYMOR_THROW(PymorException, "");
   result = function2.evaluate(x);
   if (!Dune::FloatCmp::eq(result, 1.0)) DUNE_PYMOR_THROW(PymorException, "");
 
-  AffineParametricDefaultType function3(mu.type());
+  AffineParametricDefaultType function3;
   function3.register_component(new NonparametricExpressionType("x", "x[1]", 1),
                                new ParameterFunctional(mu.type(), "diffusion[0]"));
   if (function3.hasAffinePart()) DUNE_PYMOR_THROW(PymorException, "");
-  if (function3.size() != 1) DUNE_PYMOR_THROW(PymorException, "");
+  if (function3.num_components() != 1) DUNE_PYMOR_THROW(PymorException, "");
   if (!function3.parametric()) DUNE_PYMOR_THROW(PymorException, "");
   if (function3.parameter_type() != mu.type()) DUNE_PYMOR_THROW(PymorException, "");
   if (function3.order() != 1) DUNE_PYMOR_THROW(PymorException, "");
   result = function3.evaluate(x, mu);
   if (!Dune::FloatCmp::eq(result, 1.0)) DUNE_PYMOR_THROW(PymorException, "");
-}
-
-
-TYPED_TEST_CASE(NonparametricWrapperTest, NonparametricFunctions);
-TYPED_TEST(NonparametricWrapperTest, FUNCTIONS) {
-  this->check();
 }
 
 

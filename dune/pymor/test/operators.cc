@@ -144,9 +144,8 @@ struct LinearAffinelyDecomposedDefaultTest
     typedef typename TypePair::second_type  VectorType;
     typedef Operators::LinearAffinelyDecomposedDefault< OperatorType > AffineparametricOperatorType;
     const Parameter mu = {"diffusion", {1.0, 1.0}};
-    AffineparametricOperatorType op(mu.type());
     const size_t dim = 2;
-    op.register_component(createLinearOperator(OperatorType(), dim));
+    AffineparametricOperatorType op(createLinearOperator(OperatorType(), dim));
     op.register_component(createLinearOperator(OperatorType(), dim),
                           new ParameterFunctional(mu.type(), "diffusion[0]"));
     op.register_component(createLinearOperator(OperatorType(), dim),
