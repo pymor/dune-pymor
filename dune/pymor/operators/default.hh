@@ -24,10 +24,9 @@ public:
   typedef typename LinearOperatorType::SourceType SourceType;
   typedef typename LinearOperatorType::RangeType  RangeType;
 
-  LinearAffinelyDecomposedDefault(const ParameterType& tt = ParameterType());
+  LinearAffinelyDecomposedDefault();
 
-  LinearAffinelyDecomposedDefault(LinearOperatorType* aff, const ParameterType& tt = ParameterType())
-    throw (Exception::requirements_not_met);
+  LinearAffinelyDecomposedDefault(LinearOperatorType* aff) throw (Exception::requirements_not_met);
 
   virtual ~LinearAffinelyDecomposedDefault();
 
@@ -47,7 +46,7 @@ public:
            Exception::types_are_not_compatible,
            Exception::wrong_parameter_type);
 
-  virtual unsigned int size() const;
+  virtual unsigned int num_components() const;
 
   virtual LinearOperatorType* component(const int ii) throw (Exception::requirements_not_met,
                                                              Exception::index_out_of_range);

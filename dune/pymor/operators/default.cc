@@ -22,8 +22,8 @@ namespace Operators {
 
 template< class LinearOperatorType >
 LinearAffinelyDecomposedDefault< LinearOperatorType >
-  ::LinearAffinelyDecomposedDefault(const ParameterType& tt)
-  : AffinelyDecomposedOperatorInterface(tt)
+  ::LinearAffinelyDecomposedDefault()
+  : AffinelyDecomposedOperatorInterface()
   , size_(0)
   , hasAffinePart_(false)
   , dim_source_(0)
@@ -37,9 +37,9 @@ LinearAffinelyDecomposedDefault< LinearOperatorType >
 
 template< class LinearOperatorType >
 LinearAffinelyDecomposedDefault< LinearOperatorType >
-  ::LinearAffinelyDecomposedDefault(LinearOperatorType* aff, const ParameterType& tt)
+  ::LinearAffinelyDecomposedDefault(LinearOperatorType* aff)
   throw (Exception::requirements_not_met)
-  : AffinelyDecomposedOperatorInterface(tt)
+  : AffinelyDecomposedOperatorInterface()
   , size_(0)
   , hasAffinePart_(true)
   , dim_source_(aff->dim_source())
@@ -139,17 +139,14 @@ void LinearAffinelyDecomposedDefault< LinearOperatorType >::register_component(L
                      "the type_range of comp (" << comp->type_range() << ") does not match the type_range of this ("
                      << type_range_ << ")!");
   }
-  if (coeff->parameter_type() != Parametric::parameter_type())
-    DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                     "different parameter types for coeff (" << coeff->parameter_type() << ") and this ("
-                     << Parametric::parameter_type() << ") is not yet supported!");
+  inherit_parameter_type(coeff->parameter_type(), "coefficient_" + Dune::Stuff::Common::toString(size_));
   components_.push_back(comp);
   coefficients_.push_back(coeff);
   ++size_;
 } // ... register_component(..., ...)
 
 template< class LinearOperatorType >
-unsigned int LinearAffinelyDecomposedDefault< LinearOperatorType >::size() const
+unsigned int LinearAffinelyDecomposedDefault< LinearOperatorType >::num_components() const
 {
   return size_;
 }
@@ -158,13 +155,13 @@ template< class LinearOperatorType >
 LinearOperatorType* LinearAffinelyDecomposedDefault< LinearOperatorType >::component(const int ii)
   throw (Exception::requirements_not_met, Exception::index_out_of_range)
 {
-  if (size() == 0)
+  if (size_ == 0)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                      "do not call component(ii) if size() == 0!");
-  if (ii < 0 || ii >= int(size()))
+  if (ii < 0 || ii >= int(size_))
     DUNE_PYMOR_THROW(Exception::index_out_of_range,
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
-                     << size() << "!");
+                     << size_ << "!");
   return components_[ii];
 }
 
@@ -172,13 +169,13 @@ template< class LinearOperatorType >
 const LinearOperatorType* LinearAffinelyDecomposedDefault< LinearOperatorType >::component(const int ii) const
   throw (Exception::requirements_not_met, Exception::index_out_of_range)
 {
-  if (size() == 0)
+  if (size_ == 0)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                      "do not call component(ii) if size() == 0!");
-  if (ii < 0 || ii >= int(size()))
+  if (ii < 0 || ii >= int(size_))
     DUNE_PYMOR_THROW(Exception::index_out_of_range,
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
-                     << size() << "!");
+                     << size_ << "!");
   return components_[ii];
 }
 
@@ -186,13 +183,13 @@ template< class LinearOperatorType >
 const ParameterFunctional* LinearAffinelyDecomposedDefault< LinearOperatorType >::coefficient(const int ii) const
   throw (Exception::requirements_not_met, Exception::index_out_of_range)
 {
-  if (size() == 0)
+  if (size_ == 0)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                      "do not call coefficient(ii) if size() == 0!");
-  if (ii < 0 || ii >= int(size()))
+  if (ii < 0 || ii >= int(size_))
     DUNE_PYMOR_THROW(Exception::index_out_of_range,
                      "the condition 0 < ii < size() is not fulfilled for ii = " << ii << "and size() = "
-                     << size() << "!");
+                     << size_ << "!");
   return coefficients_[ii];
 
 }
@@ -303,7 +300,7 @@ void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply(const SourceTy
     DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
                      "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                      << Parametric::parameter_type() << ")!");
-  if (size() == 0 && !hasAffinePart_)
+  if (size_ == 0 && !hasAffinePart_)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                "do not call apply() if size() == 0 and hasAffinePart() == false!");
   if (components_.size() != size_) DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "");
@@ -314,7 +311,8 @@ void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply(const SourceTy
       RangeType* tmp = new RangeType(dim_range());
       for (size_t ii = 0; ii < size_; ++ii) {
         components_[ii]->apply(source, tmp);
-        tmp->scal(coefficients_[ii]->evaluate(mu));
+        const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
+        tmp->scal(coefficients_[ii]->evaluate(muCoefficient));
         range->iadd(tmp);
       }
       delete tmp;
@@ -326,7 +324,8 @@ void LinearAffinelyDecomposedDefault< LinearOperatorType >::apply(const SourceTy
       RangeType* tmp = new RangeType(dim_range());
       for (size_t ii = 1; ii < size_; ++ii) {
         components_[ii]->apply(source, tmp);
-        tmp->scal(coefficients_[ii]->evaluate(mu));
+        const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
+        tmp->scal(coefficients_[ii]->evaluate(muCoefficient));
         range->iadd(tmp);
       }
       delete tmp;
@@ -400,7 +399,7 @@ LinearOperatorType* LinearAffinelyDecomposedDefault< LinearOperatorType >
     DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
                      "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                      << parameter_type() << ")!");
-  if (size() == 0 && !hasAffinePart_)
+  if (size_ == 0 && !hasAffinePart_)
     DUNE_PYMOR_THROW(Exception::requirements_not_met,
                "do not call freeze_parameter() if size() == 0 and hasAffinePart() == false!");
   if (components_.size() != size_) DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "");
@@ -408,15 +407,20 @@ LinearOperatorType* LinearAffinelyDecomposedDefault< LinearOperatorType >
   if (hasAffinePart_) {
     LinearOperatorType* ret = affinePart_->copy();
     if (size_ > 0)
-      for (size_t ii = 0; ii < size_; ++ii)
-        ret->axpy(coefficients_[ii]->evaluate(mu), components_[ii]);
+      for (size_t ii = 0; ii < size_; ++ii) {
+        const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
+        ret->axpy(coefficients_[ii]->evaluate(muCoefficient), components_[ii]);
+      }
     return ret;
   } else {
     LinearOperatorType* ret = components_[0]->copy();
-    ret->scal(coefficients_[0]->evaluate(mu));
+    const Parameter muCoefficient0 = map_parameter(mu, "coefficient_0");
+    ret->scal(coefficients_[0]->evaluate(muCoefficient0));
     if (size_ > 1)
-      for (size_t ii = 1; ii < size_; ++ii)
-        ret->axpy(coefficients_[ii]->evaluate(mu), components_[ii]);
+      for (size_t ii = 1; ii < size_; ++ii) {
+        const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
+        ret->axpy(coefficients_[ii]->evaluate(muCoefficient), components_[ii]);
+      }
     return ret;
   }
 }

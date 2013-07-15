@@ -19,6 +19,7 @@ libpymor_la_SOURCES = \
   la/container/interfaces.cc \
   la/container.cc \
   operators/default.cc \
+  operators/interfaces.cc \
   operators/dunedynamicmatrix.cc \
   operators/eigen.cc \
   parameters/base.cc \
