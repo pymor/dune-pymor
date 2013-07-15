@@ -27,8 +27,8 @@ class EigenDenseMatrixInverse
   : public OperatorInterface
 {
 public:
-  typedef Dune::Pymor::LA::EigenDenseVector           SourceType;
-  typedef Dune::Pymor::LA::EigenDenseVector           RangeType;
+  typedef Dune::Pymor::LA::EigenDenseVector SourceType;
+  typedef Dune::Pymor::LA::EigenDenseVector RangeType;
 
   EigenDenseMatrixInverse(const EigenDenseMatrix* op, const std::string type) throw (Exception::key_is_not_valid);
 
@@ -104,8 +104,9 @@ class EigenDenseMatrix
   : public Dune::Stuff::LA::EigenDenseMatrix< double >
   , public LinearOperatorInterface
 {
-public:
   typedef Dune::Stuff::LA::EigenDenseMatrix< double > BaseType;
+public:
+  typedef EigenDenseMatrixInverse                     InverseType;
   typedef Dune::Pymor::LA::EigenDenseVector           SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector           RangeType;
 
@@ -215,7 +216,7 @@ public:
 
   EigenRowMajorSparseMatrixInverse(const EigenRowMajorSparseMatrix* op, const std::string type);
 
-  virtual bool linear() const;
+  bool linear() const;
 
   virtual unsigned int dim_source() const;
 
@@ -289,6 +290,7 @@ class EigenRowMajorSparseMatrix
 {
   typedef Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >  BaseType;
 public:
+  typedef EigenRowMajorSparseMatrixInverse                      InverseType;
   typedef Dune::Pymor::LA::EigenDenseVector                     SourceType;
   typedef Dune::Pymor::LA::EigenDenseVector                     RangeType;
 
@@ -297,8 +299,6 @@ public:
   EigenRowMajorSparseMatrix(const BaseType& other);
 
   EigenRowMajorSparseMatrix(const int rr, const int cc, const Dune::Stuff::LA::SparsityPatternDefault& pattern);
-
-  virtual bool linear() const;
 
   virtual unsigned int dim_source() const;
 

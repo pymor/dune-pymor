@@ -101,7 +101,6 @@ public:
   virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric,
            Exception::you_have_to_implement_this,
-           Exception::this_does_not_make_any_sense,
            Exception::this_does_not_make_any_sense);
 }; // class OperatorInterface
 

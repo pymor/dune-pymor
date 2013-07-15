@@ -26,6 +26,7 @@ namespace Dune {
 namespace Pymor {
 namespace Operators {
 
+
 // ===================================
 // ===== EigenDenseMatrixInverse =====
 // ===================================
@@ -683,11 +684,6 @@ EigenRowMajorSparseMatrix::EigenRowMajorSparseMatrix(const int rr,
   : BaseType(assert_is_positive(rr), assert_is_positive(cc), pattern)
   , LinearOperatorInterface()
 {}
-
-bool EigenRowMajorSparseMatrix::linear() const
-{
-  return true;
-}
 
 unsigned int EigenRowMajorSparseMatrix::dim_source() const
 {

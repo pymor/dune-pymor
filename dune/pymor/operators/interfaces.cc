@@ -83,7 +83,6 @@ double OperatorInterface::apply2(const LA::VectorInterface* range,
 OperatorInterface* OperatorInterface::freeze_parameter(const Parameter /*mu*/) const
   throw (Exception::this_is_not_parametric,
          Exception::you_have_to_implement_this,
-         Exception::this_does_not_make_any_sense,
          Exception::this_does_not_make_any_sense)
 {
   DUNE_PYMOR_THROW(Exception::you_have_to_implement_this, "you really do!");

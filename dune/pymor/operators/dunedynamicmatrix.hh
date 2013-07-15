@@ -24,7 +24,6 @@ class DuneDynamicMatrixInverse
   : public OperatorInterface
 {
 public:
-  typedef DuneDynamicMatrixInverse                  ThisType;
   typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
   typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
 
@@ -89,7 +88,7 @@ public:
            Exception::linear_solver_failed,
            Exception::this_does_not_make_any_sense);
 
-  virtual ThisType* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
+  virtual DuneDynamicMatrixInverse* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
     throw (Exception::this_is_not_parametric, Exception::you_have_to_implement_this);
 
 private:
@@ -103,6 +102,7 @@ class DuneDynamicMatrix
 {
 public:
   typedef Dune::DynamicMatrix< double >       BaseType;
+  typedef DuneDynamicMatrixInverse            InverseType;
   typedef Dune::Pymor::LA::DuneDynamicVector  SourceType;
   typedef Dune::Pymor::LA::DuneDynamicVector  RangeType;
 
@@ -111,8 +111,6 @@ public:
   DuneDynamicMatrix(const BaseType& other);
 
   DuneDynamicMatrix(const int rr, const int cc) throw (Exception::index_out_of_range);
-
-  virtual bool linear() const;
 
   virtual unsigned int dim_source() const;
 
@@ -155,8 +153,8 @@ public:
   static std::vector< std::string > invert_options() throw(Exception::not_invertible);
 
   virtual const DuneDynamicMatrixInverse* invert(const std::string type = invert_options()[0],
-                                           const Parameter mu = Parameter()) const
-    throw(Exception::not_invertible, Exception::key_is_not_valid);
+                                                 const Parameter mu = Parameter()) const
+    throw (Exception::not_invertible, Exception::key_is_not_valid);
 
   virtual void apply_inverse(const LA::VectorInterface* range,
                              LA::VectorInterface* source,
@@ -193,7 +191,7 @@ public:
     throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible);
 
   virtual void axpy(const double alpha, const DuneDynamicMatrix* x) throw (Exception::sizes_do_not_match,
-                                                                     Exception::types_are_not_compatible);
+                                                                           Exception::types_are_not_compatible);
 
 private:
   static int assert_is_positive(const int ii) throw (Exception::index_out_of_range);

@@ -16,6 +16,9 @@ namespace Pymor {
 namespace Operators {
 
 
+// ====================================
+// ===== DuneDynamicMatrixInverse =====
+// ====================================
 DuneDynamicMatrixInverse::DuneDynamicMatrixInverse(const DuneDynamicMatrix* op)
   : OperatorInterface()
   , op_(op)
@@ -162,6 +165,9 @@ DuneDynamicMatrixInverse* DuneDynamicMatrixInverse::freeze_parameter(const Param
 }
 
 
+// =============================
+// ===== DuneDynamicMatrix =====
+// =============================
 DuneDynamicMatrix::DuneDynamicMatrix()
   : BaseType()
   , LinearOperatorInterface()
@@ -176,11 +182,6 @@ DuneDynamicMatrix::DuneDynamicMatrix(const int rr, const int cc) throw (Exceptio
   : BaseType(DuneDynamicMatrix::assert_is_positive(rr), DuneDynamicMatrix::assert_is_positive(cc), 0.0)
   , LinearOperatorInterface()
 {}
-
-bool DuneDynamicMatrix::linear() const
-{
-  return true;
-}
 
 unsigned int DuneDynamicMatrix::dim_source() const
 {
@@ -281,7 +282,7 @@ std::vector< std::string > DuneDynamicMatrix::invert_options() throw (Exception:
 
 const DuneDynamicMatrixInverse* DuneDynamicMatrix::invert(const std::string type,
                                                           const Parameter mu) const
-  throw(Exception::not_invertible, Exception::key_is_not_valid)
+  throw (Exception::not_invertible, Exception::key_is_not_valid)
 {
   if (!mu.type().empty())
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
