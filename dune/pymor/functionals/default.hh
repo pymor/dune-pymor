@@ -17,91 +17,80 @@ namespace Pymor {
 namespace Functionals {
 
 
-template< class LinearFunctionalType >
-class LinearAffinelyDecomposedDefault
-  : public AffinelyDecomposedFunctionalInterface
+template< class VectorImp >
+class VectorBased;
+
+
+template< class VectorImp >
+class VectorBasedTraits
 {
 public:
-  typedef typename LinearFunctionalType::SourceType SourceType;
+  typedef VectorBased< VectorImp >        derived_type;
+  typedef VectorImp                       VectorType;
+  typedef VectorType                      SourceType;
+  typedef derived_type                    FrozenType;
+  typedef typename SourceType::ScalarType ScalarType;
+  static_assert(std::is_base_of< Dune::Pymor::LA::VectorInterface< typename VectorImp::Traits >, VectorType >::value,
+                "VectorType must be derived from Dune::Pymor::LA::VectorInterface!");
+};
 
-  LinearAffinelyDecomposedDefault();
 
-  LinearAffinelyDecomposedDefault(LinearFunctionalType* aff) throw (Exception::requirements_not_met);
-
-  virtual ~LinearAffinelyDecomposedDefault();
+template< class VectorImp >
+class VectorBased
+  : public FunctionalInterface< VectorBasedTraits< VectorImp > >
+{
+public:
+  typedef VectorBasedTraits< VectorImp >  Traits;
+  typedef typename Traits::derived_type   ThisType;
+  typedef typename Traits::VectorType     VectorType;
+  typedef typename Traits::SourceType     SourceType;
+  typedef typename Traits::ScalarType     ScalarType;
+  typedef typename Traits::FrozenType     FrozenType;
 
   /**
-   * \attention This class takes ownership of aff!
+   * \attention This class takes ownership of vector_ptr!
    */
-  void register_component(LinearFunctionalType* aff) throw (Exception::this_does_not_make_any_sense,
-                                                            Exception::sizes_do_not_match,
-                                                            Exception::types_are_not_compatible);
+  VectorBased(const VectorType* vector_ptr)
+    : vector_(vector_ptr)
+  {}
 
-  /**
-   * \attention This class takes ownership of comp and coeff!
-   */
-  void register_component(LinearFunctionalType* comp, const ParameterFunctional* coeff)
-    throw (Exception::this_does_not_make_any_sense,
-           Exception::sizes_do_not_match,
-           Exception::types_are_not_compatible,
-           Exception::wrong_parameter_type);
+  VectorBased(const std::shared_ptr< const VectorType > vector_ptr)
+    : vector_(vector_ptr)
+  {}
 
-  virtual unsigned int num_components() const;
+  bool linear() const
+  {
+    return true;
+  }
 
-  virtual LinearFunctionalType* component(const int ii) throw (Exception::requirements_not_met,
-                                                               Exception::index_out_of_range);
+  unsigned int dim_source() const
+  {
+    return vector_->dim();
+  }
 
-  virtual const LinearFunctionalType* component(const int ii) const throw (Exception::requirements_not_met,
-                                                                           Exception::index_out_of_range);
+  ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
+    throw (Exception::this_is_not_parametric)
+  {
+    if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
+                                      "mu has to be empty if parametric() == false (is " << mu << ")!");
+    return vector_->dot(source);
+  }
 
-  virtual const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
-                                                                            Exception::index_out_of_range);
+  FrozenType freeze_parameter(const Parameter mu = Parameter()) const
+    throw (Exception::this_is_not_parametric)
+  {
+    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
+                     << "if parametric() == false!");
+    return FrozenType(new VectorType());
+  }
 
-  virtual bool hasAffinePart() const;
-
-  virtual LinearFunctionalType* affinePart() throw (Exception::requirements_not_met);
-
-  virtual const LinearFunctionalType* affinePart() const throw (Exception::requirements_not_met);
-
-  virtual bool linear() const;
-
-  virtual unsigned int dim_source() const;
-
-  virtual std::string type_source() const;
-
-  virtual double apply(const LA::VectorInterface* source,
-                       const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
-                                                                          Exception::you_have_to_implement_this,
-                                                                          Exception::sizes_do_not_match,
-                                                                          Exception::wrong_parameter_type,
-                                                                          Exception::requirements_not_met,
-                                                                          Exception::linear_solver_failed,
-                                                                          Exception::this_does_not_make_any_sense);
-
-  virtual double apply(const SourceType* source,
-                       const Parameter mu = Parameter()) const
-    throw (Exception::types_are_not_compatible,
-           Exception::you_have_to_implement_this,
-           Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met,
-           Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense);
-
-  LinearFunctionalType* freeze_parameter(const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric,
-           Exception::you_have_to_implement_this,
-           Exception::this_does_not_make_any_sense);
-
+  std::shared_ptr< const VectorType > vector() const
+  {
+    return vector_;
+  }
 private:
-  unsigned int size_;
-  bool hasAffinePart_;
-  unsigned int dim_source_;
-  std::string type_source_;
-  std::vector< LinearFunctionalType* > components_;
-  std::vector< const ParameterFunctional* > coefficients_;
-  LinearFunctionalType* affinePart_;
-}; // class LinearAffinelyDecomposedDefault
+  std::shared_ptr< const VectorType > vector_;
+}; // class VectorBased
 
 
 } // namespace Functionals
