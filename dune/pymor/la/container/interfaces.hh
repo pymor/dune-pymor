@@ -12,49 +12,80 @@
 
 #include <dune/common/float_cmp.hh>
 
+#include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/common/exceptions.hh>
-#include <dune/pymor/functionals/interfaces.hh>
+//#include <dune/pymor/functionals/interfaces.hh>
 
 namespace Dune {
 namespace Pymor {
 namespace LA {
 
 
-/**
- * \brief Interface for all vectors in dune-pymor.
- *
- *        Python bindings for any class DerivedFoo derived from this VectorInterface can be obtained by calling
- * \code
-from dune.pymor.la.container import add_VectorInterface as add_dune_Vector
-module, Vector = add_dune_Vector(module, 'DerivedFoo')
-\endcode
- *        in your python code, where DerivedFoo is a derived class, i.e. Dune::Pymor::LA::DuneDynamicVector and module
- *        is a pybindgen.module.Module.
- * \note  All derived classes are expected to implement the following static method:
- * \code
-static std::string static_type();
-\endcode
- *        where static_type() is expected to return the same as type();
- */
-class VectorInterface
-  : public Dune::Pymor::FunctionalInterface
+template< class Traits >
+class ContainerInterface
+  : public CRTPInterface< ContainerInterface< Traits >, Traits >
 {
+  typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
+  typedef ContainerInterface< Traits >                          ThisType;
 public:
-  virtual ~VectorInterface();
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::ScalarType   ScalarType;
 
   /**
-   * \brief   A unique (per class, not per instance) identifier.
-   * \return  A unique (per class, not per instance) identifier.
+   * \brief   Creates a (deep) copy of the underlying resource
+   * \return  A new container
    */
-  virtual std::string type() const = 0;
+  derived_type copy() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).copy());
+    return CRTP::as_imp(*this).copy();
+  }
+
+  /**
+   * \brief BLAS SCAL operation (in-place sclar multiplication).
+   * \param alpha The scalar coefficient with which the vector is multiplied.
+   */
+  void scal(const ScalarType& alpha)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).scal(alpha));
+  }
+
+  /**
+   * \brief BLAS AXPY operation.
+   * \param alpha The scalar coefficient with which the each element of the container is to be multiplied
+   * \param xx    Container that is to be added.
+   */
+  void axpy(const ScalarType& alpha, const derived_type& xx)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).axpy(alpha, xx));
+  }
+
+  void axpy(const ScalarType& alpha, const ThisType& xx)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).axpy(alpha, CRTP::as_imp(xx)));
+  }
+}; // class ContainerInterface
+
+
+template< class Traits >
+class VectorInterface
+  : public ContainerInterface< Traits >
+{
+  typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
+  typedef VectorInterface< Traits >                             ThisType;
+public:
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::ScalarType   ScalarType;
 
   /**
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    */
-  virtual unsigned int dim() const = 0;
-
-  virtual VectorInterface* copy() const = 0;
+  unsigned int dim() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim());
+    return CRTP::as_imp(*this).dim();
+  }
 
   /**
    * \brief   Check vectors for equality.
@@ -63,110 +94,206 @@ public:
    * \param   epsilon See Dune::FloatCmp.
    * \return          Truth value of the comparison.
    */
-  virtual bool almost_equal(const Dune::Pymor::LA::VectorInterface* other,
-                            const double /*epsilon*/ = Dune::FloatCmp::DefaultEpsilon< double >::value()) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  bool almost_equal(const derived_type& other,
+                    const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon< ScalarType >::value()) const
+    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).almost_equal(other, epsilon));
+    return CRTP::as_imp(*this).almost_equal(other, epsilon);
+  }
 
-  /**
-   * \brief BLAS SCAL operation (in-place sclar multiplication).
-   * \param alpha The scalar coefficient with which the vector is multiplied.
-   */
-  virtual void scal(const double alpha) = 0;
-
-  /**
-   * \brief BLAS AXPY operation.
-   * \param alpha The scalar coefficient with which the vector is multiplied
-   * \param x     Vector that is to be added.
-   */
-  virtual void axpy(const double /*alpha*/, const Dune::Pymor::LA::VectorInterface* x)
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  bool almost_equal(const ThisType& other,
+                    const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon< ScalarType >::value()) const
+    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).almost_equal(CRTP::as_imp(other), epsilon));
+    return CRTP::as_imp(*this).almost_equal(CRTP::as_imp(other), epsilon);
+  }
 
   /**
    * \brief   Computes the scalar products between two vectors.
    * \param   other The second factor.
    * \return        The scalar product.
    */
-  virtual double dot(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  ScalarType dot(const derived_type& other) const
+    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dot(other));
+    return CRTP::as_imp(*this).dot(other);
+  }
+
+  ScalarType dot(const ThisType& other) const
+    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dot(CRTP::as_imp(other)));
+    return CRTP::as_imp(*this).dot(CRTP::as_imp(other));
+  }
 
   /**
    * \brief   The l1-norm of the vector.
    * \return  The l1-norm of the vector.
    */
-  virtual double l1_norm() const = 0;
+  ScalarType l1_norm() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).l1_norm());
+    return CRTP::as_imp(*this).l1_norm();
+  }
 
   /**
    * \brief   The l2-norm of the vector.
    * \return  The l2-norm of the vector.
    */
-  virtual double l2_norm() const = 0;
+  ScalarType l2_norm() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).l2_norm());
+    return CRTP::as_imp(*this).l2_norm();
+  }
 
   /**
    * \brief   The l-infintiy-norm of the vector.
    * \return  The l-infintiy-norm of the vector.
    */
-  virtual double sup_norm() const = 0;
+  ScalarType sup_norm() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).sup_norm());
+    return CRTP::as_imp(*this).sup_norm();
+  }
 
   /**
    * \brief Extract components of the vector.
    * \param component_indices Indices of the vector components that are to be returned.
-   * \return                  A std::vector< double > `result` such that `result[i]` is the `component_indices[i]`-th
+   * \return                  A std::vector< ScalarType > `result` such that `result[i]` is the `component_indices[i]`-th
                               component of the vector.
    */
-  virtual std::vector< double > components(const std::vector< int >& component_indices) const
-    throw (Exception::sizes_do_not_match, Exception::index_out_of_range) = 0;
+  std::vector< ScalarType > components(const std::vector< int >& component_indices) const
+    throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).components(component_indices));
+    return CRTP::as_imp(*this).components(component_indices);
+  }
 
   /**
    * \brief   The maximum absolute value of the vector.
-   * \return  A std::vector< double > result, where int(result[0]) is the index at which the maximum is attained and
+   * \return  A std::vector< ScalarType > result, where int(result[0]) is the index at which the maximum is attained and
    *          result[1] is the absolute maximum value.
    */
-  virtual std::vector< double > amax() const = 0;
+  std::vector< ScalarType > amax() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).amax());
+    return CRTP::as_imp(*this).amax();
+  }
+
+  /**
+   * \brief Adds two vectors.
+   * \param other   The right summand.
+   * \param result  Vector to write the result of this + other to
+   */
+  void add(const derived_type& other, derived_type& result) const throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).add(other, result));
+  }
+
+  void add(const ThisType& other, ThisType& result) const throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).add(CRTP::as_imp(other), CRTP::as_imp(result)));
+  }
 
   /**
    * \brief   Adds two vectors.
    * \param   other The right summand.
-   * \return        The sum of this and other.
+   * \param
+   * \return  The sum of this and other.
    */
-  virtual Dune::Pymor::LA::VectorInterface* add(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  derived_type add(const derived_type& other) const throw (Exception::sizes_do_not_match)
+  {
+    derived_type result = this->copy();
+    result.iadd(other);
+    return result;
+  }
+
+  derived_type add(const ThisType& other) const throw (Exception::sizes_do_not_match)
+  {
+    derived_type result = this->copy();
+    result.iadd(other);
+    return result;
+  }
 
   /**
    * \brief Inplace variant of add().
    * \param other The right summand.
    */
-  virtual void iadd(const Dune::Pymor::LA::VectorInterface* other)
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  void iadd(const derived_type& other) throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).iadd(other));
+  }
+
+  void iadd(const ThisType& other) throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).iadd(CRTP::as_imp(other)));
+  }
+
+  /**
+   * \brief Subtracts two vectors.
+   * \param other   The subtrahend.
+   * \param result  The vectror to write the difference between this and other to.
+   */
+  void sub(const derived_type& other, derived_type& result) const throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).sub(other, result));
+  }
+
+  void sub(const ThisType& other, ThisType& result) const throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).sub(CRTP::as_imp(other), CRTP::as_imp(result)));
+  }
 
   /**
    * \brief   Subtracts two vectors.
    * \param   other The subtrahend.
    * \return        The difference between this and other.
    */
-  virtual Dune::Pymor::LA::VectorInterface* sub(const Dune::Pymor::LA::VectorInterface* other) const
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  derived_type sub(const derived_type& other) const throw (Exception::sizes_do_not_match)
+  {
+    derived_type result = this->copy();
+    result.isub(other);
+    return result;
+  }
+
+  derived_type sub(const ThisType& other) const throw (Exception::sizes_do_not_match)
+  {
+    derived_type result = this->copy();
+    result.isub(other);
+    return result;
+  }
 
   /**
    * \brief Inplace variant of sub().
    * \param other The subtrahend.
    */
-  virtual void isub(const Dune::Pymor::LA::VectorInterface* other)
-    throw (Exception::types_are_not_compatible, Exception::sizes_do_not_match, Exception::you_have_to_implement_this);
+  void isub(const derived_type& other) throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).isub(other));
+  }
 
-  virtual bool linear() const;
+  void isub(const ThisType& other) throw (Exception::sizes_do_not_match)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).isub(CRTP::as_imp(other)));
+  }
 
-  virtual unsigned int dim_source() const;
+//  virtual bool linear() const;
 
-  virtual std::string type_source() const;
+//  virtual unsigned int dim_source() const;
 
-  virtual double apply(const LA::VectorInterface* source,
-                       const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
-                                                                          Exception::you_have_to_implement_this,
-                                                                          Exception::sizes_do_not_match,
-                                                                          Exception::wrong_parameter_type,
-                                                                          Exception::requirements_not_met,
-                                                                          Exception::linear_solver_failed,
-                                                                          Exception::this_does_not_make_any_sense);
+//  virtual std::string type_source() const;
+
+//  virtual double apply(const LA::VectorInterface& source,
+//                       const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
+//                                                                          Exception::you_have_to_implement_this,
+//                                                                          Exception::sizes_do_not_match,
+//                                                                          Exception::wrong_parameter_type,
+//                                                                          Exception::requirements_not_met,
+//                                                                          Exception::linear_solver_failed,
+//                                                                          Exception::this_does_not_make_any_sense);
 }; // class VectorInterface
 
 
