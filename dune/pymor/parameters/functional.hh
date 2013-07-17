@@ -27,6 +27,15 @@ class ParameterFunctional
 public:
   ParameterFunctional(const ParameterType& tt, const std::string& exp) throw (Exception::sizes_do_not_match);
 
+  ParameterFunctional(const std::string& kk, const int& vv, const std::string& exp)
+    throw (Exception::key_is_not_valid, Exception::index_out_of_range, Exception::sizes_do_not_match);
+
+  ParameterFunctional(const std::vector< std::string >& kk, const std::vector< int >& vv, const std::string& exp)
+    throw (Exception::key_is_not_valid,
+           Exception::index_out_of_range,
+           Exception::sizes_do_not_match,
+           Exception::sizes_do_not_match);
+
   ParameterFunctional(const ParameterFunctional& other) throw (Exception::sizes_do_not_match);
 
   ~ParameterFunctional();
