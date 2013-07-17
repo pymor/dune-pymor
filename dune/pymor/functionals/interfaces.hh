@@ -7,105 +7,119 @@
 #define DUNE_PYMOR_FUNCTIONALS_INTERFACES_HH
 
 #include <dune/pymor/common/exceptions.hh>
+#include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
+#include <dune/pymor/la/container/interfaces.hh>
+
 
 namespace Dune {
 namespace Pymor {
 
-// forward, include is below
-namespace LA {
-class VectorInterface;
-}
 
+template< class Traits >
 class FunctionalInterface
-  : public Parametric
+  : public CRTPInterface< FunctionalInterface< Traits >, Traits >
+  , public Parametric
 {
+protected:
+  typedef CRTPInterface< FunctionalInterface< Traits >, Traits > CRTP;
 public:
-  FunctionalInterface();
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::SourceType   SourceType;
+  typedef typename Traits::ScalarType   ScalarType;
+  typedef typename Traits::FrozenType   FrozenType;
 
-  FunctionalInterface(const Parametric& other);
+  FunctionalInterface(const ParameterType mu = ParameterType())
+    : Parametric(mu)
+  {}
 
-  FunctionalInterface(const ParameterType& tt);
+  FunctionalInterface(const Parametric& other)
+    : Parametric(other)
+  {}
 
-  FunctionalInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                   Exception::index_out_of_range);
+  bool linear() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).linear());
+    return CRTP::as_imp(*this).linear();
+  }
 
-  FunctionalInterface(const std::vector< std::string >& kk,
-                      const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                           Exception::index_out_of_range,
-                                                           Exception::sizes_do_not_match);
+  unsigned int dim_source() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
+    return CRTP::as_imp(*this).dim_source();
+  }
 
-  virtual ~FunctionalInterface();
+  ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).apply(source, mu));
+    return CRTP::as_imp(*this).apply(source, mu);
+  }
 
-  virtual bool linear() const = 0;
-
-  virtual unsigned int dim_source() const = 0;
-
-  virtual std::string type_source() const = 0;
-
-  virtual double apply(const LA::VectorInterface* /*source*/,
-                       const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
-                                                                          Exception::you_have_to_implement_this,
-                                                                          Exception::sizes_do_not_match,
-                                                                          Exception::wrong_parameter_type,
-                                                                          Exception::requirements_not_met,
-                                                                          Exception::linear_solver_failed,
-                                                                          Exception::this_does_not_make_any_sense) = 0;
-
-  virtual FunctionalInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric,
-           Exception::you_have_to_implement_this,
-           Exception::this_does_not_make_any_sense);
+  FrozenType freeze_parameter(const Parameter mu = Parameter()) const
+    throw (Exception::this_is_not_parametric)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).freeze_parameter(mu));
+    return CRTP::as_imp(*this).freeze_parameter(mu);
+  }
 }; // class FunctionalInterface
 
 
+template< class Traits >
 class AffinelyDecomposedFunctionalInterface
-  : public FunctionalInterface
+  : public CRTPInterface< AffinelyDecomposedFunctionalInterface< Traits >, Traits >
+  , public FunctionalInterface< Traits >
 {
+  typedef CRTPInterface< AffinelyDecomposedFunctionalInterface< Traits >, Traits > CRTP;
+  typedef FunctionalInterface< Traits > BaseType;
 public:
-  AffinelyDecomposedFunctionalInterface();
+  typedef typename Traits::derived_type   derived_type;
+  typedef typename Traits::ComponentType  ComponentType;
+  static_assert(std::is_base_of< FunctionalInterface< typename ComponentType::Traits >, ComponentType >::value,
+                "ComponentType has to be derived from FunctionalInterface");
 
-  AffinelyDecomposedFunctionalInterface(const Parametric& other);
+  AffinelyDecomposedFunctionalInterface(const ParameterType mu = ParameterType())
+    : BaseType(mu)
+  {}
 
-  AffinelyDecomposedFunctionalInterface(const ParameterType& tt);
+  AffinelyDecomposedFunctionalInterface(const Parametric& other)
+    : BaseType(other)
+  {}
 
-  AffinelyDecomposedFunctionalInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                                     Exception::index_out_of_range);
+  unsigned int num_components() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).num_components());
+    return CRTP::as_imp(*this).num_components();
+  }
 
-  AffinelyDecomposedFunctionalInterface(const std::vector< std::string >& kk,
-                                        const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                                             Exception::index_out_of_range,
-                                                                             Exception::sizes_do_not_match);
+  ComponentType component(const int qq) const throw (Exception::requirements_not_met, Exception::index_out_of_range)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).component(qq));
+    return CRTP::as_imp(*this).component(qq);
+  }
 
-  virtual ~AffinelyDecomposedFunctionalInterface();
+  ParameterFunctional coefficient(const int qq) const throw (Exception::requirements_not_met,
+                                                             Exception::index_out_of_range)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
+    return CRTP::as_imp(*this).coefficient(qq);
+  }
 
-  virtual unsigned int num_components() const = 0;
+  bool has_affine_part() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).has_affine_part());
+    return CRTP::as_imp(*this).has_affine_part();
+  }
 
-  /**
-   * \attention The ownership of the component remains within the class!
-   */
-  virtual const FunctionalInterface* component(const int ii) const throw (Exception::requirements_not_met,
-                                                                          Exception::index_out_of_range) = 0;
-
-  /**
-   * \attention The ownership of the coefficient remains within the class!
-   */
-  virtual const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
-                                                                            Exception::index_out_of_range) = 0;
-
-  virtual bool hasAffinePart() const = 0;
-
-  /**
-   * \attention The ownership of the affinePart remains within the class!
-   */
-  virtual const FunctionalInterface* affinePart() const throw(Exception::requirements_not_met) = 0;
+  ComponentType affine_part() const throw (Exception::requirements_not_met)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).affine_part());
+    return CRTP::as_imp(*this).affine_part();
+  }
 }; // class AffinelyDecomposedFunctionalInterface
 
 
 } // namespace Pymor
 } // namespace Dune
-
-#include <dune/pymor/la/container/interfaces.hh>
 
 #endif // DUNE_PYMOR_FUNCTIONALS_INTERFACES_HH
