@@ -62,7 +62,7 @@ public:
 
   DuneDynamicVector(std::unique_ptr< BackendType >&& backend_ptr);
 
-  DuneDynamicVector(const DuneDynamicVector& other) = delete;
+  DuneDynamicVector(const ThisType& other) = delete;
 
   ThisType& operator=(const ThisType& other) = delete;
 
@@ -73,6 +73,8 @@ public:
   DuneDynamicVector copy() const;
 
   unsigned int dim() const;
+
+  bool has_equal_shape(const ThisType& other) const;
 
   bool almost_equal(const ThisType& other,
                     const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon< ScalarType >::value()) const;

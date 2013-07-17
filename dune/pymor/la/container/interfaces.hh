@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <type_traits>
 
 #include <dune/common/float_cmp.hh>
 
@@ -21,9 +22,12 @@ namespace Pymor {
 namespace LA {
 
 
+class ContainerInterfacePybindgen {};
+
 template< class Traits >
 class ContainerInterface
   : public CRTPInterface< ContainerInterface< Traits >, Traits >
+  , public ContainerInterfacePybindgen
 {
   typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
   typedef ContainerInterface< Traits >                          ThisType;
@@ -43,7 +47,7 @@ public:
 
   /**
    * \brief BLAS SCAL operation (in-place sclar multiplication).
-   * \param alpha The scalar coefficient with which the vector is multiplied.
+   * \param alpha The scalar coefficient with which each element of the container is multiplied.
    */
   void scal(const ScalarType& alpha)
   {
@@ -52,8 +56,8 @@ public:
 
   /**
    * \brief BLAS AXPY operation.
-   * \param alpha The scalar coefficient with which the each element of the container is to be multiplied
-   * \param xx    Container that is to be added.
+   * \param alpha The scalar coefficient with which each element of the container is multiplied
+   * \param xx    Container that is to be elementwise added.
    */
   void axpy(const ScalarType& alpha, const derived_type& xx)
   {
@@ -64,12 +68,21 @@ public:
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).axpy(alpha, CRTP::as_imp(xx)));
   }
+
+  bool has_equal_shape(const derived_type& other) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).has_equal_shape(other));
+    return CRTP::as_imp(*this).has_equal_shape(other);
+  }
 }; // class ContainerInterface
 
+
+class VectorInterfacePybindgen {};
 
 template< class Traits >
 class VectorInterface
   : public ContainerInterface< Traits >
+  , public VectorInterfacePybindgen
 {
   typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
   typedef VectorInterface< Traits >                             ThisType;
@@ -295,6 +308,30 @@ public:
 //                                                                          Exception::linear_solver_failed,
 //                                                                          Exception::this_does_not_make_any_sense);
 }; // class VectorInterface
+
+
+template< class Traits >
+class MatrixInterface
+  : public ContainerInterface< Traits >
+{
+  typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
+  typedef MatrixInterface< Traits >                             ThisType;
+public:
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::ScalarType   ScalarType;
+
+  unsigned int dim_source() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
+    return CRTP::as_imp(*this).dim_source();
+  }
+
+  unsigned int dim_range() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_range());
+    return CRTP::as_imp(*this).dim_range();
+  }
+}; // class MatrixInterface
 
 
 } // namespace LA

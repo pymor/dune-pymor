@@ -10,6 +10,7 @@
 #endif // HAVE_CMAKE_CONFIG
 
 #include <type_traits>
+#include <memory>
 
 #include <dune/stuff/test/test_common.hh>
 
@@ -30,6 +31,7 @@ typedef testing::Types< Dune::Pymor::LA::DuneDynamicVector< double >
 //                      , Dune::Pymor::LA::EigenDenseVector
 //#endif
                       > VectorTypes;
+
 
 template< class ContainerImp >
 struct ContainerTest
@@ -59,6 +61,7 @@ struct ContainerTest
     ContainerImp DUNE_UNUSED(d_deep_copy) = d_by_size.copy();
     d_by_size.scal(D_ScalarType(1));
     d_by_size.axpy(D_ScalarType(1), d_by_size_and_value);
+    if (!d_by_size.has_equal_shape(d_by_size_and_value)) DUNE_PYMOR_THROW(PymorException, "");
     // * of the container as the interface
     InterfaceType& i_by_size = static_cast< InterfaceType& >(d_by_size);
     InterfaceType& DUNE_UNUSED(i_by_size_and_value) = static_cast< InterfaceType& >(d_by_size_and_value);

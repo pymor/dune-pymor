@@ -15,6 +15,10 @@
 
 #include <dune/stuff/common/float_cmp.hh>
 
+#include <dune/pymor/functionals/default.hh>
+#include <dune/pymor/functionals/affine.hh>
+
+#include "affine.hh"
 #include "dunedynamic.hh"
 
 namespace Dune {
@@ -79,6 +83,12 @@ template< class S >
 unsigned int DuneDynamicVector< S >::dim() const
 {
   return backend_->size();
+}
+
+template< class S >
+bool DuneDynamicVector< S >::has_equal_shape(const ThisType& other) const
+{
+  return dim() == other.dim();
 }
 
 template< class S >
@@ -264,8 +274,18 @@ void DuneDynamicVector< S >::isub(const ThisType& other) throw (Exception::sizes
 
 //template class ContainerInterface< DuneDynamicVectorTraits< double > >;
 template class DuneDynamicVector< double >;
+template class AffinelyDecomposedConstContainer< DuneDynamicVector< double > >;
+template class AffinelyDecomposedContainer< DuneDynamicVector< double > >;
 
 
 } // namespace LA
+
+namespace Functionals {
+
+template class VectorBased< LA::DuneDynamicVector< double > >;
+template class LinearAffinelyDecomposedVectorBased< LA::DuneDynamicVector< double > >;
+
+}
+
 } // namespace Pymor
 } // namespace Dune
