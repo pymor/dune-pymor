@@ -17,20 +17,24 @@
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
-//#if HAVE_EIGEN
-//  #include <dune/pymor/la/container/eigenvector.hh>
-//#endif
 
 using namespace Dune;
 using namespace Dune::Pymor;
 
 static const size_t dim = 4;
 
-typedef testing::Types< Dune::Pymor::LA::DuneDynamicVector< double >
-//#if HAVE_EIGEN
-//                      , Dune::Pymor::LA::EigenDenseVector
-//#endif
+typedef testing::Types<
+                        Dune::Pymor::LA::DuneDynamicVector< double >
                       > VectorTypes;
+
+typedef testing::Types<
+                        Dune::Pymor::LA::DuneDynamicMatrix< double >
+                      > MatrixTypes;
+
+typedef testing::Types<
+                        Dune::Pymor::LA::DuneDynamicVector< double >
+                      , Dune::Pymor::LA::DuneDynamicMatrix< double >
+                      > ContainerTypes;
 
 
 template< class ContainerImp >
@@ -72,7 +76,7 @@ struct ContainerTest
 }; // struct ContainerTest
 
 
-TYPED_TEST_CASE(ContainerTest, VectorTypes);
+TYPED_TEST_CASE(ContainerTest, ContainerTypes);
 TYPED_TEST(ContainerTest, LA_CONTAINER) {
   this->check();
 }
