@@ -12,6 +12,7 @@ noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
   la/container/dunedynamic.cc \
+  operators/dunedynamic.cc \
   parameters/base.cc \
   parameters/functional.cc
 
