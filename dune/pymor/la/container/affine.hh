@@ -36,7 +36,7 @@ public:
   {}
 
   /**
-   * \attention This class takes ownership of aff_ptr!
+   * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposedConstContainer(const ContainerType* aff_ptr)
     : hasAffinePart_(true)
@@ -51,7 +51,7 @@ public:
   {}
 
   /**
-   * \attention This class takes ownership of comp_ptr and coeff_ptr!
+   * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposedConstContainer(const ContainerType* comp_ptr, const ParameterFunctional* coeff_ptr)
     : hasAffinePart_(false)
@@ -63,7 +63,7 @@ public:
   }
 
   /**
-   * \attention This class takes ownership of coeff_ptr!
+   * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposedConstContainer(const std::shared_ptr< const ContainerType > comp_ptr,
                                    const ParameterFunctional* coeff_ptr)
@@ -76,7 +76,7 @@ public:
   }
 
   /**
-   * \attention This class takes ownership of comp_ptr!
+   * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposedConstContainer(const ContainerType* comp_ptr,
                                    const std::shared_ptr< const ParameterFunctional > coeff_ptr)
@@ -109,7 +109,7 @@ public:
   }
 
   /**
-   * \attention This class takes ownership of aff_ptr!
+   * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
   void register_affine_part(const ContainerType* aff_ptr) throw (Exception::this_does_not_make_any_sense,
                                                                  Exception::sizes_do_not_match)
@@ -138,7 +138,7 @@ public:
   }
 
   /**
-   * \attention This class takes ownership of comp_ptr and coeff_ptr!
+   * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it manually)!
    */
   void register_component(const ContainerType* comp_ptr,
                           const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
@@ -148,7 +148,7 @@ public:
   }
 
   /**
-   * \attention This class takes ownership of comp_ptr!
+   * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
    */
   void register_component(const ContainerType* comp_ptr,
                           const std::shared_ptr< const ParameterFunctional > coeff_ptr)
@@ -158,7 +158,7 @@ public:
   }
 
   /**
-   * \attention This class takes ownership of coeff_ptr!
+   * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
    */
   void register_component(const std::shared_ptr< const ContainerType > comp_ptr,
                           const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
