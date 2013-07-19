@@ -6,20 +6,17 @@
 #ifndef DUNE_PYMOR_LA_CONTAINER_HH
 #define DUNE_PYMOR_LA_CONTAINER_HH
 
-#include <dune/pymor/common/exceptions.hh>
 #include "container/interfaces.hh"
-#include "container/dunedynamicvector.hh"
-#include "container/eigenvector.hh"
+#include "container/dunedynamic.hh"
 
 namespace Dune {
 namespace Pymor {
 namespace LA {
 
-std::vector< std::string > availableVectors();
 
-VectorInterface* createVector(const std::string type,
-                              const size_t size,
-                              const double value = 0.0) throw (Exception::types_are_not_compatible);
+template< class T >
+T createContainer(const T&, const size_t size);
+
 
 } // namespace LA
 } // namespace Pymor
