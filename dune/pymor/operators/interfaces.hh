@@ -6,176 +6,188 @@
 #ifndef DUNE_PYMOR_OPERATORS_INTERFACES_HH
 #define DUNE_PYMOR_OPERATORS_INTERFACES_HH
 
+#include <type_traits>
+
 #include <dune/pymor/common/exceptions.hh>
+#include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/la/container/interfaces.hh>
-#include <dune/pymor/la/container.hh>
 
 namespace Dune {
 namespace Pymor {
 
 
-/**
- * \note  A derived class has to implement the following static method:
-\code
-static std::vector< std::string > invert_options() throw(Exception::not_invertible)
-\endcode
- */
+template< class Traits >
 class OperatorInterface
   : public Parametric
+  , public CRTPInterface< OperatorInterface< Traits >, Traits >
 {
+  typedef CRTPInterface< OperatorInterface< Traits >, Traits > CRTP;
 public:
-  OperatorInterface();
+  typedef typename Traits::derived_type derived_type;
+  typedef typename Traits::SourceType   SourceType;
+  typedef typename Traits::RangeType    RangeType;
+  typedef typename Traits::ScalarType   ScalarType;
+  typedef typename Traits::FrozenType   FrozenType;
+  typedef typename Traits::InverseType  InverseType;
 
-  OperatorInterface(const ParameterType& tt);
+  static_assert(std::is_base_of< LA::VectorInterface< typename SourceType::Traits >, SourceType >::value,
+                "SourceType has to be derived from LA::VectorInterface!");
+  static_assert(std::is_base_of< LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,
+                "RangeType has to be derived from LA::VectorInterface!");
 
-  OperatorInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                 Exception::index_out_of_range);
+  OperatorInterface(const ParameterType mu = ParameterType())
+    : Parametric(mu)
+  {}
 
-  OperatorInterface(const std::vector< std::string >& kk,
-                    const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                         Exception::index_out_of_range,
-                                                         Exception::sizes_do_not_match);
+  OperatorInterface(const Parametric& other)
+    : Parametric(other)
+  {}
 
-  OperatorInterface(const Parametric& other);
+  bool linear() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).linear());
+    return CRTP::as_imp(*this).linear();
+  }
 
-  virtual ~OperatorInterface();
+  unsigned int dim_source() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
+    return CRTP::as_imp(*this).dim_source();
+  }
 
-  virtual bool linear() const = 0;
+  unsigned int dim_range() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_range());
+    return CRTP::as_imp(*this).dim_range();
+  }
 
-  virtual unsigned int dim_source() const = 0;
-
-  virtual unsigned int dim_range() const = 0;
-
-  virtual std::string type_source() const = 0;
-
-  virtual std::string type_range() const = 0;
-
-  virtual void apply(const LA::VectorInterface* /*source*/,
-                     LA::VectorInterface* /*range*/,
-                     const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
-                                                                        Exception::you_have_to_implement_this,
-                                                                        Exception::sizes_do_not_match,
-                                                                        Exception::wrong_parameter_type,
-                                                                        Exception::requirements_not_met,
-                                                                        Exception::linear_solver_failed,
-                                                                        Exception::this_does_not_make_any_sense) = 0;
-
-  virtual double apply2(const LA::VectorInterface* range,
-                        const LA::VectorInterface* source,
-                        const Parameter mu = Parameter()) const throw (Exception::types_are_not_compatible,
-                                                                       Exception::you_have_to_implement_this,
-                                                                       Exception::sizes_do_not_match,
-                                                                       Exception::wrong_parameter_type,
-                                                                       Exception::requirements_not_met,
-                                                                       Exception::linear_solver_failed,
-                                                                       Exception::this_does_not_make_any_sense);
-
-//  virtual Options* invert_options(const std::string& type) const = 0;
-
-  virtual const OperatorInterface* invert(const std::string type = "",
-                                          const Parameter mu = Parameter()) const
-    throw (Exception::not_invertible, Exception::key_is_not_valid) = 0;
-
-//  virtual InverseOperatorInterface* invert(const Parameter mu = Parameter(),
-//                                           const Options* = invert_options(invert_options()[0])) const = 0;
-
-  virtual void apply_inverse(const LA::VectorInterface* range,
-                             LA::VectorInterface* source,
-                             const std::string type = "",
-                             const Parameter mu = Parameter()) const
-    throw (Exception::types_are_not_compatible,
-           Exception::you_have_to_implement_this,
-           Exception::sizes_do_not_match,
+  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
+    throw (Exception::sizes_do_not_match,
            Exception::wrong_parameter_type,
            Exception::requirements_not_met,
            Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense) = 0;
+           Exception::this_does_not_make_any_sense)
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).apply(source, range, mu));
+  }
 
-//  virtual void apply_inverse(const LA::VectorInterface* range,
-//                             const LA::VectorInterface* source,
-//                             const Parameter mu = Parameter(),
-//                             const Options* options = ) const = 0;
+  RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
+  throw (Exception::sizes_do_not_match,
+         Exception::wrong_parameter_type,
+         Exception::requirements_not_met,
+         Exception::linear_solver_failed,
+         Exception::this_does_not_make_any_sense)
+  {
+    RangeType range = source.copy();
+    apply(source, range, mu);
+    return range;
+  }
 
-  virtual OperatorInterface* freeze_parameter(const Parameter /*mu*/ = Parameter()) const
-    throw (Exception::this_is_not_parametric,
-           Exception::you_have_to_implement_this,
-           Exception::this_does_not_make_any_sense);
+  /**
+   * \note  This default implementation of apply2 creates a temporary vector. Any derived class which can do better
+   *        should implement this method!
+   */
+  ScalarType apply2(const RangeType& range, const SourceType& source, const Parameter mu = Parameter()) const
+    throw (Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense)
+  {
+    RangeType tmp = range.copy();
+    apply(source, tmp, mu);
+    return tmp.dot(range);
+  }
+
+  static std::vector< std::string > invert_options()
+  {
+    return derived_type::invert_options();
+  }
+
+  InverseType invert(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).invert(option, mu));
+    return CRTP::as_imp(*this).invert(option, mu);
+  }
+
+  void apply_inverse(const RangeType& range, SourceType& source,
+                     const std::string option = invert_options()[0],
+                     const Parameter mu = Parameter()) const
+  {
+    invert(option, mu).apply(range, source);
+  }
+
+  SourceType apply_inverse(const RangeType& range,
+                           const std::string option = invert_options()[0],
+                           const Parameter mu = Parameter()) const
+  {
+    SourceType source = range.copy();
+    apply_inverse(range, source, option, mu);
+    return source;
+  }
+
+  FrozenType freeze_parameter(const Parameter mu = Parameter()) const
+    throw (Exception::this_is_not_parametric)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).freeze_parameter(mu));
+    return CRTP::as_imp(*this).freeze_parameter(mu);
+  }
 }; // class OperatorInterface
 
 
-class LinearOperatorInterface
-  : public OperatorInterface
-{
-public:
-  LinearOperatorInterface();
-
-  LinearOperatorInterface(const ParameterType& tt);
-
-  LinearOperatorInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                       Exception::index_out_of_range);
-
-  LinearOperatorInterface(const std::vector< std::string >& kk,
-                          const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                               Exception::index_out_of_range,
-                                                               Exception::sizes_do_not_match);
-
-  LinearOperatorInterface(const Parametric& other);
-
-  virtual ~LinearOperatorInterface();
-
-  virtual bool linear() const;
-
-  virtual LinearOperatorInterface* copy() const = 0;
-
-  virtual void scal(const double alpha) = 0;
-
-  virtual void axpy(const double alpha, const LinearOperatorInterface* x)
-    throw (Exception::sizes_do_not_match, Exception::types_are_not_compatible) = 0;
-}; // class LinearOperatorInterface
-
-
+template< class Traits >
 class AffinelyDecomposedOperatorInterface
-  : public OperatorInterface
+  : public CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits >
+  , public OperatorInterface< Traits >
 {
+  typedef CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits > CRTP;
+  typedef OperatorInterface< Traits > BaseType;
 public:
-  AffinelyDecomposedOperatorInterface();
+  typedef typename Traits::derived_type   derived_type;
+  typedef typename Traits::ComponentType  ComponentType;
+  static_assert(std::is_base_of< OperatorInterface< typename ComponentType::Traits >, ComponentType >::value,
+                "ComponentType has to be derived from FunctionalInterface");
 
-  AffinelyDecomposedOperatorInterface(const ParameterType& tt);
+  AffinelyDecomposedOperatorInterface(const ParameterType mu = ParameterType())
+    : BaseType(mu)
+  {}
 
-  AffinelyDecomposedOperatorInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                                   Exception::index_out_of_range);
+  AffinelyDecomposedOperatorInterface(const Parametric& other)
+    : BaseType(other)
+  {}
 
-  AffinelyDecomposedOperatorInterface(const std::vector< std::string >& kk,
-                                      const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                                           Exception::index_out_of_range,
-                                                                           Exception::sizes_do_not_match);
+  unsigned int num_components() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).num_components());
+    return CRTP::as_imp(*this).num_components();
+  }
 
-  AffinelyDecomposedOperatorInterface(const Parametric& other);
+  ComponentType component(const int qq) const throw (Exception::requirements_not_met, Exception::index_out_of_range)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).component(qq));
+    return CRTP::as_imp(*this).component(qq);
+  }
 
-  virtual ~AffinelyDecomposedOperatorInterface();
+  ParameterFunctional coefficient(const int qq) const throw (Exception::requirements_not_met,
+                                                             Exception::index_out_of_range)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
+    return CRTP::as_imp(*this).coefficient(qq);
+  }
 
-  virtual unsigned int num_components() const = 0;
+  bool has_affine_part() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).has_affine_part());
+    return CRTP::as_imp(*this).has_affine_part();
+  }
 
-  /**
-   * \attention The ownership of the component remains within the class!
-   */
-  virtual const OperatorInterface* component(const int ii) const throw (Exception::requirements_not_met,
-                                                                        Exception::index_out_of_range) = 0;
-
-  /**
-   * \attention The ownership of the coefficient remains within the class!
-   */
-  virtual const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
-                                                                            Exception::index_out_of_range) = 0;
-
-  virtual bool hasAffinePart() const = 0;
-
-  /**
-   * \attention The ownership of the affinePart remains within the class!
-   */
-  virtual const OperatorInterface* affinePart() const throw(Exception::requirements_not_met) = 0;
+  ComponentType affine_part() const throw (Exception::requirements_not_met)
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).affine_part());
+    return CRTP::as_imp(*this).affine_part();
+  }
 }; // class AffinelyDecomposedOperatorInterface
 
 
