@@ -77,6 +77,22 @@ public:
 }; // class ContainerInterface
 
 
+template< class Traits >
+class ProvidesContainer
+  : CRTPInterface< ProvidesContainer< Traits >, Traits >
+{
+  typedef CRTPInterface< ProvidesContainer< Traits >, Traits > CRTP;
+public:
+  typedef typename Traits::ContainerType ContainerType;
+
+  std::shared_ptr< const ContainerType > container() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).container());
+    return CRTP::as_imp(*this).container();
+  }
+}; // class ProvidesContainer
+
+
 class VectorInterfacePybindgen {};
 
 template< class Traits >
