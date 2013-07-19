@@ -11,11 +11,12 @@
 #include <string>
 #include <type_traits>
 
-#include <dune/common/float_cmp.hh>
+#include <dune/stuff/common/header/disable_warnings.hh>
+  #include <dune/common/float_cmp.hh>
+#include <dune/stuff/common/header/reenable_warnings.hh>
 
 #include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/common/exceptions.hh>
-//#include <dune/pymor/functionals/interfaces.hh>
 
 namespace Dune {
 namespace Pymor {
