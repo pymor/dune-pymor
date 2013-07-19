@@ -185,6 +185,14 @@ class io_error
   , public Dune::PymorException
 {};
 
+/**
+ * \brief Exception for wrong options.
+ */
+class wrong_option_given
+  : public Dune::RangeError
+  , public Dune::PymorException
+{};
+
 
 } // namespace Exceptions
 } // namespace Pymor
