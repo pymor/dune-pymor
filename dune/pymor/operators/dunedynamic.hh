@@ -1,0 +1,156 @@
+// This file is part of the dune-pymor project:
+//   https://github.com/pyMor/dune-pymor
+// Copyright Holders: Felix Albrecht, Stephan Rave
+// License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
+
+#ifndef DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
+#define DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
+
+#include <dune/pymor/common/exceptions.hh>
+#include <dune/pymor/common/crtp.hh>
+#include <dune/pymor/la/container/dunedynamic.hh>
+#include "interfaces.hh"
+
+namespace Dune {
+namespace Pymor {
+namespace Operators {
+
+
+template< class ScalarImp = double >
+class DuneDynamic;
+
+template< class ScalarImp = double >
+class DuneDynamicInverse;
+
+
+template< class ScalarImp >
+class DuneDynamicInverseTraits
+{
+public:
+  typedef ScalarImp                           ScalarType;
+  typedef DuneDynamicInverse< ScalarType >    derived_type;
+  typedef LA::DuneDynamicMatrix< ScalarType > ContainerType;
+  typedef LA::DuneDynamicVector< ScalarType > SourceType;
+  typedef LA::DuneDynamicVector< ScalarType > RangeType;
+  typedef derived_type                        FrozenType;
+  typedef DuneDynamic< ScalarType >           InverseType;
+};
+
+
+template< class ScalarImp >
+class DuneDynamicInverse
+  : public OperatorInterface< DuneDynamicInverseTraits< ScalarImp > >
+{
+  typedef OperatorInterface< DuneDynamicInverseTraits< ScalarImp > > BaseType;
+public:
+  typedef DuneDynamicInverseTraits< ScalarImp > Traits;
+  typedef typename Traits::derived_type         ThisType;
+  typedef typename Traits::ScalarType           ScalarType;
+  typedef typename Traits::SourceType           SourceType;
+  typedef typename Traits::RangeType            RangeType;
+  typedef typename Traits::ContainerType        ContainerType;
+  typedef typename Traits::FrozenType           FrozenType;
+  typedef typename Traits::InverseType          InverseType;
+
+  DuneDynamicInverse(const ContainerType* matrix_ptr, const std::string option = "superlu");
+
+  DuneDynamicInverse(const std::shared_ptr< const ContainerType > matrix_ptr, const std::string option = "superlu");
+
+  bool linear() const;
+
+  unsigned int dim_source() const;
+
+  unsigned int dim_range() const;
+
+  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
+    throw (Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
+
+  using BaseType::apply;
+
+  static std::vector< std::string > invert_options();
+
+  InverseType invert(const std::string option = invert_options()[0],
+                     const Parameter mu = Parameter()) const;
+
+  FrozenType freeze_parameter(const Parameter mu = Parameter()) const;
+
+private:
+  std::shared_ptr< const ContainerType > matrix_;
+}; // class DuneDynamicInverse
+
+
+template< class ScalarImp >
+class DuneDynamicTraits
+{
+public:
+  typedef ScalarImp                           ScalarType;
+  typedef DuneDynamic< ScalarType >           derived_type;
+  typedef LA::DuneDynamicMatrix< ScalarType > ContainerType;
+  typedef LA::DuneDynamicVector< ScalarType > SourceType;
+  typedef LA::DuneDynamicVector< ScalarType > RangeType;
+  typedef derived_type                        FrozenType;
+  typedef DuneDynamicInverse< ScalarType >    InverseType;
+};
+
+
+template< class ScalarImp >
+class DuneDynamic
+  : public OperatorInterface< DuneDynamicTraits< ScalarImp > >
+  , public LA::ProvidesContainer< DuneDynamicTraits< ScalarImp > >
+{
+  typedef OperatorInterface< DuneDynamicTraits< ScalarImp > > BaseType;
+public:
+  typedef DuneDynamicTraits< ScalarImp >  Traits;
+  typedef typename Traits::derived_type   ThisType;
+  typedef typename Traits::ScalarType     ScalarType;
+  typedef typename Traits::SourceType     SourceType;
+  typedef typename Traits::RangeType      RangeType;
+  typedef typename Traits::ContainerType  ContainerType;
+  typedef typename Traits::FrozenType     FrozenType;
+  typedef typename Traits::InverseType    InverseType;
+
+  /**
+   * \attention This class takes ownership of matrix_ptr!
+   */
+  DuneDynamic(const ContainerType* matrix_ptr);
+
+  DuneDynamic(const std::shared_ptr< const ContainerType > matrix_ptr);
+
+  bool linear() const;
+
+  unsigned int dim_source() const;
+
+  unsigned int dim_range() const;
+
+  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
+    throw (Exception::sizes_do_not_match,
+           Exception::wrong_parameter_type,
+           Exception::requirements_not_met,
+           Exception::linear_solver_failed,
+           Exception::this_does_not_make_any_sense);
+
+  using BaseType::apply;
+
+  static std::vector< std::string > invert_options();
+
+  InverseType invert(const std::string option = invert_options()[0],
+                     const Parameter mu = Parameter()) const;
+
+  FrozenType freeze_parameter(const Parameter mu = Parameter()) const;
+
+  std::shared_ptr< const ContainerType > container() const;
+
+private:
+  std::shared_ptr< const ContainerType > matrix_;
+}; // class DuneDynamic
+
+
+} // namespace Operators
+} // namespace Pymor
+} // namespace Dune
+
+#endif // DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
