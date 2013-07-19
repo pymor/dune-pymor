@@ -19,6 +19,17 @@
 
 namespace Dune {
 namespace Pymor {
+
+namespace Operators {
+
+template< class ScalarImp >
+class DuneDynamic;
+
+template< class ScalarImp >
+class DuneDynamicInverse;
+
+}
+
 namespace LA {
 
 
@@ -66,7 +77,7 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  DuneDynamicVector(DuneDynamicVector&& source);
+  DuneDynamicVector(ThisType&& source);
 
   ThisType& operator=(ThisType&& source);
 
@@ -119,46 +130,95 @@ public:
   using BaseType::isub;
 
 private:
-  static int assert_is_positive(const int ii) throw (Exception::index_out_of_range);
+  static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
+
+  friend class Operators::DuneDynamic< ScalarType >;
+  friend class Operators::DuneDynamicInverse< ScalarType >;
 
   std::unique_ptr< BackendType > backend_;
 }; // class DuneDynamicVector
 
 
-//class DuneDynamicMatrix
-//{
-//public:
-//  typedef Dune::DynamicMatrix< double > BackendType;
+template< class ScalarImp = double >
+class DuneDynamicMatrix;
 
-//  DuneDynamicMatrix(const int rr, const int cc, const double value = 0.0);
 
-//  DuneDynamicMatrix(std::shared_ptr< BackendType > backendPtr);
+template< class ScalarImp = double >
+class DuneDynamicMatrixTraits
+{
+public:
+  typedef ScalarImp                       ScalarType;
+  typedef DuneDynamicMatrix< ScalarType > derived_type;
+};
 
-//  DuneDynamicMatrix(DuneDynamicMatrix& other);
 
-//private:
-//  DuneDynamicMatrix(const DuneDynamicMatrix& other);
+template< class ScalarImp >
+class DuneDynamicMatrix
+  : public Dune::Pymor::LA::MatrixInterface< DuneDynamicMatrixTraits< ScalarImp > >
+{
+public:
+  typedef DuneDynamicMatrixTraits< ScalarImp >  Traits;
+  typedef typename Traits::derived_type         ThisType;
+  typedef typename Traits::ScalarType           ScalarType;
+private:
+  typedef Dune::DynamicMatrix< ScalarType >     BackendType;
 
-//public:
-//  virtual DuneDynamicMatrix copy() const;
+public:
+  DuneDynamicMatrix(const int rr = 0, const int cc = 0, const ScalarType value = ScalarType(0));
 
-//  unsigned int dim_source() const;
+  /**
+   * \attention This class takes ownership of backend_ptr!
+   */
+  DuneDynamicMatrix(BackendType* backend_ptr);
 
-//  unsigned int dim_range() const;
+  DuneDynamicMatrix(std::unique_ptr< BackendType >&& backend_ptr);
 
-//  void scal(const double alpha);
+  DuneDynamicMatrix(const ThisType& other) = delete;
 
-//  void axpy(const double alpha, const DuneDynamicMatrix& x) throw (Exception::sizes_do_not_match);
+  ThisType& operator=(const ThisType& other) = delete;
 
-//  std::shared_ptr< BackendType > backend();
+  DuneDynamicMatrix(ThisType&& source);
 
-//  std::shared_ptr< const BackendType > backend() const;
+  ThisType& operator=(ThisType&& source);
 
-//private:
-//  static int assert_is_positive(const int ii) throw (Exception::index_out_of_range);
+  ThisType copy() const;
 
-//  std::shared_ptr< BackendType > backend_;
-//}; // class DuneDynamicMatrix
+  unsigned int dim_source() const;
+
+  unsigned int dim_range() const;
+
+  bool has_equal_shape(const ThisType& other) const;
+
+  void scal(const ScalarType& alpha);
+
+  void axpy(const ScalarType& alpha, const ThisType& x) throw (Exception::sizes_do_not_match);
+
+private:
+  static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
+
+  friend class Operators::DuneDynamic< ScalarType >;
+  friend class Operators::DuneDynamicInverse< ScalarType >;
+
+  std::unique_ptr< BackendType > backend_;
+}; // class DuneDynamicMatrix
+
+
+template< class S >
+DuneDynamicVector< S > createContainer(const DuneDynamicVector< S >&, const size_t size)
+{
+  return DuneDynamicVector< S >(size, S(1));
+}
+
+
+template< class S >
+DuneDynamicMatrix< S > createContainer(const DuneDynamicMatrix< S >&, const size_t size)
+{
+  typedef Dune::DynamicMatrix< S > BackendType;
+  BackendType* matrix = new BackendType(size, size, S(0));
+  for (size_t ii = 0; ii < size; ++ii)
+    matrix->operator[](ii)[ii] = S(1);
+  return DuneDynamicMatrix< S >(matrix);
+}
 
 
 } // namespace LA

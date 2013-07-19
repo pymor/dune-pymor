@@ -31,7 +31,7 @@ namespace LA {
 // =============================
 template< class S >
 DuneDynamicVector< S >::DuneDynamicVector(const int size, const ScalarType value)
-  : backend_(new BackendType(size, value))
+  : backend_(new BackendType(assert_is_not_negative(size), value))
 {}
 
 template< class S >
@@ -45,7 +45,7 @@ DuneDynamicVector< S >::DuneDynamicVector(std::unique_ptr< BackendType >&& backe
 {}
 
 template< class S >
-DuneDynamicVector< S >::DuneDynamicVector(DuneDynamicVector&& source)
+DuneDynamicVector< S >::DuneDynamicVector(ThisType&& source)
   : backend_(std::move(source.backend_))
 {}
 
@@ -207,75 +207,104 @@ void DuneDynamicVector< S >::isub(const ThisType& other) throw (Exception::sizes
   backend_->operator-=(*(other.backend_));
 }
 
+template< class S >
+int DuneDynamicVector< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
+{
+  if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
+  return ii;
+}
 
-//// =============================
-//// ===== DuneDynamicMatrix =====
-//// =============================
-//DuneDynamicMatrix::DuneDynamicMatrix(const int rr, const int cc, const double value)
-//  : backend_(std::make_shared< BackendType >(assert_is_positive(rr), assert_is_positive(cc), value))
-//{}
-
-//DuneDynamicMatrix::DuneDynamicMatrix(std::shared_ptr< BackendType > backendPtr)
-//  : backend_(backendPtr)
-//{}
-
-//DuneDynamicMatrix::DuneDynamicMatrix(DuneDynamicMatrix& other)
-//  : backend_(other.backend_)
-//{}
-
-//DuneDynamicMatrix DuneDynamicMatrix::copy() const
-//{
-//  return DuneDynamicMatrix(std::make_shared< BackendType >(*backend_));
-//}
-
-//unsigned int DuneDynamicMatrix::dim_source() const
-//{
-//  return backend_->cols();
-//}
-
-//unsigned int DuneDynamicMatrix::dim_range() const
-//{
-//  return backend_->rows();
-//}
-
-//void DuneDynamicMatrix::scal(const double alpha)
-//{
-//  backend_->operator*=(alpha);
-//}
-
-//void DuneDynamicMatrix::axpy(const double alpha, const DuneDynamicMatrix& x) throw (Exception::sizes_do_not_match)
-//{
-//  if (x.dim_source() != dim_source())
-//    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-//                     "the dim_source of x (" << x.dim_source() << ") does not match the dim_source of this ("
-//                     << dim_source() << ")!");
-//  if (x.dim_range() != dim_range())
-//    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-//                     "the dim_range of x (" << x.dim_range() << ") does not match the dim_range of this ("
-//                     << dim_range() << ")!");
-//  backend_->axpy(alpha, *(x.backend()));
-//}
-
-//std::shared_ptr< typename DuneDynamicMatrix::BackendType > DuneDynamicMatrix::backend()
-//{
-//  return backend_;
-//}
-
-//std::shared_ptr< const typename DuneDynamicMatrix::BackendType > DuneDynamicMatrix::backend() const
-//{
-//  return backend_;
-//}
-
-//int DuneDynamicMatrix::assert_is_positive(const int ii) throw (Exception::index_out_of_range)
-//{
-//  if (ii <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
-//  return ii;
-//}
-
-//template class ContainerInterface< DuneDynamicVectorTraits< double > >;
 template class DuneDynamicVector< double >;
 template class AffinelyDecomposedConstContainer< DuneDynamicVector< double > >;
 template class AffinelyDecomposedContainer< DuneDynamicVector< double > >;
+
+
+// =============================
+// ===== DuneDynamicMatrix =====
+// =============================
+template< class S >
+DuneDynamicMatrix< S >::DuneDynamicMatrix(const int rr, const int cc, const ScalarType value)
+  : backend_(new BackendType(assert_is_not_negative(rr), assert_is_not_negative(cc), value))
+{}
+
+template< class S >
+DuneDynamicMatrix< S >::DuneDynamicMatrix(BackendType* backend_ptr)
+  : backend_(backend_ptr)
+{}
+
+template< class S >
+DuneDynamicMatrix< S >::DuneDynamicMatrix(std::unique_ptr< BackendType >&& backend_ptr)
+  : backend_(std::move(backend_ptr))
+{}
+
+template< class S >
+DuneDynamicMatrix< S >::DuneDynamicMatrix(ThisType&& source)
+  : backend_(std::move(source.backend_))
+{}
+
+template< class S >
+typename DuneDynamicMatrix< S >::ThisType& DuneDynamicMatrix< S >::operator=(ThisType&& source)
+{
+  if (this != &source) {
+    backend_ = std::move(source.backend_);
+  }
+  return *this;
+}
+
+template< class S >
+typename DuneDynamicMatrix< S >::ThisType DuneDynamicMatrix< S >::copy() const
+{
+  return DuneDynamicMatrix< S >(new BackendType(*backend_));
+}
+
+template< class S >
+unsigned int DuneDynamicMatrix< S >::dim_source() const
+{
+  return backend_->cols();
+}
+
+template< class S >
+unsigned int DuneDynamicMatrix< S >::dim_range() const
+{
+  return backend_->rows();
+}
+
+template< class S >
+bool DuneDynamicMatrix< S >::has_equal_shape(const ThisType& other) const
+{
+  return dim_source() == other.dim_source() && dim_range() == other.dim_range();
+}
+
+template< class S >
+void DuneDynamicMatrix< S >::scal(const ScalarType& alpha)
+{
+  backend_->operator*=(alpha);
+}
+
+template< class S >
+void DuneDynamicMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
+{
+  if (xx.dim_source() != dim_source())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_source of xx (" << xx.dim_source() << ") does not match the dim_source of this ("
+                     << dim_source() << ")!");
+  if (xx.dim_range() != dim_range())
+    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                     "the dim_range of xx (" << xx.dim_range() << ") does not match the dim_range of this ("
+                     << dim_range() << ")!");
+  backend_->axpy(alpha, *(xx.backend_));
+}
+
+template< class S >
+int DuneDynamicMatrix< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
+{
+  if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
+  return ii;
+}
+
+template class DuneDynamicMatrix< double >;
+template class AffinelyDecomposedConstContainer< DuneDynamicMatrix< double > >;
+template class AffinelyDecomposedContainer< DuneDynamicMatrix< double > >;
 
 
 } // namespace LA
