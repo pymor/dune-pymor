@@ -53,12 +53,12 @@ struct VectorBasedTest
     typedef typename Traits::ScalarType   T_ScalarType;
     typedef typename Traits::FrozenType   T_FrozenType;
     // * of the class itself (aka the derived type)
-    typedef typename FunctionalType::SourceType D_SourceType;
-    typedef typename FunctionalType::ScalarType D_ScalarType;
-    typedef typename FunctionalType::VectorType D_VectorType;
-    typedef typename FunctionalType::FrozenType D_FrozenType;
-    static_assert(std::is_same< D_VectorType, VectorType >::value,
-                  "FunctionalType::VectorType is wrong!");
+    typedef typename FunctionalType::SourceType     D_SourceType;
+    typedef typename FunctionalType::ScalarType     D_ScalarType;
+    typedef typename FunctionalType::ContainerType  D_ContainerType;
+    typedef typename FunctionalType::FrozenType     D_FrozenType;
+    static_assert(std::is_same< D_ContainerType, VectorType >::value,
+                  "FunctionalType::ContainerType is wrong!");
     // * of the class as the interface
     typedef FunctionalInterface< Traits >       InterfaceType;
     typedef typename InterfaceType::SourceType  I_SourceType;

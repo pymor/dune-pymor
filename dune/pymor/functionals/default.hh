@@ -26,35 +26,36 @@ class VectorBasedTraits
 {
 public:
   typedef VectorBased< VectorImp >        derived_type;
-  typedef VectorImp                       VectorType;
-  typedef VectorType                      SourceType;
+  typedef VectorImp                       ContainerType;
+  typedef VectorImp                       SourceType;
   typedef derived_type                    FrozenType;
   typedef typename SourceType::ScalarType ScalarType;
-  static_assert(std::is_base_of< Dune::Pymor::LA::VectorInterface< typename VectorImp::Traits >, VectorType >::value,
-                "VectorType must be derived from Dune::Pymor::LA::VectorInterface!");
+  static_assert(std::is_base_of< Dune::Pymor::LA::VectorInterface< typename VectorImp::Traits >, ContainerType >::value,
+                "VectorImp must be derived from Dune::Pymor::LA::VectorInterface!");
 };
 
 
 template< class VectorImp >
 class VectorBased
   : public FunctionalInterface< VectorBasedTraits< VectorImp > >
+  , public LA::ProvidesContainer< VectorBasedTraits< VectorImp > >
 {
 public:
   typedef VectorBasedTraits< VectorImp >  Traits;
   typedef typename Traits::derived_type   ThisType;
-  typedef typename Traits::VectorType     VectorType;
+  typedef typename Traits::ContainerType  ContainerType;
   typedef typename Traits::SourceType     SourceType;
   typedef typename Traits::ScalarType     ScalarType;
   typedef typename Traits::FrozenType     FrozenType;
 
   /**
-   * \attention This class takes ownership of vector_ptr!
+   * \attention This class takes ownership of vector_ptr (in the sense, that you must not delete it manually)!
    */
-  VectorBased(const VectorType* vector_ptr)
+  VectorBased(const ContainerType* vector_ptr)
     : vector_(vector_ptr)
   {}
 
-  VectorBased(const std::shared_ptr< const VectorType > vector_ptr)
+  VectorBased(const std::shared_ptr< const ContainerType > vector_ptr)
     : vector_(vector_ptr)
   {}
 
@@ -69,10 +70,14 @@ public:
   }
 
   ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric)
+    throw (Exception::this_is_not_parametric, Exception::sizes_do_not_match)
   {
     if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                       "mu has to be empty if parametric() == false (is " << mu << ")!");
+    if (source.dim() != dim_source())
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "the dim of source (" << source.dim() << ") does not match the dim_source of this ("
+                       << dim_source() << ")!");
     return vector_->dot(source);
   }
 
@@ -81,15 +86,15 @@ public:
   {
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
                      << "if parametric() == false!");
-    return FrozenType(new VectorType());
+    return FrozenType(new ContainerType());
   }
 
-  std::shared_ptr< const VectorType > vector() const
+  std::shared_ptr< const ContainerType > container() const
   {
     return vector_;
   }
 private:
-  std::shared_ptr< const VectorType > vector_;
+  std::shared_ptr< const ContainerType > vector_;
 }; // class VectorBased
 
 
