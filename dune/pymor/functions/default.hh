@@ -6,8 +6,8 @@
 #ifndef DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 #define DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 
-#include <dune/stuff/function/interface.hh>
-#include <dune/stuff/function/expression.hh>
+#include <dune/stuff/functions/interfaces.hh>
+#include <dune/stuff/functions/expression.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>

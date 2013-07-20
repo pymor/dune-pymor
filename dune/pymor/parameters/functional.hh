@@ -9,7 +9,7 @@
 #include <vector>
 #include <memory>
 
-#include <dune/stuff/function/expression/mathexpr.hh>
+#include <dune/stuff/functions/expression/mathexpr.hh>
 
 #include "base.hh"
 
