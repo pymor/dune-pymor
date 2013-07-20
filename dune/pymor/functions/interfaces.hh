@@ -6,8 +6,12 @@
 #ifndef DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 #define DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 
+#include <memory>
+
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
+
+#include <dune/stuff/functions/interfaces.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
@@ -17,6 +21,10 @@ namespace Dune {
 namespace Pymor {
 
 
+/**
+ * \brief Interface for matrix valued (possibly parametric) functions.
+ * \note  See specialization (rangeDimCols = 1) for scalar and vector valued functions.
+ */
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
 class ParametricFunctionInterface
   : public Parametric
@@ -31,19 +39,14 @@ public:
   static const unsigned int                                               dimRangeCols = rangeDimCols;
   typedef Dune::FieldMatrix< RangeFieldType, dimRangeRows, dimRangeCols > RangeType;
 
-  ParametricFunctionInterface();
+  typedef Stuff::FunctionInterface< DomainFieldType, dimDomain,
+                                    RangeFieldType, dimRangeRows, dimRangeCols > NonparametricType;
 
-  ParametricFunctionInterface(const ParameterType& tt);
-
-  ParametricFunctionInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                           Exception::index_out_of_range);
-
-  ParametricFunctionInterface(const std::vector< std::string >& kk,
-                              const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                                   Exception::index_out_of_range,
-                                                                   Exception::sizes_do_not_match);
+  ParametricFunctionInterface(const ParameterType tt = ParameterType());
 
   ParametricFunctionInterface(const Parametric& other);
+
+  virtual ~ParametricFunctionInterface();
 
   virtual std::string name() const;
 
@@ -53,9 +56,24 @@ public:
 
   virtual RangeType evaluate(const DomainType& x, const Parameter mu = Parameter()) const
     throw (Exception::wrong_parameter_type);
+
+  virtual bool affinely_decomposable() const;
+
+  virtual bool has_affine_part() const;
+
+  virtual std::shared_ptr< const NonparametricType > affine_part() const;
+
+  virtual unsigned int num_components() const;
+
+  virtual std::shared_ptr< const NonparametricType > component(int qq) const;
+
+  virtual std::shared_ptr< const ParameterFunctional > coefficient(int qq) const;
 }; // class ParametricFunctionInterface
 
 
+/**
+ * \brief Interface for scalar and vector valued (possibly parametric) functions.
+ */
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows >
 class ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, 1 >
   : public Parametric
@@ -68,22 +86,16 @@ public:
   typedef RangeFieldImp                                 RangeFieldType;
   static const unsigned int                             dimRangeRows = rangeDimRows;
   static const unsigned int                             dimRangeCols = 1;
-  static const unsigned int                             dimRange = 1;
+  static const unsigned int                             dimRange = dimRangeRows;
   typedef Dune::FieldVector< RangeFieldType, dimRange > RangeType;
 
-  ParametricFunctionInterface();
+  typedef Stuff::FunctionInterface< DomainFieldType, dimDomain, RangeFieldType, dimRange > NonparametricType;
 
-  ParametricFunctionInterface(const ParameterType& tt);
-
-  ParametricFunctionInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                           Exception::index_out_of_range);
-
-  ParametricFunctionInterface(const std::vector< std::string >& kk,
-                              const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                                   Exception::index_out_of_range,
-                                                                   Exception::sizes_do_not_match);
+  ParametricFunctionInterface(const ParameterType tt = ParameterType());
 
   ParametricFunctionInterface(const Parametric& other);
+
+  virtual ~ParametricFunctionInterface();
 
   virtual std::string name() const;
 
@@ -93,43 +105,19 @@ public:
 
   virtual RangeType evaluate(const DomainType& x, const Parameter mu = Parameter()) const
     throw (Exception::wrong_parameter_type);
+
+  virtual bool affinely_decomposable() const;
+
+  virtual bool has_affine_part() const;
+
+  virtual std::shared_ptr< const NonparametricType > affine_part() const;
+
+  virtual unsigned int num_components() const;
+
+  virtual std::shared_ptr< const NonparametricType > component(int ii) const;
+
+  virtual std::shared_ptr< const ParameterFunctional > coefficient(int ii) const;
 }; // class ParametricFunctionInterface< ..., 1 >
-
-
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
-class AffineParametricFunctionInterface
-  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
-{
-public:
-  typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
-                                        RangeFieldImp, rangeDimRows, rangeDimCols > ParametricFunctionType;
-
-  AffineParametricFunctionInterface();
-
-  AffineParametricFunctionInterface(const ParameterType& tt);
-
-  AffineParametricFunctionInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                                 Exception::index_out_of_range);
-
-  AffineParametricFunctionInterface(const std::vector< std::string >& kk,
-                                    const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                                         Exception::index_out_of_range,
-                                                                         Exception::sizes_do_not_match);
-
-  AffineParametricFunctionInterface(const Parametric& other);
-
-  virtual std::string name() const;
-
-  virtual bool hasAffinePart() const = 0;
-
-  virtual const ParametricFunctionType* affinePart() const = 0;
-
-  virtual unsigned int num_components() const = 0;
-
-  virtual const ParameterFunctional* coefficient(int ii) const = 0;
-
-  virtual const ParametricFunctionType* component(int ii) const = 0;
-}; // class AffineParametricFunctionInterface
 
 
 } // namespace Pymor

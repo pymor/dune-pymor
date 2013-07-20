@@ -6,6 +6,8 @@
 #ifndef DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 #define DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 
+#include <memory>
+
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/functions/expression.hh>
 
@@ -20,22 +22,21 @@ namespace Functions {
 
 
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
-class NonparametricWrapper
+class NonparametricDefault
   : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
 {
   typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
 public:
-  typedef Dune::Stuff::FunctionInterface< DomainFieldImp, domainDim,
-                                          RangeFieldImp, rangeDimRows, rangeDimCols > NonparametricType;
-  typedef typename NonparametricType::DomainType DomainType;
-  typedef typename NonparametricType::RangeType  RangeType;
+  typedef typename BaseType::NonparametricType    NonparametricType;
+  typedef typename NonparametricType::DomainType  DomainType;
+  typedef typename NonparametricType::RangeType   RangeType;
 
   /**
-   * \attention This class takes ownership of nonparametric!
+   * \attention This class takes ownership of nonparametric_ptr (in the sense, that you must not delete it manually)!
    */
-  NonparametricWrapper(const NonparametricType* nonparametric);
+  NonparametricDefault(const NonparametricType* nonparametric_ptr);
 
-  virtual ~NonparametricWrapper();
+  NonparametricDefault(const std::shared_ptr< const NonparametricType > nonparametric_ptr);
 
   virtual std::string name() const;
 
@@ -46,31 +47,40 @@ public:
 
   using BaseType::evaluate;
 
+  virtual bool affinely_decomposable() const;
+
+  virtual bool has_affine_part() const;
+
+  virtual std::shared_ptr< const NonparametricType > affine_part() const;
+
+  virtual unsigned int num_components() const;
+
 private:
-  const NonparametricType* nonparametric_;
-}; // class NonparametricWrapper
+  std::shared_ptr< const NonparametricType > nonparametric_;
+}; // class NonparametricDefault
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows >
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim >
 class NonparametricExpression
-  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, 1 >
+  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1 >
 {
-  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, 1 > BaseType;
+  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1 > BaseType;
   typedef Dune::Stuff::FunctionExpression<  DomainFieldImp, domainDim,
-                                            RangeFieldImp, rangeDimRows > ExpressionFunctionType;
+                                            RangeFieldImp, rangeDim > ExpressionFunctionType;
 public:
+  typedef typename BaseType::NonparametricType        NonparametricType;
   typedef typename ExpressionFunctionType::DomainType DomainType;
   typedef typename ExpressionFunctionType::RangeType  RangeType;
 
   NonparametricExpression(const std::string var,
                           const std::string expr,
                           const int oo = -1,
-                          const std::string nm = ExpressionFunctionType::id());
+                          const std::string nm = ExpressionFunctionType::static_id());
 
   NonparametricExpression(const std::string var,
                           const std::vector< std::string > exprs,
                           const int oo = -1,
-                          const std::string nm = ExpressionFunctionType::id());
+                          const std::string nm = ExpressionFunctionType::static_id());
 
   virtual std::string name() const;
 
@@ -81,79 +91,136 @@ public:
 
   using BaseType::evaluate;
 
+  virtual bool affinely_decomposable() const;
+
+  virtual bool has_affine_part() const;
+
+  virtual std::shared_ptr< const NonparametricType > affine_part() const;
+
+  virtual unsigned int num_components() const;
+
 private:
-  const ExpressionFunctionType expressionFunction_;
+  std::shared_ptr< const ExpressionFunctionType > expressionFunction_;
 }; // class NonparametricExpression
 
 
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
-class AffineParametricDefault
-  : public AffineParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+class AffinelyDecomposableDefault
+  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
 {
-  typedef AffineParametricFunctionInterface<  DomainFieldImp, domainDim,
-                                              RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
-public:
   typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
-                                        RangeFieldImp, rangeDimRows, rangeDimCols > ParametricFunctionType;
-  typedef typename BaseType::DomainType DomainType;
-  typedef typename BaseType::RangeType  RangeType;
+                                        RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
+public:
+  typedef typename BaseType::NonparametricType  NonparametricType;
+  typedef typename BaseType::DomainType         DomainType;
+  typedef typename BaseType::RangeType          RangeType;
 
-  AffineParametricDefault();
-
-  /**
-   * \attention This class takes ownership of aff!
-   */
-  AffineParametricDefault(const ParametricFunctionType* aff);
-
-  virtual ~AffineParametricDefault();
+  AffinelyDecomposableDefault(const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
 
   /**
-   * \attention This class takes ownership of aff!
+   * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
-  virtual void register_component(const ParametricFunctionType* aff) throw (Exception::this_does_not_make_any_sense);
+  AffinelyDecomposableDefault(const NonparametricType* aff_ptr,
+                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
+
+  AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > aff_ptr,
+                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
 
   /**
-   * \attention This class takes ownership of comp and coeff!
+   * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it
+   *            manually)!
    */
-  virtual void register_component(const ParametricFunctionType* comp, const ParameterFunctional* coeff)
+  AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
+                              const ParameterFunctional* coeff_ptr,
+                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
+
+  /**
+   * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
+   */
+  AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
+                              const std::shared_ptr< const ParameterFunctional > coeff_ptr,
+                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
+
+  /**
+   * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
+   */
+  AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
+                              const ParameterFunctional* coeff_ptr,
+                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
+
+  AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
+                              const std::shared_ptr< const ParameterFunctional > coeff_ptr,
+                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const int ord = -1);
+
+  /**
+   * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
+   */
+  void register_affine_part(const NonparametricType* aff_ptr)
     throw (Exception::this_does_not_make_any_sense);
 
-  virtual unsigned int num_components() const;
+  void register_affine_part(const std::shared_ptr< const NonparametricType > aff_ptr)
+    throw (Exception::this_does_not_make_any_sense);
 
   /**
-   * \attention The ownership of the component remains with this class!
+   * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it
+   *            manually)!
    */
-  virtual const ParametricFunctionType* component(const int ii) const throw (Exception::requirements_not_met,
-                                                                             Exception::index_out_of_range);
+  void register_component(const NonparametricType* comp_ptr, const ParameterFunctional* coeff_ptr);
 
   /**
-   * \attention The ownership of the coefficient remains with this class!
+   * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
    */
-  virtual const ParameterFunctional* coefficient(const int ii) const throw (Exception::requirements_not_met,
-                                                                            Exception::index_out_of_range);
-
-  virtual bool hasAffinePart() const;
+  void register_component(const NonparametricType* comp_ptr,
+                          const std::shared_ptr< const ParameterFunctional > coeff_ptr);
 
   /**
-   * \attention The ownership of affinePart() remains in this class!
+   * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
    */
-  virtual const ParametricFunctionType* affinePart() const throw(Exception::requirements_not_met);
+  void register_component(const std::shared_ptr< const NonparametricType > comp_ptr,
+                          const ParameterFunctional* coeff_ptr);
+
+  void register_component(const std::shared_ptr< const NonparametricType > comp_ptr,
+                          const std::shared_ptr< const ParameterFunctional > coeff_ptr);
 
   virtual int order() const;
 
+  virtual std::string name() const;
+
   virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
-    throw (Exception::wrong_parameter_type, Exception::this_does_not_make_any_sense);
+    throw (Exception::wrong_parameter_type, Exception::requirements_not_met);
 
   using BaseType::evaluate;
 
+  virtual bool affinely_decomposable() const;
+
+  virtual bool has_affine_part() const;
+
+  virtual std::shared_ptr< const NonparametricType > affine_part() const throw(Exception::requirements_not_met);
+
+  virtual unsigned int num_components() const;
+
+  virtual std::shared_ptr< const NonparametricType > component(const int qq) const
+    throw (Exception::requirements_not_met, Exception::index_out_of_range);
+
+  virtual std::shared_ptr< const ParameterFunctional > coefficient(const int qq) const
+    throw (Exception::requirements_not_met, Exception::index_out_of_range);
+
 public:
-  size_t size_;
-  bool hasAffinePart_;
+  std::string name_;
   int order_;
-  std::vector< const ParametricFunctionType* > components_;
-  std::vector< const ParameterFunctional* > coefficients_;
-  const ParametricFunctionType* affinePart_;
-}; // class AffineParametricDefault
+  unsigned int num_components_;
+  bool hasAffinePart_;
+  std::vector< std::shared_ptr< const NonparametricType > > components_;
+  std::vector< std::shared_ptr< const ParameterFunctional > > coefficients_;
+  std::shared_ptr< const NonparametricType > affinePart_;
+}; // class AffinelyDecomposableDefault
 
 } // namespace Functions
 } // namespace Pymor
