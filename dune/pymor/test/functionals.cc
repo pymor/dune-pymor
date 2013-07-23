@@ -20,6 +20,7 @@
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
+#include <dune/pymor/la/container/eigen.hh>
 #include <dune/pymor/functionals/interfaces.hh>
 #include <dune/pymor/functionals/default.hh>
 #include <dune/pymor/functionals/affine.hh>
@@ -30,6 +31,9 @@ using namespace Dune::Pymor;
 
 typedef testing::Types<
                         LA::DuneDynamicVector< double >
+#if HAVE_EIGEN
+                      , LA::EigenDenseVector< double >
+#endif
                       > VectorTypes;
 
 
