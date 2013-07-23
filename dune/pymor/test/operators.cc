@@ -75,7 +75,7 @@ struct ContainerBasedOperatorTest
     typedef typename InterfaceType::SourceType  I_SourceType;
     typedef typename InterfaceType::RangeType   I_RangeType;
     typedef typename InterfaceType::ScalarType  I_ScalarType;
-    typedef typename InterfaceType::InverseType D_InverseType;
+    typedef typename InterfaceType::InverseType I_InverseType;
     // * of the class as the container interface
     static_assert(std::is_base_of< LA::ProvidesContainer< Traits >, OperatorType >::value,
                   "OperatorType has to be derived from LA::ProvidesContainer!");
