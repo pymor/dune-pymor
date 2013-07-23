@@ -8,6 +8,7 @@
 
 #include "container/interfaces.hh"
 #include "container/dunedynamic.hh"
+#include "container/eigen.hh"
 
 namespace Dune {
 namespace Pymor {
@@ -15,7 +16,7 @@ namespace LA {
 
 
 template< class T >
-T createContainer(const T&, const size_t size);
+static T createContainer(const T&, const size_t size);
 
 
 } // namespace LA

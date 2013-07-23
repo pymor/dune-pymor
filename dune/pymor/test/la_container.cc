@@ -17,6 +17,7 @@
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
+#include <dune/pymor/la/container/eigen.hh>
 
 using namespace Dune;
 using namespace Dune::Pymor;
@@ -25,15 +26,25 @@ static const size_t dim = 4;
 
 typedef testing::Types<
                         Dune::Pymor::LA::DuneDynamicVector< double >
+#if HAVE_EIGEN
+                      , Dune::Pymor::LA::EigenDenseVector< double >
+#endif
                       > VectorTypes;
 
 typedef testing::Types<
                         Dune::Pymor::LA::DuneDynamicMatrix< double >
+#if HAVE_EIGEN
+                      , Dune::Pymor::LA::EigenRowMajorSparseMatrix< double >
+#endif
                       > MatrixTypes;
 
 typedef testing::Types<
                         Dune::Pymor::LA::DuneDynamicVector< double >
                       , Dune::Pymor::LA::DuneDynamicMatrix< double >
+#if HAVE_EIGEN
+                      , Dune::Pymor::LA::EigenDenseVector< double >
+                      , Dune::Pymor::LA::EigenRowMajorSparseMatrix< double >
+#endif
                       > ContainerTypes;
 
 
@@ -58,20 +69,18 @@ struct ContainerTest
     // dynamic tests
     // * of the container as itself (aka the derived type)
     ContainerImp DUNE_UNUSED(d_empty);
-    ContainerImp d_by_size(dim);
-    ContainerImp d_by_size_and_value(dim, D_ScalarType(0));
+    ContainerImp d_by_size = LA::createContainer(ContainerImp(), dim);
     //ContainerImp d_copy_constructor(d_by_size); // <-- this is not allowed!
     //ContainerImp d_copy_assignment = d_by_size; // <-- this is not allowed!
-    ContainerImp DUNE_UNUSED(d_deep_copy) = d_by_size.copy();
+    ContainerImp d_deep_copy = d_by_size.copy();
     d_by_size.scal(D_ScalarType(1));
-    d_by_size.axpy(D_ScalarType(1), d_by_size_and_value);
-    if (!d_by_size.has_equal_shape(d_by_size_and_value)) DUNE_PYMOR_THROW(PymorException, "");
+    d_by_size.axpy(D_ScalarType(1), d_deep_copy);
+    if (!d_by_size.has_equal_shape(d_deep_copy)) DUNE_PYMOR_THROW(PymorException, "");
     // * of the container as the interface
     InterfaceType& i_by_size = static_cast< InterfaceType& >(d_by_size);
-    InterfaceType& DUNE_UNUSED(i_by_size_and_value) = static_cast< InterfaceType& >(d_by_size_and_value);
+    ContainerImp i_deep_copy = i_by_size.copy();
     i_by_size.scal(I_ScalarType(1));
-    i_by_size.axpy(I_ScalarType(1), d_by_size_and_value);
-    ContainerImp DUNE_UNUSED(i_deep_copy) = i_by_size.copy();
+    i_by_size.axpy(I_ScalarType(1), i_deep_copy);
   }
 }; // struct ContainerTest
 
@@ -177,14 +186,14 @@ TYPED_TEST(VectorTest, LA_CONTAINER) {
 
 int main(int argc, char** argv)
 {
-//  try {
+  try {
     test_init(argc, argv);
     return RUN_ALL_TESTS();
-//  } catch (Dune::PymorException& e) {
-//    std::cerr << Dune::Stuff::Common::colorStringRed("dune-pymor reported: ") << e << std::endl;
-//  } catch (Dune::Exception& e) {
-//    std::cerr << Dune::Stuff::Common::colorStringRed("Dune reported error: ") << e << std::endl;
-//  } catch (...) {
-//    std::cerr << Dune::Stuff::Common::colorStringRed("Unknown exception thrown!") << std::endl;
-//  }
+  } catch (Dune::PymorException& e) {
+    std::cerr << Dune::Stuff::Common::colorStringRed("dune-pymor reported: ") << e << std::endl;
+  } catch (Dune::Exception& e) {
+    std::cerr << Dune::Stuff::Common::colorStringRed("Dune reported error: ") << e << std::endl;
+  } catch (...) {
+    std::cerr << Dune::Stuff::Common::colorStringRed("Unknown exception thrown!") << std::endl;
+  }
 }

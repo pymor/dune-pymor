@@ -204,14 +204,14 @@ private:
 
 
 template< class S >
-DuneDynamicVector< S > createContainer(const DuneDynamicVector< S >&, const size_t size)
+static DuneDynamicVector< S > createContainer(const DuneDynamicVector< S >&, const size_t size)
 {
   return DuneDynamicVector< S >(size, S(1));
 }
 
 
 template< class S >
-DuneDynamicMatrix< S > createContainer(const DuneDynamicMatrix< S >&, const size_t size)
+static DuneDynamicMatrix< S > createContainer(const DuneDynamicMatrix< S >&, const size_t size)
 {
   typedef Dune::DynamicMatrix< S > BackendType;
   BackendType* matrix = new BackendType(size, size, S(0));
