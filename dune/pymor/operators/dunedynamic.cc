@@ -58,11 +58,6 @@ unsigned int DuneDynamicInverse< S >::dim_range() const
 
 template< class S >
 void DuneDynamicInverse< S >::apply(const SourceType& source, RangeType& range, const Parameter mu) const
-  throw (Exception::sizes_do_not_match,
-         Exception::wrong_parameter_type,
-         Exception::requirements_not_met,
-         Exception::linear_solver_failed,
-         Exception::this_does_not_make_any_sense)
 {
   if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                     "mu has to be empty if parametric() == false (is " << mu << ")!");
@@ -140,11 +135,6 @@ unsigned int DuneDynamic< S >::dim_range() const
 
 template< class S >
 void DuneDynamic< S >::apply(const SourceType& source, RangeType& range, const Parameter mu) const
-  throw (Exception::sizes_do_not_match,
-         Exception::wrong_parameter_type,
-         Exception::requirements_not_met,
-         Exception::linear_solver_failed,
-         Exception::this_does_not_make_any_sense)
 {
   if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                     "mu has to be empty if parametric() == false (is " << mu << ")!");

@@ -63,22 +63,20 @@ public:
     return CRTP::as_imp(*this).dim_range();
   }
 
+  /**
+   * \note  May throw one of Exception::sizes_do_not_match, Exception::wrong_parameter_type,
+   *        Exception::requirements_not_met, Exception::linear_solver_failed, Exception::this_does_not_make_any_sense.
+   */
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
-    throw (Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met,
-           Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).apply(source, range, mu));
   }
 
+  /**
+   * \note  May throw one of Exception::sizes_do_not_match, Exception::wrong_parameter_type,
+   *        Exception::requirements_not_met, Exception::linear_solver_failed, Exception::this_does_not_make_any_sense.
+   */
   RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
-  throw (Exception::sizes_do_not_match,
-         Exception::wrong_parameter_type,
-         Exception::requirements_not_met,
-         Exception::linear_solver_failed,
-         Exception::this_does_not_make_any_sense)
   {
     RangeType range = source.copy();
     apply(source, range, mu);
@@ -88,13 +86,10 @@ public:
   /**
    * \note  This default implementation of apply2 creates a temporary vector. Any derived class which can do better
    *        should implement this method!
+   * \note  May throw one of Exception::sizes_do_not_match, Exception::wrong_parameter_type,
+   *        Exception::requirements_not_met, Exception::linear_solver_failed, Exception::this_does_not_make_any_sense.
    */
   ScalarType apply2(const RangeType& range, const SourceType& source, const Parameter mu = Parameter()) const
-    throw (Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met,
-           Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense)
   {
     RangeType tmp = range.copy();
     apply(source, tmp, mu);
@@ -128,8 +123,10 @@ public:
     return source;
   }
 
+  /**
+   * \note  May throw Exception::this_is_not_parametric.
+   */
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric)
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).freeze_parameter(mu));
     return CRTP::as_imp(*this).freeze_parameter(mu);
@@ -164,14 +161,19 @@ public:
     return CRTP::as_imp(*this).num_components();
   }
 
-  ComponentType component(const int qq) const throw (Exception::requirements_not_met, Exception::index_out_of_range)
+  /**
+   * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
+   */
+  ComponentType component(const int qq) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).component(qq));
     return CRTP::as_imp(*this).component(qq);
   }
 
-  ParameterFunctional coefficient(const int qq) const throw (Exception::requirements_not_met,
-                                                             Exception::index_out_of_range)
+  /**
+   * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
+   */
+  ParameterFunctional coefficient(const int qq) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
     return CRTP::as_imp(*this).coefficient(qq);
@@ -183,7 +185,10 @@ public:
     return CRTP::as_imp(*this).has_affine_part();
   }
 
-  ComponentType affine_part() const throw (Exception::requirements_not_met)
+  /**
+   * \note  May throw Exception::requirements_not_met.
+   */
+  ComponentType affine_part() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).affine_part());
     return CRTP::as_imp(*this).affine_part();

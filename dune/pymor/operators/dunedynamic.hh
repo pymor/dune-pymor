@@ -62,12 +62,7 @@ public:
 
   unsigned int dim_range() const;
 
-  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
-    throw (Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met,
-           Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense);
+  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 
   using BaseType::apply;
 
@@ -126,12 +121,7 @@ public:
 
   unsigned int dim_range() const;
 
-  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
-    throw (Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met,
-           Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense);
+  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 
   using BaseType::apply;
 
