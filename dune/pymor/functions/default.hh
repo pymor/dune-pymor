@@ -10,6 +10,7 @@
 
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/functions/expression.hh>
+#include <dune/stuff/common/parameter/tree.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -18,7 +19,7 @@
 
 namespace Dune {
 namespace Pymor {
-namespace Functions {
+namespace Function {
 
 
 template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
@@ -27,6 +28,7 @@ class NonparametricDefault
 {
   typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
 public:
+  typedef NonparametricDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >        ThisType;
   typedef typename BaseType::NonparametricType    NonparametricType;
   typedef typename NonparametricType::DomainType  DomainType;
   typedef typename NonparametricType::RangeType   RangeType;
@@ -110,23 +112,24 @@ class AffinelyDecomposableDefault
 {
   typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
                                         RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
+  static const std::string my_name_;
 public:
   typedef typename BaseType::NonparametricType  NonparametricType;
   typedef typename BaseType::DomainType         DomainType;
   typedef typename BaseType::RangeType          RangeType;
 
-  AffinelyDecomposableDefault(const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+  AffinelyDecomposableDefault(const std::string nm = my_name_,
                               const int ord = -1);
 
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposableDefault(const NonparametricType* aff_ptr,
-                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const std::string nm = my_name_,
                               const int ord = -1);
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > aff_ptr,
-                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const std::string nm = my_name_,
                               const int ord = -1);
 
   /**
@@ -135,7 +138,7 @@ public:
    */
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const ParameterFunctional* coeff_ptr,
-                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const std::string nm = my_name_,
                               const int ord = -1);
 
   /**
@@ -143,7 +146,7 @@ public:
    */
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
-                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const std::string nm = my_name_,
                               const int ord = -1);
 
   /**
@@ -151,12 +154,12 @@ public:
    */
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const ParameterFunctional* coeff_ptr,
-                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const std::string nm = my_name_,
                               const int ord = -1);
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
-                              const std::string nm = "dune.pymor.functions.affinelydecomposabledefault",
+                              const std::string nm = my_name_,
                               const int ord = -1);
 
   /**
@@ -222,7 +225,7 @@ public:
   std::shared_ptr< const NonparametricType > affinePart_;
 }; // class AffinelyDecomposableDefault
 
-} // namespace Functions
+} // namespace Function
 } // namespace Pymor
 } // namespace Dune
 

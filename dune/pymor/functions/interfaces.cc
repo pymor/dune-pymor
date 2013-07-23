@@ -33,6 +33,12 @@ ParametricFunctionInterface< D, d, R, rR, rC >::~ParametricFunctionInterface()
 {}
 
 template< class D, int d, class R, int rR, int rC >
+std::string ParametricFunctionInterface< D, d, R, rR, rC >::static_id()
+{
+  return "dune.pymor.parametricfunction";
+}
+
+template< class D, int d, class R, int rR, int rC >
 std::string ParametricFunctionInterface< D, d, R, rR, rC >::name() const
 {
   return "dune.pymor.parametricfunction";
@@ -193,6 +199,12 @@ ParametricFunctionInterface< D, d, R, r >::ParametricFunctionInterface(const Par
 template< class D, int d, class R, int r >
 ParametricFunctionInterface< D, d, R, r >::~ParametricFunctionInterface()
 {}
+
+template< class D, int d, class R, int r >
+std::string ParametricFunctionInterface< D, d, R, r >::static_id()
+{
+  return "dune.pymor.parametricfunction";
+}
 
 template< class D, int d, class R, int r >
 std::string ParametricFunctionInterface< D, d, R, r >::name() const

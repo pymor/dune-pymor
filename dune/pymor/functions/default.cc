@@ -9,11 +9,13 @@
   #include "config.h"
 #endif // HAVE_CMAKE_CONFIG
 
+#include <dune/stuff/functions.hh>
+
 #include "default.hh"
 
 namespace Dune {
 namespace Pymor {
-namespace Functions {
+namespace Function {
 
 
 // ================================
@@ -189,6 +191,9 @@ template class NonparametricExpression< double, 3, double, 3 >;
 // =======================================
 // ===== AffinelyDecomposableDefault =====
 // =======================================
+template< class D, int d, class R, int rR, int rC >
+const std::string AffinelyDecomposableDefault< D, d, R, rR, rC >::my_name_ = "dune.pymor.functions.affinelydecomposabledefault";
+
 template< class D, int d, class R, int rR, int rC >
 AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(const std::string nm,
                                                                             const int ord)
@@ -480,6 +485,6 @@ template class AffinelyDecomposableDefault< double, 3, double, 3, 2 >;
 template class AffinelyDecomposableDefault< double, 3, double, 3, 3 >;
 
 
-} // namespace Functions
+} // namespace Function
 } // namespace Pymor
 } // namespace Dune

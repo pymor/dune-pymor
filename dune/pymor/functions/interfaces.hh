@@ -48,6 +48,8 @@ public:
 
   virtual ~ParametricFunctionInterface();
 
+  static std::string static_id();
+
   virtual std::string name() const;
 
   virtual int order() const;
@@ -96,6 +98,8 @@ public:
   ParametricFunctionInterface(const Parametric& other);
 
   virtual ~ParametricFunctionInterface();
+
+  static std::string static_id();
 
   virtual std::string name() const;
 
