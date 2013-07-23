@@ -11,8 +11,10 @@ SUBDIRDS = . common discretizations functionals functions la operators parameter
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
+  functions/checkerboard.cc \
   functions/default.cc \
   functions/interfaces.cc \
+  functions.cc \
   la/container/dunedynamic.cc \
   operators/dunedynamic.cc \
   parameters/base.cc \
