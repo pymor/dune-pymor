@@ -16,6 +16,7 @@ libpymor_la_SOURCES = \
   functions/interfaces.cc \
   functions.cc \
   la/container/dunedynamic.cc \
+  la/container/eigen.cc \
   operators/dunedynamic.cc \
   parameters/base.cc \
   parameters/functional.cc
@@ -25,7 +26,6 @@ libpymor_la_SOURCES = \
 #  functionals/default.cc \
 #  functionals/interfaces.cc \
 #  la/container/dunedynamic.cc \
-#  la/container/eigenvector.cc \
 #  la/container/interfaces.cc \
 #  la/container.cc \
 #  operators/default.cc \
