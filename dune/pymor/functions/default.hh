@@ -126,11 +126,11 @@ public:
    */
   AffinelyDecomposableDefault(const NonparametricType* aff_ptr,
                               const std::string nm = my_name_,
-                              const int ord = -1);
+                              const int ord = 0);
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > aff_ptr,
                               const std::string nm = my_name_,
-                              const int ord = -1);
+                              const int ord = 0);
 
   /**
    * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it
@@ -139,7 +139,7 @@ public:
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const ParameterFunctional* coeff_ptr,
                               const std::string nm = my_name_,
-                              const int ord = -1);
+                              const int ord = 0);
 
   /**
    * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
@@ -147,7 +147,7 @@ public:
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
                               const std::string nm = my_name_,
-                              const int ord = -1);
+                              const int ord = 0);
 
   /**
    * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
@@ -155,12 +155,12 @@ public:
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const ParameterFunctional* coeff_ptr,
                               const std::string nm = my_name_,
-                              const int ord = -1);
+                              const int ord = 0);
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
                               const std::string nm = my_name_,
-                              const int ord = -1);
+                              const int ord = 0);
 
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!

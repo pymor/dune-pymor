@@ -214,7 +214,12 @@ AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(cons
   , num_components_(0)
   , hasAffinePart_(true)
   , affinePart_(std::shared_ptr< const NonparametricType >(aff_ptr))
-{}
+{
+  if (ord < 0 || affinePart_->order() < 0)
+    order_ = -1;
+  else
+    order_ = std::max(order_, affinePart_->order());
+}
 
 template< class D, int d, class R, int rR, int rC >
 AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > aff_ptr,
@@ -226,7 +231,11 @@ AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(cons
   , num_components_(0)
   , hasAffinePart_(true)
   , affinePart_(aff_ptr)
-{}
+{  if (ord < 0 || affinePart_->order() < 0)
+    order_ = -1;
+  else
+    order_ = std::max(order_, affinePart_->order());
+}
 
 template< class D, int d, class R, int rR, int rC >
 AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
@@ -242,6 +251,10 @@ AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(cons
   components_.emplace_back(comp_ptr);
   coefficients_.emplace_back(coeff_ptr);
   Parametric::inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_0");
+  if (ord < 0 || comp_ptr->order() < 0)
+    order_ = -1;
+  else
+    order_ = std::max(order_, comp_ptr->order());
 }
 
 template< class D, int d, class R, int rR, int rC >
@@ -258,6 +271,10 @@ AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(cons
   components_.emplace_back(comp_ptr);
   coefficients_.push_back(coeff_ptr);
   Parametric::inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_0");
+  if (ord < 0 || comp_ptr->order() < 0)
+    order_ = -1;
+  else
+    order_ = std::max(order_, comp_ptr->order());
 }
 
 template< class D, int d, class R, int rR, int rC >
@@ -274,6 +291,10 @@ AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(cons
   components_.push_back(comp_ptr);
   coefficients_.emplace_back(coeff_ptr);
   Parametric::inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_0");
+  if (ord < 0 || comp_ptr->order() < 0)
+    order_ = -1;
+  else
+    order_ = std::max(order_, comp_ptr->order());
 }
 
 template< class D, int d, class R, int rR, int rC >
@@ -290,6 +311,10 @@ AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(cons
   components_.push_back(comp_ptr);
   coefficients_.push_back(coeff_ptr);
   Parametric::inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_0");
+  if (ord < 0 || comp_ptr->order() < 0)
+    order_ = -1;
+  else
+    order_ = std::max(order_, comp_ptr->order());
 }
 
 template< class D, int d, class R, int rR, int rC >
