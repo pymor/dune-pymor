@@ -81,7 +81,7 @@ public:
 
   ThisType& operator=(ThisType&& source);
 
-  DuneDynamicVector copy() const;
+  ThisType copy() const;
 
   unsigned int dim() const;
 

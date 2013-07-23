@@ -59,7 +59,7 @@ typename DuneDynamicVector< S >::ThisType& DuneDynamicVector< S >::operator=(Thi
 }
 
 template< class S >
-DuneDynamicVector< S > DuneDynamicVector< S >::copy() const
+typename DuneDynamicVector< S >::ThisType DuneDynamicVector< S >::copy() const
 {
   return DuneDynamicVector< S >(new BackendType(*backend_));
 }
