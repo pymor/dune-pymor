@@ -60,10 +60,8 @@ public:
   typedef DuneDynamicVectorTraits< ScalarImp >  Traits;
   typedef typename Traits::derived_type         ThisType;
   typedef typename Traits::ScalarType           ScalarType;
-private:
   typedef Dune::DynamicVector< ScalarType >     BackendType;
 
-public:
   DuneDynamicVector(const int size = 0, const ScalarType value = ScalarType(0));
 
   /**
@@ -160,7 +158,6 @@ public:
   typedef DuneDynamicMatrixTraits< ScalarImp >  Traits;
   typedef typename Traits::derived_type         ThisType;
   typedef typename Traits::ScalarType           ScalarType;
-private:
   typedef Dune::DynamicMatrix< ScalarType >     BackendType;
 
 public:
