@@ -9,50 +9,87 @@
 #include <vector>
 #include <string>
 
+#include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
-#include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/operators/interfaces.hh>
+#include <dune/pymor/functionals/interfaces.hh>
 
 namespace Dune {
 namespace Pymor {
 
 
+template< class Traits >
 class StationaryDiscretizationInterface
   : public Parametric
+  , public CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits >
 {
+  typedef CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits > CRTP;
 public:
-  StationaryDiscretizationInterface();
+  typedef typename Traits::derived_type   derived_type;
+  typedef typename Traits::OperatorType   OperatorType;
+  typedef typename Traits::FunctionalType FunctionalType;
+  typedef typename Traits::VectorType     VectorType;
 
-  StationaryDiscretizationInterface(const ParameterType& tt);
+  StationaryDiscretizationInterface(const ParameterType tt = ParameterType())
+    : Parametric(tt)
+  {}
 
-  StationaryDiscretizationInterface(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                                 Exception::index_out_of_range);
+  StationaryDiscretizationInterface(const Parametric& other)
+    : Parametric(other)
+  {}
 
-  StationaryDiscretizationInterface(const std::vector< std::string >& kk,
-                                    const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                                         Exception::index_out_of_range,
-                                                                         Exception::sizes_do_not_match);
+  std::vector< std::string > available_operators() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_operators());
+    return CRTP::as_imp(*this).available_operators();
+  }
 
-  StationaryDiscretizationInterface(const Parametric& pp);
+  OperatorType get_operator(const std::string id = available_operators()[0]) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_operator(id));
+    return CRTP::as_imp(*this).get_operator(id);
+  }
 
-  virtual ~StationaryDiscretizationInterface();
+  std::vector< std::string > available_functionals() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_functionals());
+    return CRTP::as_imp(*this).available_functionals();
+  }
 
-  virtual std::vector< std::string > available_operators() const = 0;
+  FunctionalType get_functional(const std::string id = available_functionals()[0]) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_functional(id));
+    return CRTP::as_imp(*this).get_functional(id);
+  }
 
-  virtual const OperatorInterface* get_operator(const std::string id) const = 0;
+  VectorType create_vector() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).create_vector());
+    return CRTP::as_imp(*this).create_vector();
+  }
 
-  virtual LA::VectorInterface* create_vector() const = 0;
+  std::vector< std::string > solver_options() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options());
+    return CRTP::as_imp(*this).solver_options();
+  }
 
-  virtual std::vector< std::string > solver_options() const = 0;
+  std::string solver_options(const std::string context) const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options(context));
+    return CRTP::as_imp(*this).solver_options(context);
+  }
 
-  virtual std::string solver_options(const std::string context) const = 0;
+  void solve(VectorType& vector, const Parameter mu = Parameter()) const
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solve(vector, mu));
+  }
 
-  virtual void solve(LA::VectorInterface* vector, const Parameter mu = Parameter()) const = 0;
-
-  virtual void visualize(const LA::VectorInterface* vector,
-                         const std::string filename,
-                         const std::string name) const = 0;
+  void visualize(const VectorType& vector, const std::string filename, const std::string name) const
+  {
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).visualize(vector, filename, name));
+  }
 }; // class StationaryDiscretizationInterface
 
 
