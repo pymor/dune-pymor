@@ -45,7 +45,7 @@ public:
     return CRTP::as_imp(*this).available_operators();
   }
 
-  OperatorType get_operator(const std::string id = available_operators()[0]) const
+  OperatorType get_operator(const std::string id) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_operator(id));
     return CRTP::as_imp(*this).get_operator(id);
@@ -57,7 +57,7 @@ public:
     return CRTP::as_imp(*this).available_functionals();
   }
 
-  FunctionalType get_functional(const std::string id = available_functionals()[0]) const
+  FunctionalType get_functional(const std::string id) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_functional(id));
     return CRTP::as_imp(*this).get_functional(id);
