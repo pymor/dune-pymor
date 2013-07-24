@@ -114,14 +114,7 @@ public:
   void register_affine_part(const ContainerType* aff_ptr) throw (Exception::this_does_not_make_any_sense,
                                                                  Exception::sizes_do_not_match)
   {
-    if (hasAffinePart_)
-      DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
-                       "do not call register_affine_part(aff_ptr) if has_affine_part() == true!");
-    if (num_components_ > 0)
-      if (!components_[0]->has_equal_shape(*aff_ptr))
-        DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                         "the shape of aff_ptr does not match the shape of the existing containers!");
-    affinePart_ = std::shared_ptr< const ContainerType >(aff_ptr);
+    register_affine_part(std::shared_ptr< const ContainerType >(aff_ptr));
   }
 
   void register_affine_part(const std::shared_ptr< const ContainerType > aff_ptr)
@@ -130,11 +123,11 @@ public:
     if (hasAffinePart_)
       DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
                        "do not call register_affine_part(aff_ptr) if has_affine_part() == true!");
-    if (num_components_ > 0)
-      if (!components_[0]->has_equal_shape(*aff_ptr))
-        DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                         "the shape of aff_ptr does not match the shape of the existing containers!");
+    if (num_components_ > 0 && !components_[0]->has_equal_shape(*aff_ptr))
+      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
+                       "the shape of aff_ptr does not match the shape of the existing containers!");
     affinePart_ = aff_ptr;
+    hasAffinePart_ = true;
   }
 
   /**
