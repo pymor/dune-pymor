@@ -15,6 +15,17 @@
 
 namespace Dune {
 namespace Pymor {
+
+namespace Operators {
+
+template< class ScalarImp >
+class EigenRowMajorSparse;
+
+template< class ScalarImp >
+class EigenRowMajorSparseInverse;
+
+}
+
 namespace LA {
 
 
@@ -117,8 +128,8 @@ public:
 private:
   static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
 
-//  friend class Operators::DuneDynamic< ScalarType >;
-//  friend class Operators::DuneDynamicInverse< ScalarType >;
+  friend class Operators::EigenRowMajorSparse< ScalarType >;
+  friend class Operators::EigenRowMajorSparseInverse< ScalarType >;
 
   std::unique_ptr< BackendType > backend_;
 }; // class EigenDenseVector
@@ -179,8 +190,8 @@ public:
   void axpy(const ScalarType& alpha, const ThisType& x) throw (Exception::sizes_do_not_match);
 
 private:
-//  friend class Operators::DuneDynamic< ScalarType >;
-//  friend class Operators::DuneDynamicInverse< ScalarType >;
+  friend class Operators::EigenRowMajorSparse< ScalarType >;
+  friend class Operators::EigenRowMajorSparseInverse< ScalarType >;
 
   std::unique_ptr< BackendType > backend_;
 }; // class EigenRowMajorSparseMatrix

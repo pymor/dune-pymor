@@ -96,7 +96,7 @@ typename DuneDynamicInverse< S >::FrozenType DuneDynamicInverse< S >::freeze_par
   if (!mu.empty())
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                      "do not call freeze_parameter(" << mu << ") is parametric() == false!");
-  return FrozenType(nullptr, "superlu");
+  return FrozenType(nullptr, invert_options()[0]);
 }
 
 template class DuneDynamicInverse< double >;
