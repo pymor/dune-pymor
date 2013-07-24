@@ -8,12 +8,12 @@
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/discretizations/interfaces.hh>
-#include <dune/pymor/la/container/dunedynamicvector.hh>
-#include <dune/pymor/operators/dunedynamicmatrix.hh>
-#include <dune/pymor/operators/eigen.hh>
-#include <dune/pymor/operators/default.hh>
-#include <dune/pymor/functions/default.hh>
+#include <dune/pymor/la/container/dunedynamic.hh>
+#include <dune/pymor/operators/dunedynamic.hh>
+#include <dune/pymor/operators/affine.hh>
+#include <dune/pymor/functions.hh>
 #include <dune/pymor/functionals/default.hh>
+#include <dune/pymor/functionals/affine.hh>
 
 namespace Example {
 
@@ -22,8 +22,8 @@ class AnalyticalProblem
   : public Dune::Pymor::Parametric
 {
 public:
-  typedef Dune::Pymor::Functions::NonparametricExpression< double, 1, double, 1 > ExpressionFunctionType;
-  typedef Dune::Pymor::Functions::AffineParametricDefault< double, 1, double, 1 > FunctionType;
+  typedef Dune::Stuff::FunctionExpression< double, 1, double, 1 > ExpressionFunctionType;
+  typedef Dune::Pymor::Function::AffinelyDecomposableDefault< double, 1, double, 1 > FunctionType;
 
   static const size_t dim;
 
@@ -47,69 +47,48 @@ private:
 }; // class AnalyticalProblem
 
 
-class SimpleDiscretization
-  : public Dune::Pymor::StationaryDiscretizationInterface
-{
-  typedef Dune::Pymor::StationaryDiscretizationInterface BaseType;
-public:
-  typedef Dune::Pymor::LA::DuneDynamicVector                                                VectorType;
-  typedef Dune::Pymor::Operators::DuneDynamicMatrix                                         OperatorComponentType;
-  typedef Dune::Pymor::Operators::LinearAffinelyDecomposedDefault< OperatorComponentType >  OperatorType;
-  typedef Dune::Pymor::Functionals::LinearAffinelyDecomposedDefault< VectorType >           FunctionalType;
+class SimpleDiscretization;
 
-  SimpleDiscretization(const AnalyticalProblem* prob)
-    throw (Dune::Pymor::Exception::this_does_not_make_any_sense,
-           Dune::Pymor::Exception::sizes_do_not_match,
-           Dune::Pymor::Exception::types_are_not_compatible,
-           Dune::Pymor::Exception::wrong_parameter_type);
+class SimpleDiscretizationTraits
+{
+public:
+  typedef SimpleDiscretization derived_type;
+  typedef Dune::Pymor::LA::DuneDynamicVector< double > VectorType;
+  typedef Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< typename Dune::Pymor::Operators::DuneDynamic< double > > OperatorType;
+  typedef Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< VectorType > FunctionalType;
+};
+
+
+class SimpleDiscretization
+  : public Dune::Pymor::StationaryDiscretizationInterface< SimpleDiscretizationTraits >
+{
+  typedef SimpleDiscretizationTraits Traits;
+public:
+  typedef typename Traits::VectorType     VectorType;
+  typedef typename Traits::OperatorType   OperatorType;
+  typedef typename Traits::FunctionalType FunctionalType;
+
+  SimpleDiscretization(const AnalyticalProblem* prob);
 
   ~SimpleDiscretization();
 
-  virtual std::vector< std::string > available_operators() const;
+  std::vector< std::string > available_operators() const;
 
-  virtual const OperatorType* get_operator(const std::string id) const
-    throw (Dune::Pymor::Exception::key_is_not_valid);
+  OperatorType get_operator(const std::string id) const;
 
-  virtual std::vector< std::string > available_functionals() const;
+  std::vector< std::string > available_functionals() const;
 
-  virtual const FunctionalType* get_functional(const std::string id) const
-    throw (Dune::Pymor::Exception::key_is_not_valid);
+  FunctionalType get_functional(const std::string id) const;
 
-  virtual VectorType* create_vector() const;
+  VectorType create_vector() const;
 
-  virtual std::vector< std::string > solver_options() const;
+  std::vector< std::string > solver_options() const;
 
-  virtual std::string solver_options(const std::string context) const
-    throw (Dune::Pymor::Exception::key_is_not_valid);
+  std::string solver_options(const std::string context) const;
 
-  virtual void solve(Dune::Pymor::LA::VectorInterface* vector,
-                     const Dune::Pymor::Parameter /*mu*/ = Dune::Pymor::Parameter()) const
-    throw (Dune::Pymor::Exception::wrong_parameter_type,
-           Dune::Pymor::Exception::types_are_not_compatible,
-           Dune::Pymor::Exception::you_have_to_implement_this,
-           Dune::Pymor::Exception::sizes_do_not_match,
-           Dune::Pymor::Exception::wrong_parameter_type,
-           Dune::Pymor::Exception::requirements_not_met,
-           Dune::Pymor::Exception::linear_solver_failed,
-           Dune::Pymor::Exception::this_does_not_make_any_sense);
+  void solve(VectorType& vector, const Dune::Pymor::Parameter mu = Dune::Pymor::Parameter()) const;
 
-  virtual void solve(VectorType* vector, const Dune::Pymor::Parameter mu = Dune::Pymor::Parameter()) const
-    throw (Dune::Pymor::Exception::wrong_parameter_type,
-           Dune::Pymor::Exception::types_are_not_compatible,
-           Dune::Pymor::Exception::you_have_to_implement_this,
-           Dune::Pymor::Exception::sizes_do_not_match,
-           Dune::Pymor::Exception::wrong_parameter_type,
-           Dune::Pymor::Exception::requirements_not_met,
-           Dune::Pymor::Exception::linear_solver_failed,
-           Dune::Pymor::Exception::this_does_not_make_any_sense);
-
-  virtual void visualize(const Dune::Pymor::LA::VectorInterface* vector,
-                         const std::string /*filename*/,
-                         const std::string /*name*/) const;
-
-  virtual void visualize(const VectorType* vector,
-                         const std::string filename,
-                         const std::string name = "vector") const throw (Dune::Pymor::Exception::sizes_do_not_match);
+  void visualize(const VectorType& vector, const std::string filename, const std::string name) const;
 
 private:
   const AnalyticalProblem* problem_;

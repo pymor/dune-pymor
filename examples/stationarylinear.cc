@@ -7,6 +7,7 @@
 
 #include <dune/stuff/common/string.hh>
 
+#include <dune/pymor/la/container/affine.hh>
 #include "stationarylinear.hh"
 
 namespace Example {
@@ -30,7 +31,7 @@ AnalyticalProblem::AnalyticalProblem()
   // * force
   const Dune::Pymor::ParameterType muForce = {"force", dim};
   force_ = new FunctionType();
-  force_->register_component(new ExpressionFunctionType("x", "1.0"));
+  force_->register_affine_part(new ExpressionFunctionType("x", "1.0"));
   for (size_t ii = 0; ii < dim; ++ii)
     force_->register_component(new ExpressionFunctionType("x", "1.0"),
                                new Dune::Pymor::ParameterFunctional(muForce,
@@ -87,74 +88,77 @@ const AnalyticalProblem::FunctionType* AnalyticalProblem::neumann() const
 
 
 SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
-  throw (Dune::Pymor::Exception::this_does_not_make_any_sense,
-         Dune::Pymor::Exception::sizes_do_not_match,
-         Dune::Pymor::Exception::types_are_not_compatible,
-         Dune::Pymor::Exception::wrong_parameter_type)
-  : BaseType()
-  , problem_(prob)
+  : problem_(prob)
   , dim_(prob->dim)
-  , op_(new OperatorType())
 {
+  typedef typename OperatorType::ContainerType MatrixType;
+  typedef typename MatrixType::BackendType MatrixBackendType;
+  typedef Dune::Pymor::LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
+  AffinelyDecomposedMatrixType diffusionMatrix;
   // left hand side
   // * diffusion operator
   const auto& diffusion = *(problem_->diffusion());
   assert(int(diffusion.num_components()) == dim_);
   for (int ii = 0; ii < dim_; ++ii) {
-    OperatorComponentType* comp = new OperatorComponentType(dim_, dim_);
-    comp->operator[](ii)[ii] = 1.0;
-    op_->register_component(comp,
-                            new Dune::Pymor::ParameterFunctional(*(diffusion.coefficient(ii))));
+    MatrixBackendType* compMatrix = new MatrixBackendType(dim_, dim_);
+    compMatrix->operator[](ii)[ii] = 1.0;
+    diffusionMatrix.register_component(new MatrixType(compMatrix),
+                                       new Dune::Pymor::ParameterFunctional(*(diffusion.coefficient(ii))));
   }
-  if (diffusion.hasAffinePart()) {
-    OperatorComponentType* aff = new OperatorComponentType(dim_, dim_);
+  if (diffusion.has_affine_part()) {
+    MatrixBackendType* affMatrix = new MatrixBackendType(dim_, dim_);
     for (int ii = 0; ii < dim_; ++ii)
-      aff->operator[](ii)[ii] = 1.0;
-    op_->register_component(aff);
+      affMatrix->operator[](ii)[ii] = 1.0;
+    diffusionMatrix.register_affine_part(new MatrixType(affMatrix));
   }
+  op_ = new OperatorType(diffusionMatrix);
   inherit_parameter_type(op_->parameter_type(), "lhs");
   // right hand side
+  typedef typename FunctionalType::VectorType VectorType;
+  typedef typename VectorType::BackendType VectorBackendType;
+  typedef Dune::Pymor::LA::AffinelyDecomposedConstContainer< VectorType > AffinelyDecomposedVectorType;
   const auto& force = *(problem_->force());
   assert(int(force.num_components()) == dim_);
   const auto& dirichlet = *(problem_->dirichlet());
   assert(int(dirichlet.num_components()) == dim_);
   const auto& neumann = *(problem_->neumann());
   assert(int(neumann.num_components()) == dim_);
-  func_ = new FunctionalType();
-  VectorType* aff;
+  VectorType* affVector;
   const VectorType* ones = new VectorType(dim_, 1.0);
-  if (diffusion.hasAffinePart() || force.hasAffinePart() || dirichlet.hasAffinePart() || neumann.hasAffinePart())
-    aff = new VectorType(dim_);
+  if (diffusion.has_affine_part() || force.has_affine_part()
+      || dirichlet.has_affine_part() || neumann.has_affine_part())
+    affVector = new VectorType(dim_);
   // * force
-  if (force.hasAffinePart())
-    aff->iadd(ones);
+  AffinelyDecomposedVectorType rhsVector;
+  if (force.has_affine_part())
+    affVector->iadd(*ones);
   for (size_t qq = 0; qq < force.num_components(); ++qq) {
-    VectorType* comp = new VectorType(dim_);
-    comp->operator[](qq) = 1.0;
-    func_->register_component(comp,
-                              new Dune::Pymor::ParameterFunctional(*(force.coefficient(qq))));
+    VectorBackendType* compVector = new VectorBackendType(dim_);
+    compVector->operator[](qq) = 1.0;
+    rhsVector.register_component(new VectorType(compVector),
+                                 new Dune::Pymor::ParameterFunctional(*(force.coefficient(qq))));
   }
   // * neumann
-  if (neumann.hasAffinePart())
-    aff->iadd(ones);
+  if (neumann.has_affine_part())
+    affVector->iadd(*ones);
   for (size_t qq = 0; qq < neumann.num_components(); ++qq) {
-    VectorType* comp = new VectorType(dim_);
-    comp->operator[](qq) = 1.0;
-    func_->register_component(comp,
-                              new Dune::Pymor::ParameterFunctional(*(neumann.coefficient(qq))));
+    VectorBackendType* compVector = new VectorBackendType(dim_);
+    compVector->operator[](qq) = 1.0;
+    rhsVector.register_component(new VectorType(compVector),
+                                 new Dune::Pymor::ParameterFunctional(*(neumann.coefficient(qq))));
   }
   // * dirichlet/diffusion
-  VectorType* tmp = create_vector();
-  if (diffusion.hasAffinePart()) {
-    if (dirichlet.hasAffinePart()) {
-      op_->affinePart()->apply(ones, tmp);
-      aff->iadd(tmp);
+  VectorType tmp = create_vector();
+  if (diffusion.has_affine_part()) {
+    if (dirichlet.has_affine_part()) {
+      op_->affine_part().apply(*ones, tmp);
+      affVector->iadd(tmp);
     }
     for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
-      VectorType* comp = create_vector();
-      comp->operator[](qq) = 1.0;
-      func_->register_component(comp,
-                                new Dune::Pymor::ParameterFunctional(*(dirichlet.coefficient(qq))));
+      VectorBackendType* compVector = new VectorBackendType(dim_);
+      compVector->operator[](qq) = 1.0;
+      rhsVector.register_component(new VectorType(compVector),
+                                   new Dune::Pymor::ParameterFunctional(*(dirichlet.coefficient(qq))));
     }
   }
   Dune::Pymor::ParameterType diffusionDirichletMu;
@@ -164,19 +168,20 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
     diffusionDirichletMu.set(key, dirichlet.parameter_type().get(key));
   for (size_t pp = 0; pp < diffusion.num_components(); ++pp) {
     for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
-      VectorType* comp = create_vector();
-      VectorType* dirichletComp = create_vector();
-      dirichletComp->operator[](qq) = 1.0;
-      op_->component(pp)->apply(dirichletComp, comp);
+      VectorType* comp = new VectorType(create_vector());
+      VectorBackendType* dirichletCompVector = new VectorBackendType(dim_);
+      dirichletCompVector->operator[](qq) = 1.0;
+      VectorType* dirichletComp = new VectorType(dirichletCompVector);
+      op_->component(pp).apply(*dirichletComp, *comp);
       const std::string expression = "-1.0*(" + diffusion.coefficient(pp)->expression()
                                      + ")*(" + dirichlet.coefficient(qq)->expression() + ")";
-      func_->register_component(comp,
-                                new Dune::Pymor::ParameterFunctional(diffusionDirichletMu, expression));
+      rhsVector.register_component(comp,
+                                   new Dune::Pymor::ParameterFunctional(diffusionDirichletMu, expression));
       delete dirichletComp;
     }
   }
+  func_ = new FunctionalType(rhsVector);
   inherit_parameter_type(func_->parameter_type(), "rhs");
-  delete tmp;
 }
 
 SimpleDiscretization::~SimpleDiscretization()
@@ -191,12 +196,11 @@ std::vector< std::string > SimpleDiscretization::available_operators() const
   return { "lhs" };
 }
 
-const SimpleDiscretization::OperatorType* SimpleDiscretization::get_operator(const std::string id) const
-  throw (Dune::Pymor::Exception::key_is_not_valid)
+typename SimpleDiscretization::OperatorType SimpleDiscretization::get_operator(const std::string id) const
 {
   if (id != "lhs")
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid, "id has to be 'lhs' (is " << id << ")!");
-  return op_;
+  return *op_;
 }
 
 std::vector< std::string > SimpleDiscretization::available_functionals() const
@@ -204,17 +208,16 @@ std::vector< std::string > SimpleDiscretization::available_functionals() const
   return { "rhs" };
 }
 
-const SimpleDiscretization::FunctionalType* SimpleDiscretization::get_functional(const std::string id) const
-  throw (Dune::Pymor::Exception::key_is_not_valid)
+typename SimpleDiscretization::FunctionalType SimpleDiscretization::get_functional(const std::string id) const
 {
   if (id != "rhs")
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid, "id has to be 'rhs' (is " << id << ")!");
-  return func_;
+  return *func_;
 }
 
-SimpleDiscretization::VectorType* SimpleDiscretization::create_vector() const
+typename SimpleDiscretization::VectorType SimpleDiscretization::create_vector() const
 {
-  return new VectorType(dim_);
+  return VectorType(dim_);
 }
 
 std::vector< std::string > SimpleDiscretization::solver_options() const
@@ -223,72 +226,39 @@ std::vector< std::string > SimpleDiscretization::solver_options() const
 }
 
 std::string SimpleDiscretization::solver_options(const std::string context) const
-  throw (Dune::Pymor::Exception::key_is_not_valid)
 {
   if (context != solver_options()[0])
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid,
                      "context has to be '" << solver_options()[0] << "' (is '" << context << "')!");
-  return OperatorComponentType::invert_options()[0];
+  return OperatorType::invert_options()[0];
 }
 
-void SimpleDiscretization::solve(Dune::Pymor::LA::VectorInterface* vector,
-                                 const Dune::Pymor::Parameter /*mu*/) const
-  throw (Dune::Pymor::Exception::wrong_parameter_type,
-         Dune::Pymor::Exception::types_are_not_compatible,
-         Dune::Pymor::Exception::you_have_to_implement_this,
-         Dune::Pymor::Exception::sizes_do_not_match,
-         Dune::Pymor::Exception::wrong_parameter_type,
-         Dune::Pymor::Exception::requirements_not_met,
-         Dune::Pymor::Exception::linear_solver_failed,
-         Dune::Pymor::Exception::this_does_not_make_any_sense)
-{
-  DUNE_PYMOR_THROW(Dune::Pymor::Exception::types_are_not_compatible,
-                   "not implemented for vector of type '" << vector->type() << "'!");
-}
-
-void SimpleDiscretization::solve(VectorType* vector, const Dune::Pymor::Parameter mu) const
-  throw (Dune::Pymor::Exception::wrong_parameter_type,
-         Dune::Pymor::Exception::types_are_not_compatible,
-         Dune::Pymor::Exception::you_have_to_implement_this,
-         Dune::Pymor::Exception::sizes_do_not_match,
-         Dune::Pymor::Exception::wrong_parameter_type,
-         Dune::Pymor::Exception::requirements_not_met,
-         Dune::Pymor::Exception::linear_solver_failed,
-         Dune::Pymor::Exception::this_does_not_make_any_sense)
+void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Parameter mu) const
 {
   if (mu.type() != parameter_type())
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_parameter_type,
                      "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                      << parameter_type() << ")!");
+  if (int(vector.dim()) != dim_)
+    DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
+                     "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   // freeze lhs and rhs
   const Dune::Pymor::Parameter mu_lhs = map_parameter(mu, "lhs");
-  const auto* lhs = op_->freeze_parameter(mu_lhs);
+  const auto lhs = op_->freeze_parameter(mu_lhs);
   const Dune::Pymor::Parameter mu_rhs = map_parameter(mu, "rhs");
-  const auto *rhs = func_->freeze_parameter(mu_rhs);
+  const auto rhs = func_->freeze_parameter(mu_rhs);
   // solve linear system
   const std::string invert_options = solver_options("problem");
-  lhs->apply_inverse(rhs, vector, invert_options);
-  // clean up
-  delete rhs;
-  delete lhs;
+  lhs.apply_inverse(*(rhs.container()), vector, invert_options);
 }
 
-void SimpleDiscretization::visualize(const Dune::Pymor::LA::VectorInterface* vector,
-                                      const std::string /*filename*/,
-                                      const std::string /*name*/) const
-{
-  DUNE_PYMOR_THROW(Dune::Pymor::Exception::types_are_not_compatible,
-                   "not implemented for vector of type '" << vector->type() << "'!");
-}
-
-void SimpleDiscretization::visualize(const VectorType* vector,
+void SimpleDiscretization::visualize(const VectorType& vector,
                                      const std::string filename,
                                      const std::string name) const
-  throw (Dune::Pymor::Exception::sizes_do_not_match)
 {
-  if (int(vector->dim()) != dim_)
+  if (int(vector.dim()) != dim_)
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
-                     "size of vector has to be " << dim_ << " is (" << vector->dim() << ")!");
+                     "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   if (filename.empty())
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_input, "filename must not be empty!");
   std::ofstream file;
@@ -296,9 +266,9 @@ void SimpleDiscretization::visualize(const VectorType* vector,
   if (!file.is_open())
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::io_error, "could not open '" << filename << "' for writing!");
   file << name << " = [";
-  for (size_t ii = 0; ii < vector->dim() - 1; ++ii)
-    file << vector->operator[](ii) << ", ";
-  file << vector->operator[](vector->dim() - 1) << "]" << std::endl;
+  for (int ii = 0; ii < int(vector.dim()) - 1; ++ii)
+    file << vector.components({ii})[0] << ", ";
+  file << vector.components({vector.dim() - 1})[0] << "]" << std::endl;
 }
 
 
