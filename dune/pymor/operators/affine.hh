@@ -145,7 +145,7 @@ public:
   {
     if (!Parametric::parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
-                       << "if parametric() == false!");
+                       << " if parametric() == false!");
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
                        << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");

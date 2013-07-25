@@ -107,7 +107,8 @@ public:
     return CRTP::as_imp(*this).invert(option, mu);
   }
 
-  void apply_inverse(const RangeType& range, SourceType& source,
+  void apply_inverse(const RangeType& range,
+                     SourceType& source,
                      const std::string option = invert_options()[0],
                      const Parameter mu = Parameter()) const
   {
