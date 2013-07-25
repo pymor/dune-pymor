@@ -415,8 +415,11 @@ void Parametric::inherit_parameter_type(const ParameterType& tt, const std::stri
   throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
 {
   if (id.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "id must not be empty!");
-  if (inherits_map_.find(id) != inherits_map_.end())
-    DUNE_PYMOR_THROW(Exception::key_is_not_valid, "inheriting the same id twice is not yet implemeneted!");
+  const auto result = inherits_map_.find(id);
+  if (result != inherits_map_.end() && result->second != tt)
+    DUNE_PYMOR_THROW(Exception::key_is_not_valid,
+                     "inheriting the same id twice with different types does not make any sense (type of tt is "
+                     << tt << ", while type " << result->second << " is already registered for '" << id << "'!");
   inherits_map_[id] = tt;
   for (auto key : tt.keys()) {
     if (type_.hasKey(key) && (type_.get(key) != tt.get(key)))
