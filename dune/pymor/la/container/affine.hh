@@ -133,34 +133,34 @@ public:
   /**
    * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it manually)!
    */
-  void register_component(const ContainerType* comp_ptr,
-                          const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
+  unsigned int register_component(const ContainerType* comp_ptr,
+                                  const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
   {
-    register_component(std::shared_ptr< const ContainerType >(comp_ptr),
-                       std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    return register_component(std::shared_ptr< const ContainerType >(comp_ptr),
+                              std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
   /**
    * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
    */
-  void register_component(const ContainerType* comp_ptr,
-                          const std::shared_ptr< const ParameterFunctional > coeff_ptr)
+  unsigned int register_component(const ContainerType* comp_ptr,
+                                  const std::shared_ptr< const ParameterFunctional > coeff_ptr)
     throw (Exception::sizes_do_not_match)
   {
-    register_component(std::shared_ptr< const ContainerType >(comp_ptr), coeff_ptr);
+    return register_component(std::shared_ptr< const ContainerType >(comp_ptr), coeff_ptr);
   }
 
   /**
    * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
    */
-  void register_component(const std::shared_ptr< const ContainerType > comp_ptr,
-                          const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
+  unsigned int register_component(const std::shared_ptr< const ContainerType > comp_ptr,
+                                  const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
   {
-    register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    return register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
-  void register_component(const std::shared_ptr< const ContainerType > comp_ptr,
-                          const std::shared_ptr< const ParameterFunctional > coeff_ptr)
+  unsigned int register_component(const std::shared_ptr< const ContainerType > comp_ptr,
+                                  const std::shared_ptr< const ParameterFunctional > coeff_ptr)
     throw (Exception::sizes_do_not_match)
   {
     if (hasAffinePart_) {
@@ -175,6 +175,7 @@ public:
     coefficients_.push_back(coeff_ptr);
     inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_" + Dune::Stuff::Common::toString(num_components_));
     ++num_components_;
+    return num_components_ - 1;
   }
 
   std::shared_ptr< const ContainerType > affine_part() const throw (Exception::requirements_not_met)
@@ -330,38 +331,38 @@ public:
     BaseType::register_affine_part(affinePart_);
   }
 
-  void register_component(ContainerType* comp_ptr,
-                          const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
+  unsigned int register_component(ContainerType* comp_ptr,
+                                  const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
   {
-    register_component(std::shared_ptr< ContainerType >(comp_ptr),
-                       std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    return register_component(std::shared_ptr< ContainerType >(comp_ptr),
+                              std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
   /**
    * \attention This class takes ownership of comp_ptr!
    */
-  void register_component(ContainerType* comp_ptr,
-                          const std::shared_ptr< const ParameterFunctional > coeff_ptr)
+  unsigned int register_component(ContainerType* comp_ptr,
+                                  const std::shared_ptr< const ParameterFunctional > coeff_ptr)
     throw (Exception::sizes_do_not_match)
   {
-    register_component(std::shared_ptr< ContainerType >(comp_ptr), coeff_ptr);
+    return register_component(std::shared_ptr< ContainerType >(comp_ptr), coeff_ptr);
   }
 
   /**
    * \attention This class takes ownership of coeff_ptr!
    */
-  void register_component(std::shared_ptr< ContainerType > comp_ptr,
-                          const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
+  unsigned int register_component(std::shared_ptr< ContainerType > comp_ptr,
+                                  const ParameterFunctional* coeff_ptr) throw (Exception::sizes_do_not_match)
   {
-    register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    return register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
-  void register_component(std::shared_ptr< ContainerType > comp_ptr,
-                          const std::shared_ptr< const ParameterFunctional > coeff_ptr)
+  unsigned int register_component(std::shared_ptr< ContainerType > comp_ptr,
+                                  const std::shared_ptr< const ParameterFunctional > coeff_ptr)
     throw (Exception::sizes_do_not_match)
   {
     components_.push_back(comp_ptr);
-    BaseType::register_component(comp_ptr, coeff_ptr);
+    return BaseType::register_component(comp_ptr, coeff_ptr);
   }
 
   std::shared_ptr< ContainerType > affine_part() const throw (Exception::requirements_not_met)
