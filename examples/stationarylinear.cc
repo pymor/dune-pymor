@@ -149,16 +149,24 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   }
   // * dirichlet/diffusion
   VectorType tmp = create_vector();
-  if (diffusion.has_affine_part()) {
-    if (dirichlet.has_affine_part()) {
+  if (diffusion.has_affine_part() && dirichlet.has_affine_part()) {
       op_->affine_part().apply(*ones, tmp);
       affVector->iadd(tmp);
-    }
+  }
+  if (diffusion.has_affine_part()) {
     for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
       VectorBackendType* compVector = new VectorBackendType(dim_);
       compVector->operator[](qq) = 1.0;
       rhsVector.register_component(new VectorType(compVector),
                                    new Dune::Pymor::ParameterFunctional(*(dirichlet.coefficient(qq))));
+    }
+  }
+  if (dirichlet.has_affine_part()) {
+    for (size_t qq = 0; qq < diffusion.num_components(); ++qq) {
+      VectorBackendType* compVector = new VectorBackendType(dim_);
+      op_->component(qq).apply(*ones, compVector);
+      rhsVector.register_component(new VectorType(compVector),
+                                   new Dune::Pymor::ParameterFunctional(*(diffusion.coefficient(qq))));
     }
   }
   Dune::Pymor::ParameterType diffusionDirichletMu;
