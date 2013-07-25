@@ -78,8 +78,7 @@ template< class D, int d, class R, int rR, int rC >
 bool ParametricFunctionInterface< D, d, R, rR, rC >::has_affine_part() const
 {
   if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call affinely_decomposable() if parametric() == false!");
+    return true;
   if (affinely_decomposable())
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
                      "since affinely_decomposable() == true, youe really do!");
@@ -113,8 +112,7 @@ template< class D, int d, class R, int rR, int rC >
 unsigned int ParametricFunctionInterface< D, d, R, rR, rC >::num_components() const
 {
   if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call num_components() if parametric() == false!");
+    return 0;
   if (affinely_decomposable())
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
                      "since affinely_decomposable() == true, youe really do!");
@@ -245,8 +243,7 @@ template< class D, int d, class R, int r >
 bool ParametricFunctionInterface< D, d, R, r >::has_affine_part() const
 {
   if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call affinely_decomposable() if parametric() == false!");
+    return true;
   if (affinely_decomposable())
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
                      "since affinely_decomposable() == true, youe really do!");
@@ -280,8 +277,7 @@ template< class D, int d, class R, int r >
 unsigned int ParametricFunctionInterface< D, d, R, r >::num_components() const
 {
   if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call num_components() if parametric() == false!");
+    return 0;
   if (affinely_decomposable())
     DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
                      "since affinely_decomposable() == true, youe really do!");
