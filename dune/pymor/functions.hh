@@ -15,6 +15,7 @@
 
 #include "functions/interfaces.hh"
 #include "functions/checkerboard.hh"
+#include "functions/default.hh"
 
 namespace Dune {
 namespace Pymor {
