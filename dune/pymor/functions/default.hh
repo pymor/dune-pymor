@@ -112,24 +112,26 @@ class AffinelyDecomposableDefault
 {
   typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
                                         RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
-  static const std::string my_name_;
 public:
+  typedef AffinelyDecomposableDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > ThisType;
   typedef typename BaseType::NonparametricType  NonparametricType;
   typedef typename BaseType::DomainType         DomainType;
   typedef typename BaseType::RangeType          RangeType;
 
-  AffinelyDecomposableDefault(const std::string nm = my_name_,
+  static std::string static_id();
+
+  AffinelyDecomposableDefault(const std::string nm = static_id(),
                               const int ord = -1);
 
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposableDefault(const NonparametricType* aff_ptr,
-                              const std::string nm = my_name_,
+                              const std::string nm = static_id(),
                               const int ord = 0);
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > aff_ptr,
-                              const std::string nm = my_name_,
+                              const std::string nm = static_id(),
                               const int ord = 0);
 
   /**
@@ -138,7 +140,7 @@ public:
    */
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const ParameterFunctional* coeff_ptr,
-                              const std::string nm = my_name_,
+                              const std::string nm = static_id(),
                               const int ord = 0);
 
   /**
@@ -146,7 +148,7 @@ public:
    */
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
-                              const std::string nm = my_name_,
+                              const std::string nm = static_id(),
                               const int ord = 0);
 
   /**
@@ -154,12 +156,12 @@ public:
    */
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const ParameterFunctional* coeff_ptr,
-                              const std::string nm = my_name_,
+                              const std::string nm = static_id(),
                               const int ord = 0);
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
-                              const std::string nm = my_name_,
+                              const std::string nm = static_id(),
                               const int ord = 0);
 
   /**
@@ -214,6 +216,10 @@ public:
 
   virtual std::shared_ptr< const ParameterFunctional > coefficient(const int qq) const
     throw (Exception::requirements_not_met, Exception::index_out_of_range);
+
+  static Dune::ParameterTree defaultSettings(const std::string subName = "");
+
+  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings());
 
 public:
   std::string name_;

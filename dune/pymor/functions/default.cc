@@ -9,7 +9,10 @@
   #include "config.h"
 #endif // HAVE_CMAKE_CONFIG
 
+#include <dune/stuff/common/string.hh>
 #include <dune/stuff/functions.hh>
+
+#include <dune/pymor/parameters/base.hh>
 
 #include "default.hh"
 
@@ -192,7 +195,10 @@ template class NonparametricExpression< double, 3, double, 3 >;
 // ===== AffinelyDecomposableDefault =====
 // =======================================
 template< class D, int d, class R, int rR, int rC >
-const std::string AffinelyDecomposableDefault< D, d, R, rR, rC >::my_name_ = "dune.pymor.functions.affinelydecomposabledefault";
+std::string AffinelyDecomposableDefault< D, d, R, rR, rC >::static_id()
+{
+  return ParametricFunctionInterface< D, d, R, rR, rC >::static_id() + ".affinelydecomposabledefault";
+}
 
 template< class D, int d, class R, int rR, int rC >
 AffinelyDecomposableDefault< D, d, R, rR, rC >::AffinelyDecomposableDefault(const std::string nm,
@@ -481,33 +487,125 @@ std::shared_ptr< const ParameterFunctional > AffinelyDecomposableDefault< D, d, 
   return coefficients_[qq];
 }
 
+template< class D, int d, class R, int rR, int rC >
+Dune::ParameterTree AffinelyDecomposableDefault< D, d, R, rR, rC >::defaultSettings(const std::string subName)
+{
+  DSC::ExtendedParameterTree settings;
+  typedef Stuff::Functions< D, d, R, rR, rC > NonparametricFunctions;
+  const std::string nonparametricType = NonparametricFunctions::available()[0];
+  settings.add(NonparametricFunctions::defaultSettings(nonparametricType), "component.0");
+  settings["component.0.type"] = nonparametricType;
+  settings["coefficient.0.diffusion"] = "1";
+  settings["coefficient.0.expression"] = "diffusion[0]";
+  settings.add(NonparametricFunctions::defaultSettings(nonparametricType), "component.1");
+  settings["component.1.type"] = nonparametricType;
+  settings["coefficient.1.force"] = "2";
+  settings["coefficient.1.expression"] = "force[0] + sin(force[1])";
+  settings.add(NonparametricFunctions::defaultSettings(nonparametricType), "affine_part");
+  settings["affine_part.type"] = nonparametricType;
+  settings["name"] = static_id();
+  settings["order"] = "4";
+  if (subName.empty())
+    return settings;
+  else {
+    DSC::ExtendedParameterTree extendedSettings;
+    extendedSettings.add(settings, subName);
+    return extendedSettings;
+  }
+}
+
+template< class D, int d, class R, int rR, int rC >
+typename AffinelyDecomposableDefault< D, d, R, rR, rC >::ThisType*
+AffinelyDecomposableDefault< D, d, R, rR, rC >::create(const DSC::ExtendedParameterTree settings)
+{
+  typedef Stuff::Functions< D, d, R, rR, rC > NonparametricFunctions;
+  ThisType* ret;
+  const std::string name = settings.get< std::string >("name", static_id());
+  if (settings.hasKey("order"))
+    ret = new ThisType(name, settings.get< int >("order"));
+  else
+    ret = new ThisType(name);
+  if (settings.hasSub("affine_part")) {
+    auto affinePartSettings = settings.sub("affine_part");
+    if (!affinePartSettings.hasKey("type"))
+      DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                       "no 'type' given in the following 'affine_part' settings:\n\n"
+                       << affinePartSettings.reportString());
+    if (!affinePartSettings.hasKey("name"))
+      affinePartSettings["name"] = name + ", affine part";
+    const std::string type = affinePartSettings.get< std::string >("type");
+    ret->register_affine_part(NonparametricFunctions::create(type, affinePartSettings));
+  }
+  size_t pp = 0;
+  while (settings.hasSub("component." + Stuff::Common::toString(pp))
+         && settings.hasSub("coefficient." + Stuff::Common::toString(pp))) {
+    auto componentSettings = settings.sub("component." + Stuff::Common::toString(pp));
+    if (!componentSettings.hasKey("type"))
+      DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                       "no 'type' given in the following 'component." << pp << "' settings:\n\n"
+                       << componentSettings.reportString());
+    if (!componentSettings.hasKey("name"))
+      componentSettings["name"] = name + ", component " + Stuff::Common::toString(pp);
+    const std::string componentType = componentSettings.get< std::string >("type");
+    const auto coefficientSettings = settings.sub("coefficient." + Stuff::Common::toString(pp));
+    if (!coefficientSettings.hasKey("expression"))
+      DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                       "no 'expression' given in the following 'coefficient." << pp << "' settings:\n\n"
+                       << coefficientSettings.reportString());
+    const std::string coefficientExpression = coefficientSettings.get< std::string >("expression");
+    ParameterType coefficientMu;
+    for (std::string key : coefficientSettings.getValueKeys()) {
+      if (key != "expression")
+        coefficientMu.set(key, coefficientSettings.get< int >(key));
+    }
+    if (coefficientMu.empty())
+      DUNE_PYMOR_THROW(Pymor::Exception::wrong_option_given,
+                       "no 'key = size' pair given in the following 'coefficient." << pp << "' settings:\n\n"
+                       << coefficientSettings.reportString());
+    ret->register_component(NonparametricFunctions::create(componentType, componentSettings),
+                            new ParameterFunctional(coefficientMu, coefficientExpression));
+    ++pp;
+  }
+  if (settings.hasSub("component." + Stuff::Common::toString(pp))
+      && !settings.hasSub("coefficient." + Stuff::Common::toString(pp)))
+    DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                     "missing 'coefficient." << pp << "' to match 'component." << pp
+                     << "' in the following settings:\n\n" << settings.reportString());
+  if (!settings.hasSub("component." + Stuff::Common::toString(pp))
+      && settings.hasSub("coefficient." + Stuff::Common::toString(pp)))
+    DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                     "missing 'component." << pp << "' to match 'coefficient." << pp
+                     << "' in the following settings:\n\n" << settings.reportString());
+  return ret;
+}
+
 template class AffinelyDecomposableDefault< double, 1, double, 1, 1 >;
-template class AffinelyDecomposableDefault< double, 1, double, 1, 2 >;
-template class AffinelyDecomposableDefault< double, 1, double, 1, 3 >;
+//template class AffinelyDecomposableDefault< double, 1, double, 1, 2 >;
+//template class AffinelyDecomposableDefault< double, 1, double, 1, 3 >;
 template class AffinelyDecomposableDefault< double, 1, double, 2, 1 >;
-template class AffinelyDecomposableDefault< double, 1, double, 2, 2 >;
-template class AffinelyDecomposableDefault< double, 1, double, 2, 3 >;
+//template class AffinelyDecomposableDefault< double, 1, double, 2, 2 >;
+//template class AffinelyDecomposableDefault< double, 1, double, 2, 3 >;
 template class AffinelyDecomposableDefault< double, 1, double, 3, 1 >;
-template class AffinelyDecomposableDefault< double, 1, double, 3, 2 >;
-template class AffinelyDecomposableDefault< double, 1, double, 3, 3 >;
+//template class AffinelyDecomposableDefault< double, 1, double, 3, 2 >;
+//template class AffinelyDecomposableDefault< double, 1, double, 3, 3 >;
 template class AffinelyDecomposableDefault< double, 2, double, 1, 1 >;
-template class AffinelyDecomposableDefault< double, 2, double, 1, 2 >;
-template class AffinelyDecomposableDefault< double, 2, double, 1, 3 >;
+//template class AffinelyDecomposableDefault< double, 2, double, 1, 2 >;
+//template class AffinelyDecomposableDefault< double, 2, double, 1, 3 >;
 template class AffinelyDecomposableDefault< double, 2, double, 2, 1 >;
-template class AffinelyDecomposableDefault< double, 2, double, 2, 2 >;
-template class AffinelyDecomposableDefault< double, 2, double, 2, 3 >;
+//template class AffinelyDecomposableDefault< double, 2, double, 2, 2 >;
+//template class AffinelyDecomposableDefault< double, 2, double, 2, 3 >;
 template class AffinelyDecomposableDefault< double, 2, double, 3, 1 >;
-template class AffinelyDecomposableDefault< double, 2, double, 3, 2 >;
-template class AffinelyDecomposableDefault< double, 2, double, 3, 3 >;
+//template class AffinelyDecomposableDefault< double, 2, double, 3, 2 >;
+//template class AffinelyDecomposableDefault< double, 2, double, 3, 3 >;
 template class AffinelyDecomposableDefault< double, 3, double, 1, 1 >;
-template class AffinelyDecomposableDefault< double, 3, double, 1, 2 >;
-template class AffinelyDecomposableDefault< double, 3, double, 1, 3 >;
+//template class AffinelyDecomposableDefault< double, 3, double, 1, 2 >;
+//template class AffinelyDecomposableDefault< double, 3, double, 1, 3 >;
 template class AffinelyDecomposableDefault< double, 3, double, 2, 1 >;
-template class AffinelyDecomposableDefault< double, 3, double, 2, 2 >;
-template class AffinelyDecomposableDefault< double, 3, double, 2, 3 >;
+//template class AffinelyDecomposableDefault< double, 3, double, 2, 2 >;
+//template class AffinelyDecomposableDefault< double, 3, double, 2, 3 >;
 template class AffinelyDecomposableDefault< double, 3, double, 3, 1 >;
-template class AffinelyDecomposableDefault< double, 3, double, 3, 2 >;
-template class AffinelyDecomposableDefault< double, 3, double, 3, 3 >;
+//template class AffinelyDecomposableDefault< double, 3, double, 3, 2 >;
+//template class AffinelyDecomposableDefault< double, 3, double, 3, 3 >;
 
 
 } // namespace Function
