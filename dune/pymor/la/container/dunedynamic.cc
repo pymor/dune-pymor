@@ -208,6 +208,18 @@ void DuneDynamicVector< S >::isub(const ThisType& other) throw (Exception::sizes
 }
 
 template< class S >
+typename DuneDynamicVector< S >::BackendType& DuneDynamicVector< S >::backend()
+{
+  return *backend_;
+}
+
+template< class S >
+const typename DuneDynamicVector< S >::BackendType& DuneDynamicVector< S >::backend() const
+{
+  return *backend_;
+}
+
+template< class S >
 int DuneDynamicVector< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
@@ -293,6 +305,18 @@ void DuneDynamicMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx) t
                      "the dim_range of xx (" << xx.dim_range() << ") does not match the dim_range of this ("
                      << dim_range() << ")!");
   backend_->axpy(alpha, *(xx.backend_));
+}
+
+template< class S >
+typename DuneDynamicMatrix< S >::BackendType& DuneDynamicMatrix< S >::backend()
+{
+  return *backend_;
+}
+
+template< class S >
+const typename DuneDynamicMatrix< S >::BackendType& DuneDynamicMatrix< S >::backend() const
+{
+  return *backend_;
 }
 
 template< class S >

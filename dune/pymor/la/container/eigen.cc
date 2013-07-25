@@ -204,6 +204,18 @@ void EigenDenseVector< S >::isub(const ThisType& other) throw (Exception::sizes_
 }
 
 template< class S >
+typename EigenDenseVector< S >::BackendType& EigenDenseVector< S >::backend()
+{
+  return *backend_;
+}
+
+template< class S >
+const typename EigenDenseVector< S >::BackendType& EigenDenseVector< S >::backend() const
+{
+  return *backend_;
+}
+
+template< class S >
 int EigenDenseVector< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
@@ -291,9 +303,21 @@ void EigenRowMajorSparseMatrix< S >::axpy(const ScalarType& alpha, const ThisTyp
   backend_->backend() += alpha * xx.backend_->backend();
 }
 
+template< class S >
+typename EigenRowMajorSparseMatrix< S >::BackendType& EigenRowMajorSparseMatrix< S >::backend()
+{
+  return *backend_;
+}
+
+template< class S >
+const typename EigenRowMajorSparseMatrix< S >::BackendType& EigenRowMajorSparseMatrix< S >::backend() const
+{
+  return *backend_;
+}
+
 template class EigenRowMajorSparseMatrix< double >;
-//template class AffinelyDecomposedConstContainer< EigenDenseVector< double > >;
-//template class AffinelyDecomposedContainer< EigenDenseVector< double > >;
+template class AffinelyDecomposedConstContainer< EigenRowMajorSparseMatrix< double > >;
+template class AffinelyDecomposedContainer< EigenRowMajorSparseMatrix< double > >;
 
 
 } // namespace LA

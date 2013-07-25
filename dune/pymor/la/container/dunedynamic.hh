@@ -41,8 +41,9 @@ template< class ScalarImp = double >
 class DuneDynamicVectorTraits
 {
 public:
-  typedef ScalarImp                       ScalarType;
-  typedef DuneDynamicVector< ScalarType > derived_type;
+  typedef ScalarImp                         ScalarType;
+  typedef DuneDynamicVector< ScalarType >   derived_type;
+  typedef Dune::DynamicVector< ScalarType > BackendType;
 };
 
 
@@ -54,13 +55,14 @@ public:
 template< class ScalarImp >
 class DuneDynamicVector
   : public Dune::Pymor::LA::VectorInterface< DuneDynamicVectorTraits< ScalarImp > >
+  , public ProvidesBackend< DuneDynamicVectorTraits< ScalarImp > >
 {
   typedef Dune::Pymor::LA::VectorInterface< DuneDynamicVectorTraits< ScalarImp > > BaseType;
 public:
   typedef DuneDynamicVectorTraits< ScalarImp >  Traits;
   typedef typename Traits::derived_type         ThisType;
   typedef typename Traits::ScalarType           ScalarType;
-  typedef Dune::DynamicVector< ScalarType >     BackendType;
+  typedef typename Traits::BackendType          BackendType;
 
   DuneDynamicVector(const int size = 0, const ScalarType value = ScalarType(0));
 
@@ -127,6 +129,10 @@ public:
 
   using BaseType::isub;
 
+  BackendType& backend();
+
+  const BackendType& backend() const;
+
 private:
   static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
 
@@ -145,8 +151,9 @@ template< class ScalarImp = double >
 class DuneDynamicMatrixTraits
 {
 public:
-  typedef ScalarImp                       ScalarType;
-  typedef DuneDynamicMatrix< ScalarType > derived_type;
+  typedef ScalarImp                         ScalarType;
+  typedef DuneDynamicMatrix< ScalarType >   derived_type;
+  typedef Dune::DynamicMatrix< ScalarType > BackendType;
 };
 
 
@@ -158,7 +165,7 @@ public:
   typedef DuneDynamicMatrixTraits< ScalarImp >  Traits;
   typedef typename Traits::derived_type         ThisType;
   typedef typename Traits::ScalarType           ScalarType;
-  typedef Dune::DynamicMatrix< ScalarType >     BackendType;
+  typedef typename Traits::BackendType          BackendType;
 
 public:
   DuneDynamicMatrix(const int rr = 0, const int cc = 0, const ScalarType value = ScalarType(0));
@@ -189,6 +196,10 @@ public:
   void scal(const ScalarType& alpha);
 
   void axpy(const ScalarType& alpha, const ThisType& x) throw (Exception::sizes_do_not_match);
+
+  BackendType& backend();
+
+  const BackendType& backend() const;
 
 private:
   static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);

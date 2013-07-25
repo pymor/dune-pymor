@@ -94,6 +94,28 @@ public:
 }; // class ProvidesContainer
 
 
+template< class Traits >
+class ProvidesBackend
+  : CRTPInterface< ProvidesBackend< Traits >, Traits >
+{
+  typedef CRTPInterface< ProvidesBackend< Traits >, Traits > CRTP;
+public:
+  typedef typename Traits::BackendType BackendType;
+
+  BackendType& backend()
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).container());
+    return CRTP::as_imp(*this).container();
+  }
+
+  const BackendType& backend() const
+  {
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).container());
+    return CRTP::as_imp(*this).container();
+  }
+}; // class ProvidesBackend
+
+
 class VectorInterfacePybindgen {};
 
 template< class Traits >

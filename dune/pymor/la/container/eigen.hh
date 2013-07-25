@@ -39,6 +39,7 @@ class EigenDenseVectorTraits
 public:
   typedef ScalarImp                       ScalarType;
   typedef EigenDenseVector< ScalarType >  derived_type;
+  typedef Dune::Stuff::LA::EigenDenseVector< ScalarType > BackendType;
 };
 
 
@@ -50,13 +51,14 @@ public:
 template< class ScalarImp >
 class EigenDenseVector
   : public Dune::Pymor::LA::VectorInterface< EigenDenseVectorTraits< ScalarImp > >
+  , public ProvidesBackend< EigenDenseVectorTraits< ScalarImp > >
 {
   typedef Dune::Pymor::LA::VectorInterface< EigenDenseVectorTraits< ScalarImp > > BaseType;
 public:
   typedef EigenDenseVectorTraits< ScalarImp > Traits;
   typedef typename Traits::derived_type       ThisType;
   typedef typename Traits::ScalarType         ScalarType;
-  typedef Dune::Stuff::LA::EigenDenseVector< ScalarType > BackendType;
+  typedef typename Traits::BackendType        BackendType;
 
   EigenDenseVector(const int size = 0, const ScalarType value = ScalarType(0));
 
@@ -123,6 +125,10 @@ public:
 
   using BaseType::isub;
 
+  BackendType& backend();
+
+  const BackendType& backend() const;
+
 private:
   static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
 
@@ -143,18 +149,20 @@ class EigenRowMajorSparseMatrixTraits
 public:
   typedef ScalarImp                               ScalarType;
   typedef EigenRowMajorSparseMatrix< ScalarType > derived_type;
+  typedef Dune::Stuff::LA::EigenRowMajorSparseMatrix< ScalarType > BackendType;
 };
 
 
 template< class ScalarImp >
 class EigenRowMajorSparseMatrix
   : public Dune::Pymor::LA::MatrixInterface< EigenRowMajorSparseMatrixTraits< ScalarImp > >
+  , public ProvidesBackend< EigenRowMajorSparseMatrixTraits< ScalarImp > >
 {
 public:
   typedef EigenRowMajorSparseMatrixTraits< ScalarImp >  Traits;
   typedef typename Traits::derived_type                 ThisType;
   typedef typename Traits::ScalarType                   ScalarType;
-  typedef Dune::Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  BackendType;
+  typedef typename Traits::BackendType                  BackendType;
 
 public:
   EigenRowMajorSparseMatrix();
@@ -185,6 +193,10 @@ public:
   void scal(const ScalarType& alpha);
 
   void axpy(const ScalarType& alpha, const ThisType& x) throw (Exception::sizes_do_not_match);
+
+  BackendType& backend();
+
+  const BackendType& backend() const;
 
 private:
   friend class Operators::EigenRowMajorSparse< ScalarType >;
