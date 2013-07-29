@@ -32,3 +32,4 @@ depcomp
 *.la
 demos
 *.dirstamp
+.kateproject.d
