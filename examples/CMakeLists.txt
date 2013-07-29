@@ -8,8 +8,8 @@ add_library( dunepymor-example-stationary-linear STATIC "stationarylinear.cc" )
 ADD_EXECUTABLE( example_stationary_linear "stationarylinear_main.cc" ${COMMON_HEADER} )
 TARGET_LINK_LIBRARIES( example_stationary_linear dunepymor-example-stationary-linear ${COMMON_LIBS} )
 
-find_package(PythonLibs)
-find_package(PythonInterp)
+find_package(PythonLibs 2.7)
+find_package(PythonInterp 2.7)
 include(CheckPythonModule)
 CheckPythonModule(pybindgen)
 
