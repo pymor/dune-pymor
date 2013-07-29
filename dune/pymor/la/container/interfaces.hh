@@ -23,12 +23,12 @@ namespace Pymor {
 namespace LA {
 
 
-class ContainerInterfacePybindgen {};
+class ContainerInterfaceDynamic {};
 
 template< class Traits >
 class ContainerInterface
   : public CRTPInterface< ContainerInterface< Traits >, Traits >
-  , public ContainerInterfacePybindgen
+  , public ContainerInterfaceDynamic
 {
   typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
   typedef ContainerInterface< Traits >                          ThisType;
@@ -44,6 +44,16 @@ public:
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).copy());
     return CRTP::as_imp(*this).copy();
+  }
+
+  /**
+   * \brief Returns the result of copy() as a pointer.
+   *
+   *        We need this for pybindgen.
+   */
+  derived_type* copy_and_return_ptr() const
+  {
+    return new derived_type(copy());
   }
 
   /**
@@ -116,12 +126,12 @@ public:
 }; // class ProvidesBackend
 
 
-class VectorInterfacePybindgen {};
+class VectorInterfaceDynamic {};
 
 template< class Traits >
 class VectorInterface
   : public ContainerInterface< Traits >
-  , public VectorInterfacePybindgen
+  , public VectorInterfaceDynamic
 {
   typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
   typedef VectorInterface< Traits >                             ThisType;
@@ -271,6 +281,16 @@ public:
   }
 
   /**
+   * \brief Returns the result of add() as a pointer.
+   *
+   *        We need this for pybindgen.
+   */
+  derived_type* add_and_return_ptr(const derived_type& other) const
+  {
+    return new derived_type(add(other));
+  }
+
+  /**
    * \brief Inplace variant of add().
    * \param other The right summand.
    */
@@ -319,6 +339,16 @@ public:
   }
 
   /**
+   * \brief Returns the result of sub() as a pointer.
+   *
+   *        We need this for pybindgen.
+   */
+  derived_type* sub_and_return_ptr(const derived_type& other) const
+  {
+    return new derived_type(sub(other));
+  }
+
+  /**
    * \brief Inplace variant of sub().
    * \param other The subtrahend.
    */
@@ -331,27 +361,15 @@ public:
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).isub(CRTP::as_imp(other)));
   }
-
-//  virtual bool linear() const;
-
-//  virtual unsigned int dim_source() const;
-
-//  virtual std::string type_source() const;
-
-//  virtual double apply(const LA::VectorInterface& source,
-//                       const Parameter /*mu*/ = Parameter()) const throw (Exception::types_are_not_compatible,
-//                                                                          Exception::you_have_to_implement_this,
-//                                                                          Exception::sizes_do_not_match,
-//                                                                          Exception::wrong_parameter_type,
-//                                                                          Exception::requirements_not_met,
-//                                                                          Exception::linear_solver_failed,
-//                                                                          Exception::this_does_not_make_any_sense);
 }; // class VectorInterface
 
+
+class MatrixInterfaceDynamic {};
 
 template< class Traits >
 class MatrixInterface
   : public ContainerInterface< Traits >
+  , public MatrixInterfaceDynamic
 {
   typedef CRTPInterface< ContainerInterface< Traits >, Traits > CRTP;
   typedef MatrixInterface< Traits >                             ThisType;
