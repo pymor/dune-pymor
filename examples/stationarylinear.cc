@@ -163,9 +163,9 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   }
   if (dirichlet.has_affine_part()) {
     for (size_t qq = 0; qq < diffusion.num_components(); ++qq) {
-      VectorBackendType* compVector = new VectorBackendType(dim_);
-      op_->component(qq).apply(*ones, compVector);
-      rhsVector.register_component(new VectorType(compVector),
+      VectorType* comp = new VectorType(dim_);
+      op_->component(qq).apply(*ones, *comp);
+      rhsVector.register_component(comp,
                                    new Dune::Pymor::ParameterFunctional(*(diffusion.coefficient(qq))));
     }
   }
@@ -276,7 +276,7 @@ void SimpleDiscretization::visualize(const VectorType& vector,
   file << name << " = [";
   for (int ii = 0; ii < int(vector.dim()) - 1; ++ii)
     file << vector.components({ii})[0] << ", ";
-  file << vector.components({vector.dim() - 1})[0] << "]" << std::endl;
+  file << vector.components({int(vector.dim() - 1)})[0] << "]" << std::endl;
 }
 
 
