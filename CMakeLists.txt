@@ -53,6 +53,7 @@ set( COMMON_LIBS
      ${BOOST_LIBS}
      ${GRIDLIBS}
      ${FASPLIB}
+     -lpthread
 )
 
 add_subdirectory(doc)
