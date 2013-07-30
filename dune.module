@@ -4,6 +4,6 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 Module: dune-pymor
-Version: 0.0.1
+Version: 0.1
 Maintainer: felix.albrecht@wwu.de
 Depends: dune-common (>= 2.2.1) dune-stuff
