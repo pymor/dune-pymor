@@ -13,44 +13,45 @@
 namespace Example {
 
 
-const size_t AnalyticalProblem::dim = 4;
-
-AnalyticalProblem::AnalyticalProblem()
+AnalyticalProblem::AnalyticalProblem(const int dd)
   : Dune::Pymor::Parametric()
+  , dim_(dd)
 {
+  if (dd < 1)
+    DUNE_PYMOR_THROW(Dune::Pymor::Exception::index_out_of_range, "dd has to be positive (is " << dd << ")!");
   // build the data functions
   // * diffusion
-  const Dune::Pymor::ParameterType muDiffusion = {"diffusion", dim};
+  const Dune::Pymor::ParameterType muDiffusion = {"diffusion", dim_};
   diffusion_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
-  for (size_t ii = 0; ii < dim; ++ii)
+  for (size_t ii = 0; ii < dim_; ++ii)
     diffusion_->register_component(new ExpressionFunctionType("x", "1.0"),
                                    new Dune::Pymor::ParameterFunctional(muDiffusion,
                                                                         "diffusion["
                                                                         + Dune::Stuff::Common::toString(ii) + "]"));
   inherit_parameter_type(muDiffusion, "diffusion");
   // * force
-  const Dune::Pymor::ParameterType muForce = {"force", dim};
+  const Dune::Pymor::ParameterType muForce = {"force", dim_};
   force_ = new FunctionType();
   force_->register_affine_part(new ExpressionFunctionType("x", "1.0"));
-  for (size_t ii = 0; ii < dim; ++ii)
+  for (size_t ii = 0; ii < dim_; ++ii)
     force_->register_component(new ExpressionFunctionType("x", "1.0"),
                                new Dune::Pymor::ParameterFunctional(muForce,
                                                                     "force["
                                                                     + Dune::Stuff::Common::toString(ii) + "]"));
   inherit_parameter_type(muForce, "force");
   // * dirichlet
-  const Dune::Pymor::ParameterType muDirichlet = {"dirichlet", dim};
+  const Dune::Pymor::ParameterType muDirichlet = {"dirichlet", dim_};
   dirichlet_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
-  for (size_t ii = 0; ii < dim; ++ii)
+  for (size_t ii = 0; ii < dim_; ++ii)
     dirichlet_->register_component(new ExpressionFunctionType("x", "1.0"),
                                    new Dune::Pymor::ParameterFunctional(muDirichlet,
                                                                         "dirichlet["
                                                                         + Dune::Stuff::Common::toString(ii) + "]"));
   inherit_parameter_type(muDirichlet, "dirichlet");
   // * neumann
-  const Dune::Pymor::ParameterType muNeumann = {"neumann", dim};
+  const Dune::Pymor::ParameterType muNeumann = {"neumann", dim_};
   neumann_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
-  for (size_t ii = 0; ii < dim; ++ii)
+  for (size_t ii = 0; ii < dim_; ++ii)
     neumann_->register_component(new ExpressionFunctionType("x", "1.0"),
                                  new Dune::Pymor::ParameterFunctional(muNeumann,
                                                                       "neumann["
@@ -64,6 +65,11 @@ AnalyticalProblem::~AnalyticalProblem()
   delete dirichlet_;
   delete force_;
   delete diffusion_;
+}
+
+unsigned int AnalyticalProblem::dim() const
+{
+  return dim_;
 }
 
 const AnalyticalProblem::FunctionType* AnalyticalProblem::diffusion() const
@@ -89,7 +95,7 @@ const AnalyticalProblem::FunctionType* AnalyticalProblem::neumann() const
 
 SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   : problem_(prob)
-  , dim_(prob->dim)
+  , dim_(prob->dim())
 {
   typedef typename OperatorType::ContainerType MatrixType;
   typedef typename MatrixType::BackendType MatrixBackendType;

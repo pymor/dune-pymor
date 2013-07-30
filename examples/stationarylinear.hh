@@ -27,11 +27,11 @@ public:
   typedef Dune::Stuff::FunctionExpression< double, 1, double, 1 > ExpressionFunctionType;
   typedef Dune::Pymor::Function::AffinelyDecomposableDefault< double, 1, double, 1 > FunctionType;
 
-  static const size_t dim;
-
-  AnalyticalProblem();
+  AnalyticalProblem(const int dd = 4);
 
   ~AnalyticalProblem();
+
+  unsigned int dim() const;
 
   const FunctionType* diffusion() const;
 
@@ -42,6 +42,7 @@ public:
   const FunctionType* neumann() const;
 
 private:
+  unsigned int dim_;
   FunctionType* diffusion_;
   FunctionType* force_;
   FunctionType* dirichlet_;
