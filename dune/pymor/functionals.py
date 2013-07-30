@@ -8,132 +8,126 @@ import pybindgen
 from pybindgen import retval, param
 
 
-def inject_FunctionalInterface(module, exceptions, CONFIG_H, Parametric):
+def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, dict))
+    assert(isinstance(interfaces, dict))
+    for element in interfaces:
+        assert(isinstance(element, str))
+        assert(len(element) > 0)
     assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(Parametric, pybindgen.CppClass))
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
-    FunctionalInterface = namespace.add_class('FunctionalInterface', parent=Parametric)
-    return module, FunctionalInterface
+    assert(isinstance(Traits, dict))
+    for key in Traits.keys():
+        assert(isinstance(Traits[key], str))
+        assert(len(Traits[key].strip()) > 0)
+    assert('SourceType' in Traits)
+    SourceType = Traits['SourceType']
+    assert('ScalarType' in Traits)
+    ScalarType = Traits['ScalarType']
+    if template_parameters is not None:
+        if isinstance(template_parameters, str):
+            assert(len(template_parameters.strip()) > 0)
+            template_parameters = [ template_parameters ]
+        elif isinstance(template_parameters, list):
+            for element in template_parameters:
+                assert(isinstance(element, str))
+                assert(len(element.strip()) > 0)
+    module = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Functionals')
+    Class = module.add_class('VectorBased',
+                             parent=[interfaces['Dune::Pymor::FunctionalInterfaceDynamic'],
+                                     interfaces['Dune::Pymor::Parametric']],
+                             template_parameters=template_parameters)
+    Class.add_method('linear', retval('bool'), [], is_const=True)
+    Class.add_method('dim_source', retval('unsigned int'), [], is_const=True)
+    Class.add_method('apply',
+                     retval(ScalarType),
+                     [param('const ' + SourceType + ' &', 'source')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']])
+    Class.add_method('apply',
+                     retval(ScalarType),
+                     [param('const ' + SourceType + ' &', 'source'),
+                      param('const Dune::Pymor::Parameter', 'mu')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']])
+    return Class
 
 
-def inject_AffinelyDecomposedFunctionalInterface(module, exceptions, CONFIG_H, FunctionalInterface):
-    assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
-    assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(FunctionalInterface, pybindgen.CppClass))
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
-    AffinelyDecomposedFunctionalInterface = namespace.add_class('AffinelyDecomposedFunctionalInterface',
-                                                                parent=FunctionalInterface)
-    return module, AffinelyDecomposedFunctionalInterface
-
-
-def inject_specialization_of_LinearAffinelyDecomposedDefault(module,
+def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                                                              exceptions,
+                                                             interfaces,
                                                              CONFIG_H,
-                                                             AffinelyDecomposedFunctionalInterface,
-                                                             LinearFunctionalType,
-                                                             SourceType):
+                                                             Traits,
+                                                             template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, dict))
+    assert(isinstance(interfaces, dict))
+    for element in interfaces:
+        assert(isinstance(element, str))
+        assert(len(element) > 0)
     assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(AffinelyDecomposedFunctionalInterface, pybindgen.CppClass))
-    assert(isinstance(LinearFunctionalType, str))
-    assert(len(LinearFunctionalType) > 0)
-    assert(isinstance(SourceType, str))
-    assert(len(SourceType) > 0)
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Functionals')
-    LinearAffinelyDecomposedDefault = namespace.add_class('LinearAffinelyDecomposedDefault',
-                                                          parent=AffinelyDecomposedFunctionalInterface,
-                                                          template_parameters=[LinearFunctionalType])
-    LinearAffinelyDecomposedDefault.add_constructor([])
-    LinearAffinelyDecomposedDefault.add_constructor([param(LinearFunctionalType + ' *', 'aff', transfer_ownership=True)],
-                                                    throw=[exceptions['requirements_not_met']])
-    LinearAffinelyDecomposedDefault.add_method('register_component',
-                                               None,
-                                               [param(LinearFunctionalType + ' *', 'aff', transfer_ownership=True)],
-                                               throw=[exceptions['this_does_not_make_any_sense'],
-                                                      exceptions['sizes_do_not_match'],
-                                                      exceptions['types_are_not_compatible']])
-    LinearAffinelyDecomposedDefault.add_method('register_component',
-                                               None,
-                                               [param(LinearFunctionalType + ' *', 'comp', transfer_ownership=True),
-                                                param('const Dune::Pymor::ParameterFunctional *',
-                                                      'coeff',
-                                                      transfer_ownership=True)],
-                                               throw=[exceptions['this_does_not_make_any_sense'],
-                                                      exceptions['sizes_do_not_match'],
-                                                      exceptions['types_are_not_compatible'],
-                                                      exceptions['wrong_parameter_type']])
-    LinearAffinelyDecomposedDefault.add_method('num_components', retval('unsigned int'), [], is_const=True)
-    LinearAffinelyDecomposedDefault.add_method('component',
-                                               retval(LinearFunctionalType + ' *', caller_owns_return=False),
-                                               [param('const int', 'ii')],
-                                               throw=[exceptions['requirements_not_met'],
-                                                      exceptions['index_out_of_range']])
-    LinearAffinelyDecomposedDefault.add_method('component',
-                                               retval('const ' + LinearFunctionalType + ' *',
-                                                      caller_owns_return=False),
-                                               [param('const int', 'ii')],
-                                               is_const=True,
-                                               throw=[exceptions['requirements_not_met'],
-                                                      exceptions['index_out_of_range']])
-    LinearAffinelyDecomposedDefault.add_method('coefficient',
-                                               retval('const Dune::Pymor::ParameterFunctional *',
-                                                      caller_owns_return=False),
-                                               [param('const int', 'ii')],
-                                               is_const=True,
-                                               throw=[exceptions['requirements_not_met'],
-                                                      exceptions['index_out_of_range']])
-    LinearAffinelyDecomposedDefault.add_method('hasAffinePart', retval('bool'), [], is_const=True)
-    LinearAffinelyDecomposedDefault.add_method('affinePart',
-                                               retval(LinearFunctionalType + ' *', caller_owns_return=False),
-                                               [],
-                                               throw=[exceptions['requirements_not_met']])
-    LinearAffinelyDecomposedDefault.add_method('affinePart',
-                                               retval('const ' + LinearFunctionalType + ' *', caller_owns_return=False),
-                                               [],
-                                               is_const=True,
-                                               throw=[exceptions['requirements_not_met']])
-    LinearAffinelyDecomposedDefault.add_method('linear', retval('bool'), [], is_const=True)
-    LinearAffinelyDecomposedDefault.add_method('dim_source', retval('unsigned int'), [], is_const=True)
-    LinearAffinelyDecomposedDefault.add_method('type_source', retval('std::string'), [], is_const=True)
-    LinearAffinelyDecomposedDefault.add_method('apply',
-                                               retval('double'),
-                                               [param('const ' + SourceType + ' *', 'source', transfer_ownership=False)],
-                                               is_const=True,
-                                               throw=[exceptions['types_are_not_compatible'],
-                                                      exceptions['you_have_to_implement_this'],
-                                                      exceptions['sizes_do_not_match'],
-                                                      exceptions['wrong_parameter_type'],
-                                                      exceptions['requirements_not_met'],
-                                                      exceptions['linear_solver_failed'],
-                                                      exceptions['this_does_not_make_any_sense']])
-    LinearAffinelyDecomposedDefault.add_method('apply',
-                                               retval('double'),
-                                               [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                                                param('const Dune::Pymor::Parameter', 'mu')],
-                                               is_const=True,
-                                               throw=[exceptions['types_are_not_compatible'],
-                                                      exceptions['you_have_to_implement_this'],
-                                                      exceptions['sizes_do_not_match'],
-                                                      exceptions['wrong_parameter_type'],
-                                                      exceptions['requirements_not_met'],
-                                                      exceptions['linear_solver_failed'],
-                                                      exceptions['this_does_not_make_any_sense']])
-    LinearAffinelyDecomposedDefault.add_method('freeze_parameter',
-                                               retval(LinearFunctionalType + ' *', caller_owns_return=True),
-                                               [],
-                                               is_const=True,
-                                               throw=[exceptions['this_is_not_parametric'],
-                                                      exceptions['you_have_to_implement_this'],
-                                                      exceptions['this_does_not_make_any_sense']])
-    LinearAffinelyDecomposedDefault.add_method('freeze_parameter',
-                                               retval(LinearFunctionalType + ' *', caller_owns_return=True),
-                                               [param('const Dune::Pymor::Parameter', 'mu')],
-                                               is_const=True,
-                                               throw=[exceptions['this_is_not_parametric'],
-                                                      exceptions['you_have_to_implement_this'],
-                                                      exceptions['this_does_not_make_any_sense']])
-    return module, LinearAffinelyDecomposedDefault
+    assert(isinstance(Traits, dict))
+    for key in Traits.keys():
+        assert(isinstance(Traits[key], str))
+        assert(len(Traits[key].strip()) > 0)
+    assert('SourceType' in Traits)
+    SourceType = Traits['SourceType']
+    assert('ComponentType' in Traits)
+    ComponentType = Traits['ComponentType']
+    assert('ScalarType' in Traits)
+    ScalarType = Traits['ScalarType']
+    assert('FrozenType' in Traits)
+    FrozenType = Traits['ComponentType']
+    if template_parameters is not None:
+        if isinstance(template_parameters, str):
+            assert(len(template_parameters.strip()) > 0)
+            template_parameters = [ template_parameters ]
+        elif isinstance(template_parameters, list):
+            for element in template_parameters:
+                assert(isinstance(element, str))
+                assert(len(element.strip()) > 0)
+    module = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Functionals')
+    Class = module.add_class('LinearAffinelyDecomposedVectorBased',
+                             parent=[interfaces['Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic'],
+                                     interfaces['Dune::Pymor::Parametric']],
+                             template_parameters=template_parameters)
+    Class.add_method('num_components', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('component_and_return_ptr',
+                     retval(ComponentType + ' *', caller_owns_return=True),
+                     [param('const int', 'qq')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']],
+                     custom_name='component')
+    Class.add_method('coefficient_and_return_ptr',
+                     retval('Dune::Pymor::ParameterFunctional *', caller_owns_return=True),
+                     [param('const int', 'qq')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']],
+                     custom_name='coefficient')
+    Class.add_method('has_affine_part', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('affine_part_and_return_ptr',
+                     retval(ComponentType + ' *', caller_owns_return=True),
+                     [],
+                     is_const=True,
+                     throw=[exceptions['PymorException']],
+                     custom_name='affine_part')
+    Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('dim_source', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply',
+                     retval(ScalarType),
+                     [param('const ' + SourceType + ' &', 'source')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']])
+    Class.add_method('apply',
+                     retval(ScalarType),
+                     [param('const ' + SourceType + ' &', 'source'),
+                      param('const Dune::Pymor::Parameter', 'mu')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']])
+    Class.add_method('freeze_parameter_and_return_ptr',
+                     retval(FrozenType + ' *', caller_owns_return=True),
+                     [param('const Dune::Pymor::Parameter', 'mu')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']],
+                     custom_name='freeze_parameter')
+    return Class

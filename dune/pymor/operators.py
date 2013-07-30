@@ -8,548 +8,388 @@ import pybindgen
 from pybindgen import retval, param
 
 
-def inject_OperatorInterface(module, exceptions, CONFIG_H, Parametric):
+def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONFIG_H,
+                                            operator_name,
+                                            operator_Traits,
+                                            inverse_name,
+                                            inverse_Traits,
+                                            operator_template_parameters=None,
+                                            inverse_template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, dict))
+    assert(isinstance(interfaces, dict))
+    for element in interfaces:
+        assert(isinstance(element, str))
+        assert(len(element) > 0)
     assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(Parametric, pybindgen.CppClass))
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
-    OperatorInterface = namespace.add_class('OperatorInterface', parent=Parametric)
-    OperatorInterface.add_method('apply2',
-                                 retval('double'),
-                                 [param('const Dune::Pymor::LA::VectorInterface *', 'range', transfer_ownership=False),
-                                  param('const Dune::Pymor::LA::VectorInterface *', 'source', transfer_ownership=False)],
-                                 is_const=True,
-                                 throw=[exceptions['types_are_not_compatible'],
-                                        exceptions['you_have_to_implement_this'],
-                                        exceptions['sizes_do_not_match'],
-                                        exceptions['wrong_parameter_type'],
-                                        exceptions['requirements_not_met'],
-                                        exceptions['linear_solver_failed'],
-                                        exceptions['this_does_not_make_any_sense']])
-    OperatorInterface.add_method('apply2',
-                                 retval('double'),
-                                 [param('const Dune::Pymor::LA::VectorInterface *', 'range', transfer_ownership=False),
-                                  param('const Dune::Pymor::LA::VectorInterface *', 'source', transfer_ownership=False),
-                                  param('const Dune::Pymor::Parameter', 'mu')],
-                                 is_const=True,
-                                 throw=[exceptions['types_are_not_compatible'],
-                                        exceptions['you_have_to_implement_this'],
-                                        exceptions['sizes_do_not_match'],
-                                        exceptions['wrong_parameter_type'],
-                                        exceptions['requirements_not_met'],
-                                        exceptions['linear_solver_failed'],
-                                        exceptions['this_does_not_make_any_sense']])
-    return module, OperatorInterface
+    # checks for the operator
+    assert(isinstance(operator_Traits, dict))
+    for key in operator_Traits.keys():
+        assert(isinstance(operator_Traits[key], str))
+        assert(len(operator_Traits[key].strip()) > 0)
+    assert('SourceType' in operator_Traits)
+    operator_SourceType = operator_Traits['SourceType']
+    assert('RangeType' in operator_Traits)
+    operator_RangeType = operator_Traits['RangeType']
+    assert('ScalarType' in operator_Traits)
+    operator_ScalarType = operator_Traits['ScalarType']
+    assert('InverseType' in operator_Traits)
+    operator_InverseType = operator_Traits['InverseType']
+    assert('FrozenType' in operator_Traits)
+    operator_FrozenType = operator_Traits['FrozenType']
+    if operator_template_parameters is not None:
+        if isinstance(operator_template_parameters, str):
+            assert(len(operator_template_parameters.strip()) > 0)
+            operator_template_parameters = [ operator_template_parameters ]
+        elif isinstance(operator_template_parameters, list):
+            for element in operator_template_parameters:
+                assert(isinstance(element, str))
+                assert(len(element.strip()) > 0)
+    # checks for the inverse
+    assert(isinstance(inverse_Traits, dict))
+    for key in inverse_Traits.keys():
+        assert(isinstance(inverse_Traits[key], str))
+        assert(len(inverse_Traits[key].strip()) > 0)
+    assert('SourceType' in inverse_Traits)
+    inverse_SourceType = inverse_Traits['SourceType']
+    assert('RangeType' in inverse_Traits)
+    inverse_RangeType = inverse_Traits['RangeType']
+    assert('ScalarType' in inverse_Traits)
+    inverse_ScalarType = inverse_Traits['ScalarType']
+    assert('InverseType' in inverse_Traits)
+    inverse_InverseType = inverse_Traits['InverseType']
+    assert('FrozenType' in inverse_Traits)
+    inverse_FrozenType = inverse_Traits['FrozenType']
+    if inverse_template_parameters is not None:
+        if isinstance(inverse_template_parameters, str):
+            assert(len(inverse_template_parameters.strip()) > 0)
+            inverse_template_parameters = [ inverse_template_parameters ]
+        elif isinstance(inverse_template_parameters, list):
+            for element in inverse_template_parameters:
+                assert(isinstance(element, str))
+                assert(len(element.strip()) > 0)
+    # add the operator
+    operator_namespace = module
+    operator_namespaces = [nspace.strip() for nspace in operator_name.split('::')[:-1]]
+    operator_name = operator_name.split('::')[-1].strip()
+    if len(operator_namespaces) > 0:
+        for nspace in operator_namespaces:
+            operator_namespace = operator_namespace.add_cpp_namespace(nspace)
+    Operator = operator_namespace.add_class(operator_name,
+                                            parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'],
+                                            template_parameters=operator_template_parameters)
+    # add the inverse
+    inverse_namespace = module
+    inverse_namespaces = [nspace.strip() for nspace in inverse_name.split('::')[:-1]]
+    inverse_name = inverse_name.split('::')[-1].strip()
+    if len(inverse_namespaces) > 0:
+        for nspace in inverse_namespaces:
+            inverse_namespace = inverse_namespace.add_cpp_namespace(nspace)
+    Inverse = inverse_namespace.add_class(inverse_name,
+                                          parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'],
+                                          template_parameters=inverse_template_parameters)
+    # fill the operator
+    Operator.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('dim_source', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('dim_range', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply', None,
+                        [param('const ' + operator_SourceType + ' &', 'source'),
+                         param(operator_RangeType + ' &', 'range')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply', None,
+                        [param('const ' + operator_SourceType + ' &', 'source'),
+                         param(operator_RangeType + ' &', 'range'),
+                         param('Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply_and_return_ptr',
+                        retval(operator_RangeType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_SourceType + ' &', 'source')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+    Operator.add_method('apply_and_return_ptr',
+                        retval(operator_RangeType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_SourceType + ' &', 'source'),
+                         param('Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+    Operator.add_method('apply2', operator_ScalarType,
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param('const ' + operator_SourceType + ' &', 'source')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply2', operator_ScalarType,
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param('const ' + operator_SourceType + ' &', 'source'),
+                         param('Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('invert_options',
+                        retval('std::vector< std::string >'),
+                        [], is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('invert_and_return_ptr',
+                        retval(operator_InverseType + ' *', caller_owns_return=True),
+                        [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Operator.add_method('invert_and_return_ptr',
+                        retval(operator_InverseType + ' *', caller_owns_return=True),
+                        [param('const std::string', 'option')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Operator.add_method('invert_and_return_ptr',
+                        retval(operator_InverseType + ' *', caller_owns_return=True),
+                        [param('const std::string', 'option'),
+                         param('Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Operator.add_method('apply_inverse', None,
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param(operator_SourceType + ' &', 'source')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply_inverse', None,
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param(operator_SourceType + ' &', 'source'),
+                         param('const std::string', 'option')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply_inverse', None,
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param(operator_SourceType + ' &', 'source'),
+                         param('const std::string', 'option'),
+                         param('const Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']])
+    Operator.add_method('apply_inverse_and_return_ptr',
+                        retval(operator_SourceType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_RangeType + ' &', 'range')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Operator.add_method('apply_inverse_and_return_ptr',
+                        retval(operator_SourceType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param('const std::string', 'option')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Operator.add_method('apply_inverse_and_return_ptr',
+                        retval(operator_SourceType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param('const std::string', 'option'),
+                         param('const Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Operator.add_method('freeze_parameter_and_return_ptr',
+                        retval(operator_FrozenType + ' *', caller_owns_return=True),
+                        [param('Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
+    # fill the inverse
+    Inverse.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('dim_source', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('dim_range', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply', None,
+                       [param('const ' + inverse_SourceType + ' &', 'source'),
+                        param(inverse_RangeType + ' &', 'range')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply', None,
+                       [param('const ' + inverse_SourceType + ' &', 'source'),
+                        param(inverse_RangeType + ' &', 'range'),
+                        param('Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply_and_return_ptr',
+                       retval(inverse_RangeType + ' *', caller_owns_return=True),
+                       [param('const ' + inverse_SourceType + ' &', 'source')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+    Inverse.add_method('apply_and_return_ptr',
+                       retval(inverse_RangeType + ' *', caller_owns_return=True),
+                       [param('const ' + inverse_SourceType + ' &', 'source'),
+                        param('Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+    Inverse.add_method('apply2', inverse_ScalarType,
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param('const ' + inverse_SourceType + ' &', 'source')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply2', inverse_ScalarType,
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param('const ' + inverse_SourceType + ' &', 'source'),
+                        param('Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('invert_options',
+                       retval('std::vector< std::string >'),
+                       [], is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('invert_and_return_ptr',
+                       retval(inverse_InverseType + ' *', caller_owns_return=True),
+                       [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Inverse.add_method('invert_and_return_ptr',
+                       retval(inverse_InverseType + ' *', caller_owns_return=True),
+                       [param('const std::string', 'option')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Inverse.add_method('invert_and_return_ptr',
+                       retval(inverse_InverseType + ' *', caller_owns_return=True),
+                       [param('const std::string', 'option'),
+                        param('Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Inverse.add_method('apply_inverse', None,
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param(inverse_SourceType + ' &', 'source')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply_inverse', None,
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param(inverse_SourceType + ' &', 'source'),
+                        param('const std::string', 'option')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply_inverse', None,
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param(inverse_SourceType + ' &', 'source'),
+                        param('const std::string', 'option'),
+                        param('const Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']])
+    Inverse.add_method('apply_inverse_and_return_ptr',
+                       retval(inverse_SourceType + ' *', caller_owns_return=True),
+                       [param('const ' + inverse_RangeType + ' &', 'range')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Inverse.add_method('apply_inverse_and_return_ptr',
+                       retval(inverse_SourceType + ' *', caller_owns_return=True),
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param('const std::string', 'option')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Inverse.add_method('apply_inverse_and_return_ptr',
+                       retval(inverse_SourceType + ' *', caller_owns_return=True),
+                       [param('const ' + inverse_RangeType + ' &', 'range'),
+                        param('const std::string', 'option'),
+                        param('const Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Inverse.add_method('freeze_parameter_and_return_ptr',
+                       retval(inverse_FrozenType + ' *', caller_owns_return=True),
+                       [param('Dune::Pymor::Parameter', 'mu')],
+                       is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
+    return Operator, Inverse
 
 
-def inject_LinearOperatorInterface(module, exceptions, CONFIG_H, OperatorInterface):
+def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
+                                                                exceptions,
+                                                                interfaces,
+                                                                CONFIG_H,
+                                                                Traits,
+                                                                template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, dict))
+    assert(isinstance(interfaces, dict))
+    for element in interfaces:
+        assert(isinstance(element, str))
+        assert(len(element) > 0)
     assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(OperatorInterface, pybindgen.CppClass))
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
-    LinearOperatorInterface = namespace.add_class('LinearOperatorInterface', parent=OperatorInterface)
-    LinearOperatorInterface.add_method('linear', retval('bool'), [], is_const=True)
-    return module, LinearOperatorInterface
-
-
-def inject_derived_from_LinearOperatorInterface_with_Inverse(module,
-                                                             exceptions,
-                                                             CONFIG_H,
-                                                             OperatorInterface,
-                                                             LinearOperatorInterface,
-                                                             LinearOperatorName,
-                                                             LinearOperatorInverseName,
-                                                             SourceType,
-                                                             RangeType):
-    assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
-    assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(OperatorInterface, pybindgen.CppClass))
-    assert(isinstance(LinearOperatorInterface, pybindgen.CppClass))
-    assert(isinstance(LinearOperatorName, str))
-    assert(isinstance(LinearOperatorInverseName, str))
-    assert(len(LinearOperatorInverseName.strip()) > 0)
-    assert(len(LinearOperatorName) > 0)
-    assert(isinstance(SourceType.strip(), str))
-    assert(len(SourceType) > 0)
-    assert(isinstance(RangeType, str))
-    assert(len(RangeType.strip()) > 0)
-    # parse names and create namespaces
-    namespace_LinearOperator = module
-    namespaces_LinearOperator = [nspace.strip() for nspace in LinearOperatorName.split('::')[:-1]]
-    LinearOperatorName = LinearOperatorName.split('::')[-1].strip()
-    full_LinearOperatorName = LinearOperatorName
-    if len(namespaces_LinearOperator) > 0:
-        full_LinearOperatorName = '::'.join(namespaces_LinearOperator) + '::' + LinearOperatorName
-    for nspace in namespaces_LinearOperator:
-        namespace_LinearOperator = namespace_LinearOperator.add_cpp_namespace(nspace)
-    namespace_LinearOperatorInverse = module
-    namespaces_LinearOperatorInverse = [nspace.strip() for nspace in LinearOperatorInverseName.split('::')[:-1]]
-    LinearOperatorInverseName = LinearOperatorInverseName.split('::')[-1].strip()
-    full_LinearOperatorInverseName = LinearOperatorInverseName
-    if len(namespaces_LinearOperatorInverse) > 0:
-        full_LinearOperatorInverseName = '::'.join(namespaces_LinearOperatorInverse) + '::' + LinearOperatorInverseName
-    for nspace in namespaces_LinearOperatorInverse:
-        namespace_LinearOperatorInverse = namespace_LinearOperatorInverse.add_cpp_namespace(nspace)
-    LinearOperator = namespace_LinearOperator.add_class(LinearOperatorName, parent=LinearOperatorInterface)
-    LinearOperatorInverse = namespace_LinearOperatorInverse.add_class(LinearOperatorInverseName, parent=OperatorInterface)
-    # create the LinearOperator
-    LinearOperator.add_constructor([])
-    LinearOperator.add_copy_constructor()
-    LinearOperator.add_method('dim_source', retval('unsigned int'), [], is_const=True)
-    LinearOperator.add_method('dim_range', retval('unsigned int'), [], is_const=True)
-    LinearOperator.add_method('type_source', retval('std::string'), [], is_const=True)
-    LinearOperator.add_method('type_range', retval('std::string'), [], is_const=True)
-    LinearOperator.add_method('apply',
-                              None,
-                              [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                               param(RangeType + ' *', 'range', transfer_ownership=False)],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('apply',
-                              None,
-                              [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                               param(RangeType + ' *', 'range', transfer_ownership=False),
-                               param('Dune::Pymor::Parameter', 'mu')],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('apply2',
-                              retval('double'),
-                              [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                               param('const ' + RangeType + ' *', 'range', transfer_ownership=False)],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('apply2',
-                              retval('double'),
-                              [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                               param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                               param('Dune::Pymor::Parameter', 'mu')],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('invert_options',
-                              retval('std::vector< std::string >'),
-                              [],
-                              is_const=True,
-                              throw=[exceptions['not_invertible']])
-    LinearOperator.add_method('invert',
-                              retval('const ' + full_LinearOperatorInverseName + ' *', caller_owns_return=True),
-                              [],
-                              is_const=True,
-                              throw=[exceptions['not_invertible'],
-                                     exceptions['key_is_not_valid']])
-    LinearOperator.add_method('invert',
-                              retval('const ' + full_LinearOperatorInverseName + ' *', caller_owns_return=True),
-                              [param('const std::string', 'type')],
-                              is_const=True,
-                              throw=[exceptions['not_invertible'],
-                                     exceptions['key_is_not_valid']])
-    LinearOperator.add_method('invert',
-                              retval('const ' + full_LinearOperatorInverseName + ' *', caller_owns_return=True),
-                              [param('const std::string', 'type'),
-                               param('const Dune::Pymor::Parameter', 'mu')],
-                              is_const=True,
-                              throw=[exceptions['not_invertible'],
-                                     exceptions['key_is_not_valid']])
-    LinearOperator.add_method('apply_inverse',
-                              None,
-                              [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                               param(SourceType + ' *', 'source', transfer_ownership=False)],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('apply_inverse',
-                              None,
-                              [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                               param(SourceType + ' *', 'source', transfer_ownership=False),
-                               param('const std::string', 'type')],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('apply_inverse',
-                              None,
-                              [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                               param(SourceType + ' *', 'source', transfer_ownership=False),
-                               param('const std::string', 'type'),
-                               param('const Dune::Pymor::Parameter', 'mu')],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('freeze_parameter',
-                              retval(full_LinearOperatorName + ' *', caller_owns_return=True),
-                              [],
-                              is_const=True,
-                              throw=[exceptions['this_is_not_parametric'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperator.add_method('copy',
-                              retval(full_LinearOperatorName + ' * ', caller_owns_return=True),
-                              [],
-                              is_const=True)
-    LinearOperator.add_method('scal', None, [param('const double', 'alpha')])
-    LinearOperator.add_method('axpy',
-                              None,
-                              [param('const double', 'alpha'),
-                               param('const ' + full_LinearOperatorName + ' *', 'x', transfer_ownership=False)],
-                              throw=[exceptions['sizes_do_not_match'],
-                                     exceptions['types_are_not_compatible']])
-    # create the LinearOperatorInverse
-    LinearOperatorInverse.add_method('linear', retval('bool'), [], is_const=True)
-    LinearOperatorInverse.add_method('dim_source', retval('unsigned int'), [], is_const=True)
-    LinearOperatorInverse.add_method('dim_range', retval('unsigned int'), [], is_const=True)
-    LinearOperatorInverse.add_method('type_source', retval('std::string'), [], is_const=True)
-    LinearOperatorInverse.add_method('type_range', retval('std::string'), [], is_const=True)
-    LinearOperatorInverse.add_method('apply',
-                                     None,
-                                     [param('const ' + RangeType + ' *', 'source', transfer_ownership=False),
-                                      param(SourceType + ' *', 'range', transfer_ownership=False)],
-                                     is_const=True,
-                                     throw=[exceptions['types_are_not_compatible'],
-                                            exceptions['you_have_to_implement_this'],
-                                            exceptions['sizes_do_not_match'],
-                                            exceptions['wrong_parameter_type'],
-                                            exceptions['requirements_not_met'],
-                                            exceptions['linear_solver_failed'],
-                                            exceptions['this_does_not_make_any_sense']])
-    LinearOperatorInverse.add_method('apply',
-                                     None,
-                                     [param('const ' + RangeType + ' *', 'source', transfer_ownership=False),
-                                      param(SourceType + ' *', 'range', transfer_ownership=False),
-                                      param('Dune::Pymor::Parameter', 'mu')],
-                                     is_const=True,
-                                     throw=[exceptions['types_are_not_compatible'],
-                                            exceptions['you_have_to_implement_this'],
-                                            exceptions['sizes_do_not_match'],
-                                            exceptions['wrong_parameter_type'],
-                                            exceptions['requirements_not_met'],
-                                            exceptions['linear_solver_failed'],
-                                            exceptions['this_does_not_make_any_sense']])
-    LinearOperatorInverse.add_method('invert_options',
-                                     retval('std::vector< std::string >'),
-                                     [],
-                                     is_const=True,
-                                     throw=[exceptions['not_invertible']])
-    LinearOperatorInverse.add_method('invert',
-                                     retval('const Dune::Pymor::OperatorInterface *', caller_owns_return=True),
-                                     [],
-                                     is_const=True,
-                                     throw=[exceptions['not_invertible'],
-                                            exceptions['key_is_not_valid']])
-    LinearOperatorInverse.add_method('invert',
-                                     retval('const Dune::Pymor::OperatorInterface *', caller_owns_return=True),
-                                     [param('const std::string', 'type')],
-                                     is_const=True,
-                                     throw=[exceptions['not_invertible'],
-                                            exceptions['key_is_not_valid']])
-    LinearOperatorInverse.add_method('invert',
-                                     retval('const Dune::Pymor::OperatorInterface *', caller_owns_return=True),
-                                     [param('const std::string', 'type'),
-                                      param('const Dune::Pymor::Parameter', 'mu')],
-                                     is_const=True,
-                                     throw=[exceptions['not_invertible'],
-                                            exceptions['key_is_not_valid']])
-    LinearOperatorInverse.add_method('apply_inverse',
-                                     None,
-                                     [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                                      param(SourceType + ' *', 'source', transfer_ownership=False)],
-                                     is_const=True,
-                                     throw=[exceptions['types_are_not_compatible'],
-                                            exceptions['you_have_to_implement_this'],
-                                            exceptions['sizes_do_not_match'],
-                                            exceptions['wrong_parameter_type'],
-                                            exceptions['requirements_not_met'],
-                                            exceptions['linear_solver_failed'],
-                                            exceptions['this_does_not_make_any_sense']])
-    LinearOperatorInverse.add_method('apply_inverse',
-                                     None,
-                                     [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                                      param(SourceType + ' *', 'source', transfer_ownership=False),
-                                      param('const std::string', 'type')],
-                                     is_const=True,
-                                     throw=[exceptions['types_are_not_compatible'],
-                                            exceptions['you_have_to_implement_this'],
-                                            exceptions['sizes_do_not_match'],
-                                            exceptions['wrong_parameter_type'],
-                                            exceptions['requirements_not_met'],
-                                            exceptions['linear_solver_failed'],
-                                            exceptions['this_does_not_make_any_sense']])
-    LinearOperatorInverse.add_method('apply_inverse',
-                              None,
-                              [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                               param(SourceType + ' *', 'source', transfer_ownership=False),
-                               param('const std::string', 'type'),
-                               param('const Dune::Pymor::Parameter', 'mu')],
-                              is_const=True,
-                              throw=[exceptions['types_are_not_compatible'],
-                                     exceptions['you_have_to_implement_this'],
-                                     exceptions['sizes_do_not_match'],
-                                     exceptions['wrong_parameter_type'],
-                                     exceptions['requirements_not_met'],
-                                     exceptions['linear_solver_failed'],
-                                     exceptions['this_does_not_make_any_sense']])
-    LinearOperatorInverse.add_method('freeze_parameter',
-                                     retval(full_LinearOperatorInverseName + ' *', caller_owns_return=True),
-                                     [],
-                                     is_const=True,
-                                     throw=[exceptions['this_is_not_parametric'],
-                                            exceptions['you_have_to_implement_this'],
-                                            exceptions['this_does_not_make_any_sense']])
-    return module, LinearOperator, LinearOperatorInverse
-
-
-def inject_AffinelyDecomposedOperatorInterface(module, exceptions, CONFIG_H, OperatorInterface):
-    assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
-    assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(OperatorInterface, pybindgen.CppClass))
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
-    AffinelyDecomposedOperatorInterface = namespace.add_class('AffinelyDecomposedOperatorInterface',
-                                                              parent=OperatorInterface)
-    return module, AffinelyDecomposedOperatorInterface
-
-
-
-def inject_specialization_of_LinearAffinelyDecomposedDefault(module,
-                                                             exceptions,
-                                                             CONFIG_H,
-                                                             AffinelyDecomposedOperatorInterface,
-                                                             LinearOperatorType,
-                                                             LinearOperatorInverseType,
-                                                             SourceType,
-                                                             RangeType):
-    assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
-    assert(isinstance(CONFIG_H, dict))
-    assert(isinstance(AffinelyDecomposedOperatorInterface, pybindgen.CppClass))
-    assert(isinstance(LinearOperatorType, str))
-    assert(len(LinearOperatorType) > 0)
-    assert(isinstance(SourceType.strip(), str))
-    assert(len(SourceType) > 0)
-    assert(isinstance(RangeType, str))
-    assert(len(RangeType.strip()) > 0)
-    namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Operators')
-    Class = namespace.add_class('LinearAffinelyDecomposedDefault',
-                                parent=AffinelyDecomposedOperatorInterface,
-                                template_parameters=[LinearOperatorType])
-    Class.add_constructor([])
-    Class.add_constructor([param(LinearOperatorType + ' *', 'aff', transfer_ownership=True)],
-                                                    throw=[exceptions['requirements_not_met']])
-    Class.add_method('register_component',
-                     None,
-                     [param(LinearOperatorType + ' *', 'aff', transfer_ownership=True)],
-                     throw=[exceptions['this_does_not_make_any_sense'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['types_are_not_compatible']])
-    Class.add_method('register_component',
-                     None,
-                     [param(LinearOperatorType + ' *', 'comp', transfer_ownership=True),
-                      param('const Dune::Pymor::ParameterFunctional *',
-                            'coeff',
-                            transfer_ownership=True)],
-                     throw=[exceptions['this_does_not_make_any_sense'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['types_are_not_compatible'],
-                            exceptions['wrong_parameter_type']])
-    Class.add_method('num_components', retval('unsigned int'), [], is_const=True)
-    Class.add_method('component',
-                     retval(LinearOperatorType + ' *', caller_owns_return=False),
-                     [param('const int', 'ii')],
-                     throw=[exceptions['requirements_not_met'],
-                            exceptions['index_out_of_range']])
-    Class.add_method('component',
-                     retval('const ' + LinearOperatorType + ' *',
-                            caller_owns_return=False),
-                     [param('const int', 'ii')],
+    assert(isinstance(Traits, dict))
+    for key in Traits.keys():
+        assert(isinstance(Traits[key], str))
+        assert(len(Traits[key].strip()) > 0)
+    assert('SourceType' in Traits)
+    SourceType = Traits['SourceType']
+    assert('RangeType' in Traits)
+    RangeType = Traits['RangeType']
+    assert('ComponentType' in Traits)
+    ComponentType = Traits['ComponentType']
+    assert('ScalarType' in Traits)
+    ScalarType = Traits['ScalarType']
+    assert('FrozenType' in Traits)
+    FrozenType = Traits['ComponentType']
+    assert('InverseType' in Traits)
+    InverseType = Traits['InverseType']
+    if template_parameters is not None:
+        if isinstance(template_parameters, str):
+            assert(len(template_parameters.strip()) > 0)
+            template_parameters = [ template_parameters ]
+        elif isinstance(template_parameters, list):
+            for element in template_parameters:
+                assert(isinstance(element, str))
+                assert(len(element.strip()) > 0)
+    module = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Operators')
+    Class = module.add_class('LinearAffinelyDecomposedContainerBased',
+                             parent=[interfaces['Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic'],
+                                     interfaces['Dune::Pymor::Parametric']],
+                             template_parameters=template_parameters)
+    Class.add_method('num_components', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('component_and_return_ptr',
+                     retval(ComponentType + ' *', caller_owns_return=True),
+                     [param('const int', 'qq')],
                      is_const=True,
-                     throw=[exceptions['requirements_not_met'],
-                            exceptions['index_out_of_range']])
-    Class.add_method('coefficient',
-                     retval('const Dune::Pymor::ParameterFunctional *',
-                            caller_owns_return=False),
-                     [param('const int', 'ii')],
+                     throw=[exceptions['PymorException']],
+                     custom_name='component')
+    Class.add_method('coefficient_and_return_ptr',
+                     retval('Dune::Pymor::ParameterFunctional *', caller_owns_return=True),
+                     [param('const int', 'qq')],
                      is_const=True,
-                     throw=[exceptions['requirements_not_met'],
-                            exceptions['index_out_of_range']])
-    Class.add_method('hasAffinePart', retval('bool'), [], is_const=True)
-    Class.add_method('affinePart',
-                     retval(LinearOperatorType + ' *', caller_owns_return=False),
-                     [],
-                     throw=[exceptions['requirements_not_met']])
-    Class.add_method('affinePart',
-                     retval('const ' + LinearOperatorType + ' *', caller_owns_return=False),
+                     throw=[exceptions['PymorException']],
+                     custom_name='coefficient')
+    Class.add_method('has_affine_part', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('affine_part_and_return_ptr',
+                     retval(ComponentType + ' *', caller_owns_return=True),
                      [],
                      is_const=True,
-                     throw=[exceptions['requirements_not_met']])
-    Class.add_method('linear', retval('bool'), [], is_const=True)
-    Class.add_method('dim_source', retval('unsigned int'), [], is_const=True)
-    Class.add_method('dim_range', retval('unsigned int'), [], is_const=True)
-    Class.add_method('type_source', retval('std::string'), [], is_const=True)
-    Class.add_method('type_range', retval('std::string'), [], is_const=True)
-    Class.add_method('apply',
-                     None,
-                     [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                      param(RangeType + ' *', 'range', transfer_ownership=False)],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('apply',
-                     None,
-                     [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                      param(RangeType + ' *', 'range', transfer_ownership=False),
-                      param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('apply2',
-                     retval('double'),
-                     [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                      param('const ' + RangeType + ' *', 'range', transfer_ownership=False)],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('apply2',
-                     retval('double'),
-                     [param('const ' + SourceType + ' *', 'source', transfer_ownership=False),
-                      param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                      param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
+                     throw=[exceptions['PymorException']],
+                     custom_name='affine_part')
+    Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('dim_source', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('dim_range', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply', None,
+                     [param('const ' + SourceType + ' &', 'source'),
+                      param(RangeType + ' &', 'range')],
+                     is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply', None,
+                     [param('const ' + SourceType + ' &', 'source'),
+                      param(RangeType + ' &', 'range'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply_and_return_ptr',
+                     retval(RangeType + ' *', caller_owns_return=True),
+                     [param('const ' + SourceType + ' &', 'source')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+    Class.add_method('apply_and_return_ptr',
+                     retval(RangeType + ' *', caller_owns_return=True),
+                     [param('const ' + SourceType + ' &', 'source'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+    Class.add_method('apply2', ScalarType,
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param('const ' + SourceType + ' &', 'source')],
+                     is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply2', ScalarType,
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param('const ' + SourceType + ' &', 'source'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('invert_options',
                      retval('std::vector< std::string >'),
-                     [],
-                     is_const=True,
-                     throw=[exceptions['not_invertible']])
-    Class.add_method('invert',
-                     retval('const ' + LinearOperatorInverseType + ' *', caller_owns_return=True),
-                     [],
-                     is_const=True,
-                     throw=[exceptions['not_invertible'],
-                            exceptions['key_is_not_valid']])
-    Class.add_method('invert',
-                     retval('const ' + LinearOperatorInverseType + ' *', caller_owns_return=True),
-                     [param('const std::string', 'type')],
-                     is_const=True,
-                     throw=[exceptions['not_invertible'],
-                            exceptions['key_is_not_valid']])
-    Class.add_method('invert',
-                     retval('const ' + LinearOperatorInverseType + ' *', caller_owns_return=True),
-                     [param('const std::string', 'type'),
+                     [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('invert_and_return_ptr',
+                     retval(InverseType + ' *', caller_owns_return=True),
+                     [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Class.add_method('invert_and_return_ptr',
+                     retval(InverseType + ' *', caller_owns_return=True),
+                     [param('const std::string', 'option')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Class.add_method('invert_and_return_ptr',
+                     retval(InverseType + ' *', caller_owns_return=True),
+                     [param('const std::string', 'option'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+    Class.add_method('apply_inverse', None,
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param(SourceType + ' &', 'source')],
+                     is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply_inverse', None,
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param(SourceType + ' &', 'source'),
+                      param('const std::string', 'option')],
+                     is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply_inverse', None,
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param(SourceType + ' &', 'source'),
+                      param('const std::string', 'option'),
                       param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True,
-                     throw=[exceptions['not_invertible'],
-                            exceptions['key_is_not_valid']])
-    Class.add_method('apply_inverse',
-                     None,
-                     [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                      param(SourceType + ' *', 'source', transfer_ownership=False)],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('apply_inverse',
-                     None,
-                     [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                      param(SourceType + ' *', 'source', transfer_ownership=False),
-                      param('const std::string', 'type')],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('apply_inverse',
-                     None,
-                     [param('const ' + RangeType + ' *', 'range', transfer_ownership=False),
-                      param(SourceType + ' *', 'source', transfer_ownership=False),
-                      param('const std::string', 'type'),
+                     is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('apply_inverse_and_return_ptr',
+                     retval(SourceType + ' *', caller_owns_return=True),
+                     [param('const ' + RangeType + ' &', 'range')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Class.add_method('apply_inverse_and_return_ptr',
+                     retval(SourceType + ' *', caller_owns_return=True),
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param('const std::string', 'option')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Class.add_method('apply_inverse_and_return_ptr',
+                     retval(SourceType + ' *', caller_owns_return=True),
+                     [param('const ' + RangeType + ' &', 'range'),
+                      param('const std::string', 'option'),
                       param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True,
-                     throw=[exceptions['types_are_not_compatible'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['sizes_do_not_match'],
-                            exceptions['wrong_parameter_type'],
-                            exceptions['requirements_not_met'],
-                            exceptions['linear_solver_failed'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('freeze_parameter',
-                     retval(LinearOperatorType + ' *', caller_owns_return=True),
-                     [],
-                     is_const=True,
-                     throw=[exceptions['this_is_not_parametric'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['this_does_not_make_any_sense']])
-    Class.add_method('freeze_parameter',
-                     retval(LinearOperatorType + ' *', caller_owns_return=True),
-                     [param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True,
-                     throw=[exceptions['this_is_not_parametric'],
-                            exceptions['you_have_to_implement_this'],
-                            exceptions['this_does_not_make_any_sense']])
-    return module, Class
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+    Class.add_method('freeze_parameter_and_return_ptr',
+                     retval(FrozenType + ' *', caller_owns_return=True),
+                     [param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
+    return Class
