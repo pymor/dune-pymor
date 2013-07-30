@@ -10,7 +10,7 @@ try:
     import stationarylinearexample as example_module
 
     print('creating analytical problem... ', end='')
-    analytical_problem = example_module.Example.AnalyticalProblem()
+    analytical_problem = example_module.Example.AnalyticalProblem(4)
     print('done')
 
     print('discretizing... ', end='')
