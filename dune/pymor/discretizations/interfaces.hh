@@ -19,6 +19,9 @@ namespace Dune {
 namespace Pymor {
 
 
+class StationaryDiscretizationInterfaceDynamic {};
+
+
 template< class Traits >
 class StationaryDiscretizationInterface
   : public Parametric
@@ -51,6 +54,11 @@ public:
     return CRTP::as_imp(*this).get_operator(id);
   }
 
+  OperatorType* get_operator_and_return_ptr(const std::string id) const
+  {
+    return new OperatorType(get_operator(id));
+  }
+
   std::vector< std::string > available_functionals() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_functionals());
@@ -63,10 +71,20 @@ public:
     return CRTP::as_imp(*this).get_functional(id);
   }
 
+  FunctionalType* get_functional_and_return_ptr(const std::string id) const
+  {
+    return new FunctionalType(get_functional(id));
+  }
+
   VectorType create_vector() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).create_vector());
     return CRTP::as_imp(*this).create_vector();
+  }
+
+  VectorType* create_vector_and_return_ptr() const
+  {
+    return new VectorType(create_vector());
   }
 
   std::vector< std::string > solver_options() const
@@ -84,6 +102,18 @@ public:
   void solve(VectorType& vector, const Parameter mu = Parameter()) const
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solve(vector, mu));
+  }
+
+  VectorType solve(const Parameter mu = Parameter()) const
+  {
+    VectorType ret = create_vector();
+    solve(ret, mu);
+    return ret;
+  }
+
+  VectorType* solve_and_return_ptr(const Parameter mu = Parameter()) const
+  {
+    return new VectorType(solve(mu));
   }
 
   void visualize(const VectorType& vector, const std::string filename, const std::string name) const

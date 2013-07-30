@@ -18,10 +18,14 @@ namespace Dune {
 namespace Pymor {
 
 
+class OperatorInterfaceDynamic {};
+
+
 template< class Traits >
 class OperatorInterface
   : public Parametric
-  , public CRTPInterface< OperatorInterface< Traits >, Traits >
+  , public OperatorInterfaceDynamic
+  , CRTPInterface< OperatorInterface< Traits >, Traits >
 {
   typedef CRTPInterface< OperatorInterface< Traits >, Traits > CRTP;
 public:
@@ -83,6 +87,11 @@ public:
     return range;
   }
 
+  RangeType* apply_and_return_ptr(const SourceType& source, const Parameter mu = Parameter()) const
+  {
+    return new RangeType(apply(source, mu));
+  }
+
   /**
    * \note  This default implementation of apply2 creates a temporary vector. Any derived class which can do better
    *        should implement this method!
@@ -107,6 +116,11 @@ public:
     return CRTP::as_imp(*this).invert(option, mu);
   }
 
+  InverseType* invert_and_return_ptr(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
+  {
+    return new InverseType(invert(option, mu));
+  }
+
   void apply_inverse(const RangeType& range,
                      SourceType& source,
                      const std::string option = invert_options()[0],
@@ -124,6 +138,13 @@ public:
     return source;
   }
 
+  SourceType* apply_inverse_and_return_ptr(const RangeType& range,
+                                           const std::string option = invert_options()[0],
+                                           const Parameter mu = Parameter()) const
+  {
+    return new SourceType(apply_inverse(range, option, mu));
+  }
+
   /**
    * \note  May throw Exception::this_is_not_parametric.
    */
@@ -132,13 +153,22 @@ public:
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).freeze_parameter(mu));
     return CRTP::as_imp(*this).freeze_parameter(mu);
   }
+
+  FrozenType* freeze_parameter_and_return_ptr(const Parameter mu = Parameter()) const
+  {
+    return new FrozenType(freeze_parameter(mu));
+  }
 }; // class OperatorInterface
+
+
+class AffinelyDecomposedOperatorInterfaceDynamic {};
 
 
 template< class Traits >
 class AffinelyDecomposedOperatorInterface
-  : public CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits >
+  : CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits >
   , public OperatorInterface< Traits >
+  , public AffinelyDecomposedOperatorInterfaceDynamic
 {
   typedef CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits > CRTP;
   typedef OperatorInterface< Traits > BaseType;
@@ -171,6 +201,11 @@ public:
     return CRTP::as_imp(*this).component(qq);
   }
 
+  ComponentType* component_and_return_ptr(const int qq) const
+  {
+    return new ComponentType(component(qq));
+  }
+
   /**
    * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
    */
@@ -178,6 +213,11 @@ public:
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
     return CRTP::as_imp(*this).coefficient(qq);
+  }
+
+  ParameterFunctional* coefficient_and_return_ptr(const int qq) const
+  {
+    return new ParameterFunctional(coefficient(qq));
   }
 
   bool has_affine_part() const
@@ -193,6 +233,11 @@ public:
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).affine_part());
     return CRTP::as_imp(*this).affine_part();
+  }
+
+  ComponentType* affine_part_and_return_ptr() const
+  {
+    return new ComponentType(affine_part());
   }
 }; // class AffinelyDecomposedOperatorInterface
 

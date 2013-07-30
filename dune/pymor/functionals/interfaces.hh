@@ -17,10 +17,13 @@ namespace Dune {
 namespace Pymor {
 
 
+class FunctionalInterfaceDynamic {};
+
 template< class Traits >
 class FunctionalInterface
-  : public CRTPInterface< FunctionalInterface< Traits >, Traits >
+  : CRTPInterface< FunctionalInterface< Traits >, Traits >
   , public Parametric
+  , public FunctionalInterfaceDynamic
 {
 protected:
   typedef CRTPInterface< FunctionalInterface< Traits >, Traits > CRTP;
@@ -64,6 +67,8 @@ public:
   }
 }; // class FunctionalInterface
 
+
+class AffinelyDecomposedFunctionalInterfaceDynamic {};
 
 template< class Traits >
 class AffinelyDecomposedFunctionalInterface

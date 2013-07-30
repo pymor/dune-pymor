@@ -75,9 +75,19 @@ public:
     return ComponentType(affinelyDecomposedVector_.component(qq));
   }
 
+  ComponentType* component_and_return_ptr(const int qq)
+  {
+    return new ComponentType(component(qq));
+  }
+
   ParameterFunctional coefficient(const int qq) const
   {
     return ParameterFunctional(*(affinelyDecomposedVector_.coefficient(qq)));
+  }
+
+  ParameterFunctional* coefficient_and_return_ptr(const int qq) const
+  {
+    return new ParameterFunctional(coefficient(qq));
   }
 
   bool has_affine_part() const
@@ -88,6 +98,11 @@ public:
   ComponentType affine_part() const
   {
     return ComponentType(affinelyDecomposedVector_.affine_part());
+  }
+
+  ComponentType* affine_part_and_return_ptr()
+  {
+    return new ComponentType(affine_part());
   }
 
   bool linear() const
@@ -122,6 +137,11 @@ public:
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
                        << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
     return FrozenType(new VectorType(affinelyDecomposedVector_.freeze_parameter(mu)));
+  }
+
+  FrozenType* freeze_parameter_and_return_ptr(const Parameter mu = Parameter()) const
+  {
+    return new FrozenType(freeze_parameter(mu));
   }
 
 private:
