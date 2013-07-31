@@ -35,7 +35,12 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_config.h.in ${CMAKE_CURR
 add_dune_modules(
   pymor
   stuff
+  gdt
   fem
+  fem-localfunctions
+  pdelab
+  localfunctions
+  grid-multiscale
   grid
   geometry
   istl
