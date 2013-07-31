@@ -15,6 +15,8 @@
   #include <dune/common/float_cmp.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
+#include <dune/stuff/common/type_utils.hh>
+
 #include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/common/exceptions.hh>
 
@@ -35,6 +37,8 @@ class ContainerInterface
 public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType   ScalarType;
+
+  static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
 
   /**
    * \brief   Creates a (deep) copy of the underlying resource

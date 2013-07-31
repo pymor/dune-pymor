@@ -6,6 +6,8 @@
 #ifndef DUNE_PYMOR_FUNCTIONALS_INTERFACES_HH
 #define DUNE_PYMOR_FUNCTIONALS_INTERFACES_HH
 
+#include <dune/stuff/common/type_utils.hh>
+
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -32,6 +34,14 @@ public:
   typedef typename Traits::SourceType   SourceType;
   typedef typename Traits::ScalarType   ScalarType;
   typedef typename Traits::FrozenType   FrozenType;
+
+  static_assert(std::is_base_of< LA::VectorInterface< typename SourceType::Traits >, SourceType >::value,
+                "SourceType has to be derived from LA::VectorInterface!");
+
+  static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
+  static std::string type_source() {  return Stuff::Common::Typename< SourceType >::value(); }
+  static std::string type_scalar() {  return Stuff::Common::Typename< ScalarType >::value(); }
+  static std::string type_frozen() {  return Stuff::Common::Typename< FrozenType >::value(); }
 
   FunctionalInterface(const ParameterType mu = ParameterType())
     : Parametric(mu)

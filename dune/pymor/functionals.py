@@ -37,6 +37,14 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
                              parent=[interfaces['Dune::Pymor::FunctionalInterfaceDynamic'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                   exceptions['DuneException']])
+    Class.add_method('type_source', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                     exceptions['DuneException']])
+    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                     exceptions['DuneException']])
+    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                     exceptions['DuneException']])
     Class.add_method('linear', retval('bool'), [], is_const=True)
     Class.add_method('dim_source', retval('unsigned int'), [], is_const=True)
     Class.add_method('apply',
@@ -91,6 +99,14 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                              parent=[interfaces['Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                   exceptions['DuneException']])
+    Class.add_method('type_source', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                     exceptions['DuneException']])
+    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                     exceptions['DuneException']])
+    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
+                                                                                     exceptions['DuneException']])
     Class.add_method('num_components', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('component_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),

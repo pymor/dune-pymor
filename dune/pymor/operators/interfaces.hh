@@ -6,7 +6,7 @@
 #ifndef DUNE_PYMOR_OPERATORS_INTERFACES_HH
 #define DUNE_PYMOR_OPERATORS_INTERFACES_HH
 
-#include <type_traits>
+#include <dune/stuff/common/type_utils.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/common/crtp.hh>
@@ -40,6 +40,13 @@ public:
                 "SourceType has to be derived from LA::VectorInterface!");
   static_assert(std::is_base_of< LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,
                 "RangeType has to be derived from LA::VectorInterface!");
+
+  static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
+  static std::string type_source() {  return Stuff::Common::Typename< SourceType >::value(); }
+  static std::string type_range() {   return Stuff::Common::Typename< RangeType >::value(); }
+  static std::string type_scalar() {  return Stuff::Common::Typename< ScalarType >::value(); }
+  static std::string type_frozen() {  return Stuff::Common::Typename< FrozenType >::value(); }
+  static std::string type_inverse() { return Stuff::Common::Typename< InverseType >::value(); }
 
   OperatorInterface(const ParameterType mu = ParameterType())
     : Parametric(mu)
