@@ -56,6 +56,8 @@ set( COMMON_LIBS
      -lpthread
 )
 
+include(PymorUtils)
+
 add_subdirectory(doc)
 add_subdirectory(dune)
 add_subdirectory(examples)
