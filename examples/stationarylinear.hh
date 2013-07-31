@@ -15,7 +15,7 @@
 #include <dune/pymor/functionals/default.hh>
 #include <dune/pymor/functionals/affine.hh>
 
-#include <dune/pymor/all.hh>
+#include <dune/pymor/python-bindings.hh>
 
 namespace Example {
 

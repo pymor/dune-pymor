@@ -3,8 +3,8 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_PYMOR_ALL_HH
-#define DUNE_PYMOR_ALL_HH
+#ifndef DUNE_PYMOR_PYTHON_BINDINGS_HH
+#define DUNE_PYMOR_PYTHON_BINDINGS_HH
 
 #include <dune/pymor/discretizations/interfaces.hh>
 #include <dune/pymor/functionals/affine.hh>
@@ -22,4 +22,4 @@
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 
-#endif // DUNE_PYMOR_ALL_HH
+#endif // DUNE_PYMOR_PYTHON_BINDINGS_HH
