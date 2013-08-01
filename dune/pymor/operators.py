@@ -89,18 +89,18 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                                           parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'],
                                           template_parameters=inverse_template_parameters)
     # fill the operator
-    Operator.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                      exceptions['DuneException']])
-    Operator.add_method('type_source', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                        exceptions['DuneException']])
-    Operator.add_method('type_range', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                       exceptions['DuneException']])
-    Operator.add_method('type_scalar', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                        exceptions['DuneException']])
-    Operator.add_method('type_inverse', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                         exceptions['DuneException']])
-    Operator.add_method('type_frozen', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                        exceptions['DuneException']])
+    Operator.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
+                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Operator.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
+                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Operator.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
+                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Operator.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
+                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Operator.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
+                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Operator.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
+                        throw=[exceptions['PymorException'], exceptions['DuneException']])
     Operator.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
     Operator.add_method('dim_source', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
     Operator.add_method('dim_range', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
@@ -133,7 +133,7 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                         is_const=True, throw=[exceptions['PymorException']])
     Operator.add_method('invert_options',
                         retval('std::vector< std::string >'),
-                        [], is_const=True, throw=[exceptions['PymorException']])
+                        [], is_const=True, is_static=True, throw=[exceptions['PymorException']])
     Operator.add_method('invert_and_return_ptr',
                         retval(operator_InverseType + ' *', caller_owns_return=True),
                         [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
@@ -181,18 +181,18 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                         [param('Dune::Pymor::Parameter', 'mu')],
                         is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
     # fill the inverse
-    Inverse.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                     exceptions['DuneException']])
-    Inverse.add_method('type_source', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                       exceptions['DuneException']])
-    Inverse.add_method('type_range', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                      exceptions['DuneException']])
-    Inverse.add_method('type_scalar', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                       exceptions['DuneException']])
-    Inverse.add_method('type_inverse', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                        exceptions['DuneException']])
-    Inverse.add_method('type_frozen', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                       exceptions['DuneException']])
+    Inverse.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
+                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Inverse.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
+                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Inverse.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
+                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Inverse.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
+                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Inverse.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
+                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Inverse.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
+                       throw=[exceptions['PymorException'], exceptions['DuneException']])
     Inverse.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
     Inverse.add_method('dim_source', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
     Inverse.add_method('dim_range', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
@@ -317,18 +317,18 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
                              parent=[interfaces['Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
-    Class.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                   exceptions['DuneException']])
-    Class.add_method('type_source', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                     exceptions['DuneException']])
-    Class.add_method('type_range', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                    exceptions['DuneException']])
-    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                     exceptions['DuneException']])
-    Class.add_method('type_inverse', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                      exceptions['DuneException']])
-    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                     exceptions['DuneException']])
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Class.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Class.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
     Class.add_method('num_components', retval('unsigned int'), [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('component_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),

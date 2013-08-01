@@ -46,8 +46,8 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_constructor([param('int', 'size')])
     Class.add_constructor([param('int', 'size'), param(ScalarType, 'value')])
     # what we want from ContainerInterface
-    Class.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                   exceptions['DuneException']])
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
     Class.add_method('copy_and_return_ptr',
                      retval(ThisType + ' *', caller_owns_return=True),
                      [],
@@ -170,8 +170,8 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                                 template_parameters=template_parameters)
     Class.add_constructor([])
     # what we want from ContainerInterface
-    Class.add_method('type_this', retval('std::string'), [], is_const=True, throw=[exceptions['PymorException'],
-                                                                                   exceptions['DuneException']])
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
+                     throw=[exceptions['PymorException'], exceptions['DuneException']])
     Class.add_method('copy_and_return_ptr',
                      retval(ThisType + ' *', caller_owns_return=True),
                      [],
