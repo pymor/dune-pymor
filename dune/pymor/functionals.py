@@ -7,6 +7,11 @@
 import pybindgen
 from pybindgen import retval, param
 
+import numpy as np
+
+from pymor.la import NumpyVectorArray
+from pymor.operators import LincombOperatorInterface
+from pymor.operators.basic import OperatorBase
 
 def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
@@ -59,6 +64,57 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
                      is_const=True,
                      throw=[exceptions['PymorException']])
     return Class
+
+
+class WrappedFunctionalBase(OperatorBase):
+
+    wrapped_type = None
+
+    vec_type_source = None
+
+    type_source = None
+    type_range = NumpyVectorArray
+
+    dim_range = 1
+
+    _wrapper = None
+
+    def __init__(self, op):
+        assert isinstance(op, self.wrapped_type)
+        self._impl = op
+        self.dim_source = op.dim_source()
+        self.linear = op.linear()
+        if hasattr(op, 'parametric') and op.parametric():
+            pt = self._wrapper.parameter_type(op.parameter_type())
+            self.build_parameter_type(pt, local_global=True)
+
+    def apply(self, U, ind=None, mu=None):
+        assert isinstance(U, self.type_source)
+        vectors = U._list if ind is None else [U._list[i] for i in ind]
+        if self.parametric:
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            R = np.array([self._impl.apply(v._impl, mu) for v in vectors])[..., np.newaxis]
+            return NumpyVectorArray(R, copy=False)
+        else:
+            assert self.check_parameter(mu)
+            R = np.array([self._impl.apply(v._impl) for v in vectors])[..., np.newaxis]
+            return NumpyVectorArray(R, copy=False)
+
+
+def wrap_functional(cls, wrapper):
+
+    class WrappedFunctional(WrappedFunctionalBase):
+        wrapped_type = cls
+        vec_type_source = wrapper[cls.type_source()]
+        type_source = wrapper.vector_array(vec_type_source)
+        _wrapper = wrapper
+
+        def __init__(self, op):
+            WrappedFunctionalBase.__init__(self, op)
+            self.lock()
+
+    WrappedFunctional.__name__ = cls.__name__
+    return WrappedFunctional
 
 
 def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
@@ -147,3 +203,36 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                      throw=[exceptions['PymorException']],
                      custom_name='freeze_parameter')
     return Class
+
+
+def wrap_affinely_decomposed_functional(cls, wrapper):
+
+    class WrappedFunctional(LincombOperatorInterface, WrappedFunctionalBase):
+        wrapped_type = cls
+        vec_type_source = wrapper[cls.type_source()]
+        type_source = wrapper.vector_array(vec_type_source)
+        _wrapper = wrapper
+
+        def __init__(self, op):
+            WrappedFunctionalBase.__init__(self, op)
+            operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
+            coefficients = [op.coefficient(i) for i in xrange(op.num_components())]
+            if op.has_affine_part():
+                operators.append(self._wrapper[op.affine_part()])
+                coefficients.append(1.)
+                self.affine_part = True
+            else:
+                self.affine_part = False
+            self.operators = tuple(operators)
+            self.coefficients = tuple(coefficients)
+            self.lock()
+
+        def evaluate_coefficients(self, mu):
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            if self.affine_part:
+                return [c.evaluate(mu) for c in self.coefficients[:-1]] + [1.]
+            else:
+                return [c.evaluate(mu) for c in self.coefficients]
+
+    WrappedFunctional.__name__ = cls.__name__
+    return WrappedFunctional

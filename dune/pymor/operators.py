@@ -4,8 +4,13 @@
 # Copyright Holders: Felix Albrecht, Stephan Rave
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
+from collections import OrderedDict
+
 import pybindgen
 from pybindgen import retval, param
+
+from pymor.operators import LincombOperatorInterface
+from pymor.operators.basic import OperatorBase
 
 
 def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONFIG_H,
@@ -275,6 +280,82 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
     return Operator, Inverse
 
 
+class WrappedOperatorBase(OperatorBase):
+
+    wrapped_type = None
+
+    vec_type_source = None
+    vec_type_range = None
+
+    type_source = None
+    type_range = None
+
+    _wrapper = None
+
+    def __init__(self, op):
+        assert isinstance(op, self.wrapped_type)
+        self._impl = op
+        self.dim_source = int(op.dim_source())
+        self.dim_range = int(op.dim_range())
+        self.linear = op.linear()
+        if hasattr(op, 'parametric') and op.parametric():
+            pt = self._wrapper.parameter_type(op.parameter_type())
+            self.build_parameter_type(pt, local_global=True)
+
+    @property
+    def invert_options(self):
+        return OrderedDict([(k, {'type': k}) for k in list(self._impl.invert_options())])
+
+    def apply(self, U, ind=None, mu=None):
+        assert isinstance(U, self.type_source)
+        vectors = U._list if ind is None else [U._list[i] for i in ind]
+        if self.parametric:
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            return self.type_range([self.vec_type_range(self._impl.apply(v._impl, mu)) for v in vectors],
+                                   dim=self.dim_range)
+        else:
+            assert self.check_parameter(mu)
+            return self.type_range([self.vec_type_range(self._impl.apply(v._impl)) for v in vectors],
+                                   dim=self.dim_range)
+
+    def apply_inverse(self, U, ind=None, mu=None, options=None):
+        assert isinstance(U, self.type_range)
+        assert options is None or isinstance(options, str) \
+            or (isinstance(options, dict) and options.keys() == ['type'] and
+                options['type'] in self.invert_options.keys())
+        if isinstance(options, dict):
+            options = options['type']
+        elif options is None:
+            options = next(self.invert_options.iterkeys())
+        vectors = U._list if ind is None else [U._list[i] for i in ind]
+        if self.parametric:
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
+                                     for v in vectors], dim=self.dim_source)
+        else:
+            assert self.check_parameter(mu)
+            return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options))
+                                     for v in vectors], dim=self.dim_source)
+
+
+def wrap_operator(cls, wrapper):
+
+    class WrappedOperator(WrappedOperatorBase):
+        wrapped_type = cls
+        vec_type_source = wrapper[cls.type_source()]
+        vec_type_range = wrapper[cls.type_range()]
+        type_source = wrapper.vector_array(vec_type_source)
+        type_range = wrapper.vector_array(vec_type_range)
+        _wrapper = wrapper
+
+        def __init__(self, op):
+            WrappedOperatorBase.__init__(self, op)
+            self.lock()
+
+    WrappedOperator.__name__ = cls.__name__
+    return WrappedOperator
+
+
 def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
                                                                 exceptions,
                                                                 interfaces,
@@ -429,3 +510,38 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
                      [param('Dune::Pymor::Parameter', 'mu')],
                      is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
     return Class
+
+
+def wrap_affinely_decomposed_operator(cls, wrapper):
+
+    class WrappedOperator(LincombOperatorInterface, WrappedOperatorBase):
+        wrapped_type = cls
+        vec_type_source = wrapper[cls.type_source()]
+        vec_type_range = wrapper[cls.type_range()]
+        type_source = wrapper.vector_array(vec_type_source)
+        type_range = wrapper.vector_array(vec_type_range)
+        _wrapper = wrapper
+
+        def __init__(self, op):
+            WrappedOperatorBase.__init__(self, op)
+            operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
+            coefficients = [op.coefficient(i) for i in xrange(op.num_components())]
+            if op.has_affine_part():
+                operators.append(self._wrapper[op.affine_part()])
+                coefficients.append(1.)
+                self.affine_part = True
+            else:
+                self.affine_part = False
+            self.operators = tuple(operators)
+            self.coefficients = tuple(coefficients)
+            self.lock()
+
+        def evaluate_coefficients(self, mu):
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            if self.affine_part:
+                return [c.evaluate(mu) for c in self.coefficients[:-1]] + [1.]
+            else:
+                return [c.evaluate(mu) for c in self.coefficients]
+
+    WrappedOperator.__name__ = cls.__name__
+    return WrappedOperator

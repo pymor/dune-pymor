@@ -7,6 +7,8 @@
 import pybindgen
 from pybindgen import retval, param
 
+from pymor import defaults
+from pymor.la.listvectorarray import VectorInterface, ListVectorArray
 
 def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
@@ -199,3 +201,86 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      is_const=True,
                      throw=[exceptions['PymorException']])
     return module, Class
+
+
+def wrap_vector(cls):
+
+    class WrappedVector(VectorInterface):
+
+        wrapped_type = cls
+
+        def __init__(self, v):
+            self._impl = v
+
+        def zeros(cls, dim):
+            return cls(cls.wrapped_type(dim))
+
+        @property
+        def dim(self):
+            return self._impl.dim()
+
+        def copy(self):
+            return type(self)(self._impl.copy())
+
+        def almost_equal(self, other, rtol=None, atol=0):
+            assert atol is None or atol == 0, 'Not supported'
+            assert type(other) == type(self)
+            rtol = defaults.float_cmp_tol if rtol is None else rtol
+            return self._impl.almost_equal(other._impl, rtol)
+
+        def scal(self, alpha):
+            self._impl.scal(alpha)
+
+        def axpy(self, alpha, x):
+            assert type(x) == type(self)
+            self._impl.axpy(alpha, x._impl)
+
+        def dot(self, other):
+            assert type(other) == type(self)
+            return self._impl.dot(other._impl)
+
+        def l1_norm(self):
+            return self._impl.l1_norm()
+
+        def l2_norm(self):
+            return self._impl.l2_norm()
+
+        def sup_norm(self):
+            return self._impl.sup_norm()
+
+        def components(self, component_indices):
+            if isinstance(component_indices, np.ndarray):
+                component_indices = list(component_indices)
+            return np.array(list(self._impl.components(component_indices)), ndmin=1)
+
+        def amax(self):
+            return tuple(self._impl.amax())
+
+        def __add__(self, other):
+            assert type(other) == type(self)
+            return type(self)(self._impl.add(other._impl))
+
+        def __iadd__(self, other):
+            assert type(other) == type(self)
+            self._impl.iadd(other._impl)
+            return self
+
+        __radd__ = __add__
+
+        def __sub__(self, other):
+            assert type(other) == type(self)
+            return type(self)(self._impl.sub(other._impl))
+
+        def __isub__(self, other):
+            assert type(other) == type(self)
+            self._impl.isub(other._impl)
+            return self
+
+    WrappedVector.__name__ = cls.__name__
+
+    class VectorArray(ListVectorArray):
+        vector_type = WrappedVector
+
+    VectorArray.__name__ = '{}_ListVectorArray'.format(cls.__name__)
+
+    return WrappedVector, VectorArray

@@ -4,8 +4,16 @@
 # Copyright Holders: Felix Albrecht, Stephan Rave
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
+from tempfile import mkstemp
+import os
+import subprocess
+
 import pybindgen
 from pybindgen import retval, param
+
+from pymor.discretizations import DiscretizationInterface, StationaryDiscretization
+from pymor.la import NumpyVectorArray
+from pymor.tools.frozendict import FrozenDict
 
 
 def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces, CONFIG_H,
@@ -103,3 +111,57 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                       param('const std::string', 'name')],
                      is_const=True, throw=[exceptions['PymorException']])
     return Class
+
+
+def wrap_stationary_discretization(cls, wrapper):
+
+    class WrappedDiscretization(DiscretizationInterface):
+
+        wrapped_type = cls
+
+        _wrapper = wrapper
+
+        def __init__(self, d):
+            self._impl = d
+            operators = {'operator': self._wrapper[d.get_operator('lhs')],
+                         'rhs': self._wrapper[d.get_functional('rhs')]}
+            self.operators = FrozenDict(operators)
+            self.operator = operators['operator']
+            self.rhs = operators['rhs']
+            self.products = None
+            self.linear = all(op.linear for op in operators.itervalues())
+            self.build_parameter_type(inherits=operators.values())
+            assert self.parameter_type == self._wrapper.parameter_type(d.parameter_type())
+            self.lock()
+
+        with_arguments = StationaryDiscretization.with_arguments
+
+        def with_(self, **kwargs):
+            assert 'operators' in kwargs
+            operators = kwargs.pop('operators')
+            assert set(operators.keys()) == {'operator', 'rhs'}
+            assert all(op.type_source == NumpyVectorArray for op in operators.itervalues())
+            assert all(op.type_range == NumpyVectorArray for op in operators.itervalues())
+            d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
+            return d.with_(**kwargs)
+
+        def solve(self, mu=None):
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
+
+        _solve = solve
+
+        def visualize(self, U, file_name=None, name='solution', delete=True):
+            assert len(U) == 1
+            if file_name is None:
+                _, file_name = mkstemp(suffix='.vtu')
+            if not file_name.endswith('.vtu'):
+                file_name = file_name + '.vtu'
+            self._impl.visualize(U._list[0]._impl, file_name[:-4], name)
+            subprocess.call(['paraview', file_name])
+            if delete:
+                os.remove(file_name)
+
+
+    WrappedDiscretization.__name__ = cls.__name__
+    return WrappedDiscretization
