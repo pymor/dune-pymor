@@ -157,7 +157,10 @@ def wrap_stationary_discretization(cls, wrapper):
                 return d
 
         def solve(self, mu=None):
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            mu = self.parse_parameter(mu)
+            if not self.logging_disabled:
+                self.logger.info('Solving {} for {} ...'.format(self.name, mu))
+            mu = self._wrapper.dune_parameter(mu)
             return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
 
         _solve = solve
