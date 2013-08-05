@@ -141,13 +141,20 @@ def wrap_stationary_discretization(cls, wrapper):
         with_arguments = StationaryDiscretization.with_arguments
 
         def with_(self, **kwargs):
-            assert 'operators' in kwargs
-            operators = kwargs.pop('operators')
-            assert set(operators.keys()) == {'operator', 'rhs'}
-            assert all(op.type_source == NumpyVectorArray for op in operators.itervalues())
-            assert all(op.type_range == NumpyVectorArray for op in operators.itervalues())
-            d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
-            return d.with_(**kwargs)
+            assert 'operators' in kwargs or kwargs.keys() == ['parameter_space']
+            if 'operators' in kwargs:
+                operators = kwargs.pop('operators')
+                assert set(operators.keys()) == {'operator', 'rhs'}
+                assert all(op.type_source == NumpyVectorArray for op in operators.itervalues())
+                assert all(op.type_range == NumpyVectorArray for op in operators.itervalues())
+                d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
+                return d.with_(**kwargs)
+            else:
+                d = type(self)(self._impl)
+                d.unlock()
+                d.parameter_space = kwargs['parameter_space']
+                d.lock()
+                return d
 
         def solve(self, mu=None):
             mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
