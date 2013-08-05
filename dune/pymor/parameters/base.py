@@ -124,19 +124,29 @@ def inject_Parametric(module, exceptions, CONFIG_H):
     assert(isinstance(CONFIG_H, dict))
     namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
     Parametric = namespace.add_class('Parametric')
-    Parametric.add_constructor([])
-    Parametric.add_constructor([param('Dune::Pymor::ParameterType', 'tt')])
-    Parametric.add_constructor([param('std::string', 'kk'),
-                                param('int', 'vv')])
-    Parametric.add_constructor([param('std::vector< std::string >', 'kk'),
-                                param('std::vector< int >', 'vv')])
-    Parametric.add_copy_constructor()
+
+    ###################################################################
+
+    # The following code leads to segfaults of the python interpreter.
+    # Not excactly sure why, but probably not needed on the python side
+    # anyway.
+
+    # Parametric.add_constructor([])
+    # Parametric.add_constructor([param('Dune::Pymor::ParameterType', 'tt')])
+    # Parametric.add_constructor([param('std::string', 'kk'),
+    #                             param('int', 'vv')])
+    # Parametric.add_constructor([param('std::vector< std::string >', 'kk'),
+    #                             param('std::vector< int >', 'vv')])
+    # Parametric.add_copy_constructor()
+
+    ###################################################################
+
     Parametric.add_method('parameter_type',
                           retval('const Dune::Pymor::ParameterType&'),
                           [],
                           is_const=True)
     Parametric.add_method('parametric', retval('bool'), [], is_const=True)
-    Parametric.allow_subclassing = True
+    # Parametric.allow_subclassing = True
     return module, Parametric
 
 
