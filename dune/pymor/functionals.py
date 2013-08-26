@@ -65,11 +65,12 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
                       param('const Dune::Pymor::Parameter', 'mu')],
                      is_const=True,
                      throw=[exceptions['PymorException']])
-    Class.add_method('as_vector',
-                     retval('const ' + ContainerType + ' &'),
+    Class.add_method('as_vector_and_return_ptr',
+                     retval(ContainerType + ' *', caller_owns_return=True),
                      [],
                      is_const=True,
-                     throw=[exceptions['PymorException']])
+                     throw=[exceptions['PymorException']],
+                     custom_name='as_vector')
     return Class
 
 

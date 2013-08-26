@@ -94,9 +94,9 @@ public:
     return vector_;
   }
 
-  const ContainerType& as_vector() const
+  ContainerType* as_vector_and_return_copy() const
   {
-    return *vector_;
+    return new ContainerType(vector_.copy());
   }
 
 private:
