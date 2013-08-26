@@ -93,6 +93,12 @@ public:
   {
     return vector_;
   }
+
+  const ContainerType& as_vector() const
+  {
+    return *vector_;
+  }
+
 private:
   std::shared_ptr< const ContainerType > vector_;
 }; // class VectorBased

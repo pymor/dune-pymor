@@ -29,6 +29,8 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
     SourceType = Traits['SourceType']
     assert('ScalarType' in Traits)
     ScalarType = Traits['ScalarType']
+    assert('ContainerType' in Traits)
+    ContainerType = Traits['ContainerType']
     if template_parameters is not None:
         if isinstance(template_parameters, str):
             assert(len(template_parameters.strip()) > 0)
@@ -61,6 +63,11 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source'),
                       param('const Dune::Pymor::Parameter', 'mu')],
+                     is_const=True,
+                     throw=[exceptions['PymorException']])
+    Class.add_method('as_vector',
+                     retval('const ' + ContainerType + ' &'),
+                     [],
                      is_const=True,
                      throw=[exceptions['PymorException']])
     return Class

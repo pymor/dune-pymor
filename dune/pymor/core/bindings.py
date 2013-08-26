@@ -119,7 +119,8 @@ def inject_lib_dune_pymor(module):
     _ = dune.pymor.functionals.inject_VectorBasedImplementation(
         module, exceptions, interfaces, CONFIG_H,
         Traits={'SourceType' : 'Dune::Pymor::LA::DuneDynamicVector< double >',
-                'ScalarType' : 'double'},
+                'ScalarType' : 'double',
+                'ContainerType' : 'Dune::Pymor::LA::DuneDynamicVector< double >'},
         template_parameters='Dune::Pymor::LA::DuneDynamicVector< double >')
     _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
         module, exceptions, interfaces, CONFIG_H,
@@ -133,7 +134,8 @@ def inject_lib_dune_pymor(module):
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : 'Dune::Pymor::LA::EigenDenseVector< double >',
-                    'ScalarType' : 'double'},
+                    'ScalarType' : 'double',
+                    'ContainerType' : 'Dune::Pymor::LA::EigenDenseVector< double >'},
             template_parameters='Dune::Pymor::LA::EigenDenseVector< double >')
         _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
