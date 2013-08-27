@@ -85,9 +85,9 @@ public:
 
   VectorType create_vector() const;
 
-  std::vector< std::string > solver_options() const;
+//  std::vector< std::string > solver_options() const;
 
-  std::string solver_options(const std::string context) const;
+//  std::string solver_options(const std::string context) const;
 
   void solve(VectorType& vector, const Dune::Pymor::Parameter mu = Dune::Pymor::Parameter()) const;
 

@@ -87,17 +87,17 @@ public:
     return new VectorType(create_vector());
   }
 
-  std::vector< std::string > solver_options() const
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options());
-    return CRTP::as_imp(*this).solver_options();
-  }
+//  std::vector< std::string > solver_options() const
+//  {
+//    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options());
+//    return CRTP::as_imp(*this).solver_options();
+//  }
 
-  std::string solver_options(const std::string context) const
-  {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options(context));
-    return CRTP::as_imp(*this).solver_options(context);
-  }
+//  std::string solver_options(const std::string context) const
+//  {
+//    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options(context));
+//    return CRTP::as_imp(*this).solver_options(context);
+//  }
 
   void solve(VectorType& vector, const Parameter mu = Parameter()) const
   {

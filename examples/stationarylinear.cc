@@ -234,18 +234,18 @@ typename SimpleDiscretization::VectorType SimpleDiscretization::create_vector() 
   return VectorType(dim_);
 }
 
-std::vector< std::string > SimpleDiscretization::solver_options() const
-{
-  return { "problem" };
-}
+//std::vector< std::string > SimpleDiscretization::solver_options() const
+//{
+//  return { "problem" };
+//}
 
-std::string SimpleDiscretization::solver_options(const std::string context) const
-{
-  if (context != solver_options()[0])
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid,
-                     "context has to be '" << solver_options()[0] << "' (is '" << context << "')!");
-  return OperatorType::invert_options()[0];
-}
+//std::string SimpleDiscretization::solver_options(const std::string context) const
+//{
+//  if (context != solver_options()[0])
+//    DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid,
+//                     "context has to be '" << solver_options()[0] << "' (is '" << context << "')!");
+//  return OperatorType::invert_options()[0];
+//}
 
 void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Parameter mu) const
 {
@@ -262,7 +262,7 @@ void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Paramete
   const Dune::Pymor::Parameter mu_rhs = map_parameter(mu, "rhs");
   const auto rhs = func_->freeze_parameter(mu_rhs);
   // solve linear system
-  const std::string invert_options = solver_options("problem");
+  const std::string invert_options = lhs.invert_options()[0];
   lhs.apply_inverse(*(rhs.container()), vector, invert_options);
 }
 
