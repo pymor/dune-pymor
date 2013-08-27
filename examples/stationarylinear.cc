@@ -205,28 +205,25 @@ SimpleDiscretization::~SimpleDiscretization()
   delete problem_;
 }
 
-std::vector< std::string > SimpleDiscretization::available_operators() const
+typename SimpleDiscretization::OperatorType SimpleDiscretization::get_operator() const
 {
-  return { "lhs" };
-}
-
-typename SimpleDiscretization::OperatorType SimpleDiscretization::get_operator(const std::string id) const
-{
-  if (id != "lhs")
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid, "id has to be 'lhs' (is " << id << ")!");
   return *op_;
 }
 
-std::vector< std::string > SimpleDiscretization::available_functionals() const
+typename SimpleDiscretization::FunctionalType SimpleDiscretization::get_rhs() const
 {
-  return { "rhs" };
+  return *func_;
 }
 
-typename SimpleDiscretization::FunctionalType SimpleDiscretization::get_functional(const std::string id) const
+std::vector< std::string > SimpleDiscretization::available_products() const
 {
-  if (id != "rhs")
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid, "id has to be 'rhs' (is " << id << ")!");
-  return *func_;
+  return std::vector< std::string >();
+}
+
+typename SimpleDiscretization::ProductType SimpleDiscretization::get_product(const std::string /*id*/) const
+{
+  DUNE_PYMOR_THROW(Dune::Pymor::Exception::this_does_not_make_any_sense,
+                   "This discretizaiton does not have any products!");
 }
 
 typename SimpleDiscretization::VectorType SimpleDiscretization::create_vector() const

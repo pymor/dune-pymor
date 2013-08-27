@@ -59,6 +59,7 @@ public:
   typedef Dune::Pymor::LA::DuneDynamicVector< double > VectorType;
   typedef Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< typename Dune::Pymor::Operators::DuneDynamic< double > > OperatorType;
   typedef Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< VectorType > FunctionalType;
+  typedef OperatorType ProductType;
 };
 
 
@@ -70,18 +71,19 @@ public:
   typedef typename Traits::VectorType     VectorType;
   typedef typename Traits::OperatorType   OperatorType;
   typedef typename Traits::FunctionalType FunctionalType;
+  typedef typename Traits::ProductType    ProductType;
 
   SimpleDiscretization(const AnalyticalProblem* prob);
 
   ~SimpleDiscretization();
 
-  std::vector< std::string > available_operators() const;
+  OperatorType get_operator() const;
 
-  OperatorType get_operator(const std::string id) const;
+  FunctionalType get_rhs() const;
 
-  std::vector< std::string > available_functionals() const;
+  std::vector< std::string > available_products() const;
 
-  FunctionalType get_functional(const std::string id) const;
+  ProductType get_product(const std::string id) const;
 
   VectorType create_vector() const;
 

@@ -27,13 +27,11 @@ int main(int argc, char** argv)
     Example::SimpleDiscretization discretization(problem);
     std::cout << "done" << std::endl;
 
-    const std::string operatorID = discretization.available_operators()[0];
-    const auto lhsOperator = discretization.get_operator(operatorID);
+    const auto lhsOperator = discretization.get_operator();
     std::cout << "parameter_type of the left hand side is:\n  "
               << lhsOperator.parameter_type() << std::endl;
 
-    const std::string functionalID = discretization.available_functionals()[0];
-    const auto rhsFunctional = discretization.get_functional(functionalID);
+    const auto rhsFunctional = discretization.get_rhs();
     std::cout << "parameter_type of the right hand side is:\n  "
               << rhsFunctional.parameter_type() << std::endl;
 

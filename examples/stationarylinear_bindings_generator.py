@@ -32,7 +32,8 @@ if __name__ == '__main__':
         'Example::SimpleDiscretization',
         Traits={'VectorType': 'Dune::Pymor::LA::DuneDynamicVector< double >',
                 'OperatorType': 'Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< Dune::Pymor::Operators::DuneDynamic< double > >',
-                'FunctionalType': 'Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< Dune::Pymor::LA::DuneDynamicVector< double > >'})
+                'FunctionalType': 'Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< Dune::Pymor::LA::DuneDynamicVector< double > >',
+                'ProductType': 'Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< Dune::Pymor::Operators::DuneDynamic< double > >'})
     # and add the custom constructor to the discretization
     discretization.add_constructor([param('const Example::AnalyticalProblem *', 'prob', transfer_ownership=True)])
     # and finally write the pybindgen .cc file

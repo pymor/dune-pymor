@@ -17,16 +17,11 @@ try:
     discretization = example_module.Example.SimpleDiscretization(analytical_problem)
     print('done')
 
-    operator_ids = list(discretization.available_operators())
-    for operator_id in operator_ids:
-         operator = discretization.get_operator(operator_id)
-         print('parameter type of operator \'{}\' is: {}'.format(operator_id,
-                                                                 operator.parameter_type().report()))
-    functional_ids = list(discretization.available_functionals())
-    for functional_id in functional_ids:
-         functional = discretization.get_functional(functional_id)
-         print('parameter type of functional \'{}\' is: {}'.format(functional_id,
-                                                                   functional.parameter_type().report()))
+    operator = discretization.get_operator()
+    print('parameter type of operator is: {}'.format(operator.parameter_type().report()))
+
+    functional = discretization.get_rhs()
+    print('parameter type of rhs is: {}'.format(functional.parameter_type().report()))
 
     mu = example_module.Dune.Pymor.Parameter(
             ['diffusion', 'force', 'neumann', 'dirichlet'],
