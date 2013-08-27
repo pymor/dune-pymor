@@ -37,6 +37,8 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
     OperatorType = Traits['OperatorType']
     assert('FunctionalType' in Traits)
     FunctionalType = Traits['FunctionalType']
+    assert('ProductType' in Traits)
+    ProductType = Traits['ProductType']
     assert('VectorType' in Traits)
     VectorType = Traits['VectorType']
     if template_parameters is not None:
@@ -61,33 +63,35 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                                 parent=[interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic'],
                                         interfaces['Dune::Pymor::Parametric']],
                                 template_parameters=template_parameters)
-    Class.add_method('available_operators',
-                     retval('std::vector< std::string >'),
-                     [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('get_operator_and_return_ptr',
                      retval(OperatorType + ' *', caller_owns_return=True),
-                     [param('const std::string', 'id')],
+                     [],
                      is_const=True, throw=[exceptions['PymorException']],
                      custom_name='get_operator')
-    Class.add_method('available_functionals',
+    Class.add_method('get_rhs_and_return_ptr',
+                     retval(FunctionalType + ' *', caller_owns_return=True),
+                     [],
+                     is_const=True, throw=[exceptions['PymorException']],
+                     custom_name='get_rhs')
+    Class.add_method('available_products',
                      retval('std::vector< std::string >'),
                      [], is_const=True, throw=[exceptions['PymorException']])
-    Class.add_method('get_functional_and_return_ptr',
-                     retval(FunctionalType + ' *', caller_owns_return=True),
+    Class.add_method('get_product_and_return_ptr',
+                     retval(ProductType + ' *', caller_owns_return=True),
                      [param('const std::string', 'id')],
                      is_const=True, throw=[exceptions['PymorException']],
-                     custom_name='get_functional')
+                     custom_name='get_product')
     Class.add_method('create_vector_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
                      [], is_const=True, throw=[exceptions['PymorException']],
                      custom_name='create_vector')
-    Class.add_method('solver_options',
-                     retval('std::vector< std::string >'),
-                     [], is_const=True, throw=[exceptions['PymorException']])
-    Class.add_method('solver_options',
-                     retval('std::string'),
-                     [param('const std::string', 'context')],
-                     is_const=True, throw=[exceptions['PymorException']])
+    #Class.add_method('solver_options',
+                     #retval('std::vector< std::string >'),
+                     #[], is_const=True, throw=[exceptions['PymorException']])
+    #Class.add_method('solver_options',
+                     #retval('std::string'),
+                     #[param('const std::string', 'context')],
+                     #is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('solve',
                      None,
                      [param(VectorType + ' &', 'vector')],

@@ -32,6 +32,7 @@ public:
   typedef typename Traits::derived_type   derived_type;
   typedef typename Traits::OperatorType   OperatorType;
   typedef typename Traits::FunctionalType FunctionalType;
+  typedef typename Traits::ProductType    ProductType;
   typedef typename Traits::VectorType     VectorType;
 
   StationaryDiscretizationInterface(const ParameterType tt = ParameterType())
@@ -42,38 +43,43 @@ public:
     : Parametric(other)
   {}
 
-  std::vector< std::string > available_operators() const
+  OperatorType get_operator() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_operators());
-    return CRTP::as_imp(*this).available_operators();
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_operator());
+    return CRTP::as_imp(*this).get_operator();
   }
 
-  OperatorType get_operator(const std::string id) const
+  OperatorType* get_operator_and_return_ptr() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_operator(id));
-    return CRTP::as_imp(*this).get_operator(id);
+    return new OperatorType(get_operator());
   }
 
-  OperatorType* get_operator_and_return_ptr(const std::string id) const
+  FunctionalType get_rhs() const
   {
-    return new OperatorType(get_operator(id));
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_rhs());
+    return CRTP::as_imp(*this).get_rhs();
   }
 
-  std::vector< std::string > available_functionals() const
+  FunctionalType* get_rhs_and_return_ptr() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_functionals());
-    return CRTP::as_imp(*this).available_functionals();
+    return new FunctionalType(get_rhs());
   }
 
-  FunctionalType get_functional(const std::string id) const
+  std::vector< std::string > available_products() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_functional(id));
-    return CRTP::as_imp(*this).get_functional(id);
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_products());
+    return CRTP::as_imp(*this).available_products();
   }
 
-  FunctionalType* get_functional_and_return_ptr(const std::string id) const
+  ProductType get_product(const std::string id) const
   {
-    return new FunctionalType(get_functional(id));
+    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_product(id));
+    return CRTP::as_imp(*this).get_product(id);
+  }
+
+  ProductType* get_product_and_return_ptr(const std::string id) const
+  {
+    return new ProductType(get_product(id));
   }
 
   VectorType create_vector() const
