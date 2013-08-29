@@ -9,8 +9,7 @@ from collections import OrderedDict
 import pybindgen
 from pybindgen import retval, param
 
-from pymor.operators import LincombOperatorInterface
-from pymor.operators.basic import OperatorBase
+from pymor.operators.basic import OperatorBase, LincombOperatorBase
 
 
 def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONFIG_H,
@@ -514,7 +513,7 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
 
 def wrap_affinely_decomposed_operator(cls, wrapper):
 
-    class WrappedOperator(LincombOperatorInterface, WrappedOperatorBase):
+    class WrappedOperator(WrappedOperatorBase, LincombOperatorBase):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
         vec_type_range = wrapper[cls.type_range()]
@@ -525,23 +524,15 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
         def __init__(self, op):
             WrappedOperatorBase.__init__(self, op)
             operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
-            coefficients = [op.coefficient(i) for i in xrange(op.num_components())]
+            coefficients = [self._wrapper.parameter_functional(op.coefficient(i)) for i in xrange(op.num_components())]
             if op.has_affine_part():
                 operators.append(self._wrapper[op.affine_part()])
                 coefficients.append(1.)
                 self.affine_part = True
             else:
                 self.affine_part = False
-            self.operators = tuple(operators)
-            self.coefficients = tuple(coefficients)
+            LincombOperatorBase.__init__(self, operators, coefficients)
             self.lock()
-
-        def evaluate_coefficients(self, mu):
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
-            if self.affine_part:
-                return [c.evaluate(mu) for c in self.coefficients[:-1]] + [1.]
-            else:
-                return [c.evaluate(mu) for c in self.coefficients]
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator

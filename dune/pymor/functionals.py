@@ -10,8 +10,7 @@ from pybindgen import retval, param
 import numpy as np
 
 from pymor.la import NumpyVectorArray
-from pymor.operators import LincombOperatorInterface
-from pymor.operators.basic import OperatorBase
+from pymor.operators.basic import OperatorBase, LincombOperatorBase
 
 def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
@@ -231,7 +230,7 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
 
 def wrap_affinely_decomposed_functional(cls, wrapper):
 
-    class WrappedFunctional(LincombOperatorInterface, WrappedFunctionalBase):
+    class WrappedFunctional(WrappedFunctionalBase, LincombOperatorBase):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
         type_source = wrapper.vector_array(vec_type_source)
@@ -240,23 +239,15 @@ def wrap_affinely_decomposed_functional(cls, wrapper):
         def __init__(self, op):
             WrappedFunctionalBase.__init__(self, op)
             operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
-            coefficients = [op.coefficient(i) for i in xrange(op.num_components())]
+            coefficients = [self._wrapper.parameter_functional(op.coefficient(i)) for i in xrange(op.num_components())]
             if op.has_affine_part():
                 operators.append(self._wrapper[op.affine_part()])
                 coefficients.append(1.)
                 self.affine_part = True
             else:
                 self.affine_part = False
-            self.operators = tuple(operators)
-            self.coefficients = tuple(coefficients)
+            LincombOperatorBase.__init__(self, operators, coefficients)
             self.lock()
-
-        def evaluate_coefficients(self, mu):
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
-            if self.affine_part:
-                return [c.evaluate(mu) for c in self.coefficients[:-1]] + [1.]
-            else:
-                return [c.evaluate(mu) for c in self.coefficients]
 
     WrappedFunctional.__name__ = cls.__name__
     return WrappedFunctional
