@@ -30,19 +30,17 @@ def wrap_module(mod):
     wrapper = Wrapper(DuneParameterType = ParameterType,
                       DuneParameter = Parameter)
 
-    def create_modules(mod, parent_name=''):
+    def create_modules(mod):
         wrapped_mod = ModuleType(mod.__name__.lower())
-        full_name = '.'.join([parent_name, wrapped_mod.__name__]) if parent_name else wrapped_mod.__name__
-        wrapped_modules[mod] = {'wrapped': wrapped_mod, 'empty': True, 'full_name': full_name}
+        wrapped_modules[mod] = {'wrapped': wrapped_mod, 'empty': True}
         for k, v in mod.__dict__.iteritems():
             if isinstance(v, ModuleType):
-                create_modules(v, full_name)
+                create_modules(v)
 
     def add_to_module(k, v, mod):
         wrapped_mod = wrapped_modules[mod]['wrapped']
-        full_name = wrapped_modules[mod]['full_name']
         try:
-            v.__module__ = full_name
+            v.__module__ = wrapped_mod.__name__
         except AttributeError:
             pass
         wrapped_mod.__dict__[k] = v
