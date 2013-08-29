@@ -108,6 +108,22 @@ class WrappedFunctionalBase(OperatorBase):
             R = np.array([self._impl.apply(v._impl) for v in vectors])[..., np.newaxis]
             return NumpyVectorArray(R, copy=False)
 
+    def as_vector(self, mu=None):
+        if self.parametric:
+            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            if hasattr(self._impl, 'as_vector'):
+                return self._wrapper.vector_array(self.vec_type_source(self._impl.as_vector(mu)))
+            elif hasattr(self._impl, 'freeze_parameter'):
+                return self._wrapper.vector_array(self.vec_type_source(self._impl.freeze_parameter(mu).as_vector()))
+            else:
+                raise NotImplementedError
+        else:
+            assert self.check_parameter(mu)
+            if hasattr(self._impl, 'as_vector'):
+                return self._wrapper.vector_array(self.vec_type_source(self._impl.as_vector()))
+            else:
+                raise NotImplementedError
+
 
 def wrap_functional(cls, wrapper):
 
