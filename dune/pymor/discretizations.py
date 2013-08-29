@@ -127,12 +127,12 @@ def wrap_stationary_discretization(cls, wrapper):
 
         def __init__(self, d):
             self._impl = d
-            operators = {'operator': self._wrapper[d.get_operator('lhs')],
-                         'rhs': self._wrapper[d.get_functional('rhs')]}
+            operators = {'operator': self._wrapper[d.get_operator()],
+                         'rhs': self._wrapper[d.get_rhs()]}
             self.operators = FrozenDict(operators)
             self.operator = operators['operator']
             self.rhs = operators['rhs']
-            self.products = None
+            self.products = {k: self._wrapper[d.get_product(k)] for k in list(d.available_products())}
             self.linear = all(op.linear for op in operators.itervalues())
             self.build_parameter_type(inherits=operators.values())
             assert self.parameter_type == self._wrapper.parameter_type(d.parameter_type())
