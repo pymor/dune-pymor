@@ -8,12 +8,16 @@ import pybindgen
 from pybindgen import retval, param
 
 
-def inject_ParameterFunctional(module, exceptions, CONFIG_H):
+def inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, dict))
-    assert(isinstance(CONFIG_H, dict))
+    assert(isinstance(interfaces, dict))
+    for element in interfaces:
+        assert(isinstance(element, str))
+        assert(len(element) > 0)
+        assert(isinstance(CONFIG_H, dict))
     namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
-    ParameterFunctional = namespace.add_class('ParameterFunctional')
+    ParameterFunctional = namespace.add_class('ParameterFunctional', parent=[interfaces['Dune::Pymor::Parametric']])
     ParameterFunctional.add_copy_constructor()
     ParameterFunctional.add_constructor([param('const Dune::Pymor::ParameterType&', 'tt'),
                                          param('const std::string', 'exp')],

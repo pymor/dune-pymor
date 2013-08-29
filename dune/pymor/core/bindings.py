@@ -63,7 +63,7 @@ def inject_lib_dune_pymor(module):
     (module, interfaces['Dune::Pymor::Parametric']
      ) = dune.pymor.parameters.inject_Parametric(module, exceptions, CONFIG_H)
     (module, interfaces['Dune::Pymor::ParameterFunctional']
-     ) = dune.pymor.parameters.inject_ParameterFunctional(module, exceptions, CONFIG_H)
+     ) = dune.pymor.parameters.inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H)
     # then what we need of la.container
     #   the vectors
     (module, interfaces['Dune::Pymor::LA::ContainerInterfaceDynamic']
