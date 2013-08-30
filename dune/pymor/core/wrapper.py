@@ -13,7 +13,7 @@ import numpy as np
 
 from pymor.core import getLogger
 from pymor.parameters.base import Parameter, ParameterType
-from pymor.parameters.functionals import GenericParameterFunctional
+from pymor.parameters.functionals import ExpressionParameterFunctional
 
 
 class Wrapper(object):
@@ -65,9 +65,7 @@ class Wrapper(object):
     def parameter_functional(self, dune_functional):
         pt = self.parameter_type(dune_functional.parameter_type())
         expression = dune_functional.expression()
-        code = compile(expression, '<dune expression>', 'eval')
-        mapping = lambda mu: eval(code, {}, mu)
-        return GenericParameterFunctional(mapping, pt)
+        return ExpressionParameterFunctional(expression, pt)
 
     def __getitem__(self, obj):
         if isclass(obj):
