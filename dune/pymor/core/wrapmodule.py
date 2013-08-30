@@ -28,7 +28,8 @@ def wrap_module(mod):
     wrapped_modules = {}
 
     wrapper = Wrapper(DuneParameterType = ParameterType,
-                      DuneParameter = Parameter)
+                      DuneParameter = Parameter,
+                      DuneParameterFunctional = ParameterFunctional)
 
     def create_modules(mod):
         wrapped_mod = ModuleType(mod.__name__.lower())

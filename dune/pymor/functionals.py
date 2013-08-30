@@ -92,7 +92,7 @@ class WrappedFunctionalBase(OperatorBase):
         self.dim_source = op.dim_source()
         self.linear = op.linear()
         if hasattr(op, 'parametric') and op.parametric():
-            pt = self._wrapper.parameter_type(op.parameter_type())
+            pt = self._wrapper[op.parameter_type()]
             self.build_parameter_type(pt, local_global=True)
 
     def apply(self, U, ind=None, mu=None):
@@ -239,7 +239,7 @@ def wrap_affinely_decomposed_functional(cls, wrapper):
         def __init__(self, op):
             WrappedFunctionalBase.__init__(self, op)
             operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
-            coefficients = [self._wrapper.parameter_functional(op.coefficient(i)) for i in xrange(op.num_components())]
+            coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
             if op.has_affine_part():
                 operators.append(self._wrapper[op.affine_part()])
                 coefficients.append(1.)

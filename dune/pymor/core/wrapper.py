@@ -18,12 +18,15 @@ from pymor.parameters.functionals import ExpressionParameterFunctional
 
 class Wrapper(object):
 
-    def __init__(self, DuneParameterType, DuneParameter):
+    def __init__(self, DuneParameterType, DuneParameter, DuneParameterFunctional):
         self.wrapped_classes = {}
         self.wrapped_classes_by_type_this = {}
         self.vector_arrays = {}
         self.DuneParameterType = DuneParameterType
         self.DuneParameter = DuneParameter
+        self.instance_wrappers = {DuneParameterType: self._parameter_type,
+                                  DuneParameter: self._parameter,
+                                  DuneParameterFunctional: self._parameter_functional}
 
     def add_class(self, cls, wrapped_cls):
         self.wrapped_classes[cls] = wrapped_cls
@@ -44,15 +47,19 @@ class Wrapper(object):
         else:
             return self.vector_arrays[type(obj)]([obj])
 
-    def parameter_type(self, dune_parameter_type):
-        assert isinstance(dune_parameter_type, self.DuneParameterType)
+    def _parameter_type(self, dune_parameter_type):
         return ParameterType({k: v for k, v in izip(list(dune_parameter_type.keys()),
                                                     list(dune_parameter_type.values()))})
 
-    def parameter(self, dune_parameter):
+    def _parameter(self, dune_parameter):
         assert isinstance(dune_parameter, self.DuneParameter)
         return Parameter({k: np.array(v) for k, v in izip(list(dune_parameter.keys()),
                                                           [list(p) for p in list(dune_parameter.values())])})
+
+    def _parameter_functional(self, dune_functional):
+        pt = self[dune_functional.parameter_type()]
+        expression = dune_functional.expression()
+        return ExpressionParameterFunctional(expression, pt)
 
     def dune_parameter(self, parameter):
         assert isinstance(parameter, Parameter)
@@ -62,14 +69,11 @@ class Wrapper(object):
             dune_parameter.set(k, list(v))
         return dune_parameter
 
-    def parameter_functional(self, dune_functional):
-        pt = self.parameter_type(dune_functional.parameter_type())
-        expression = dune_functional.expression()
-        return ExpressionParameterFunctional(expression, pt)
-
     def __getitem__(self, obj):
         if isclass(obj):
             return self.wrapped_classes[obj]
+        elif type(obj) in self.instance_wrappers:
+            return self.instance_wrappers[type(obj)](obj)
         elif isinstance(obj, str):
             return self.wrapped_classes_by_type_this[obj]
         else:

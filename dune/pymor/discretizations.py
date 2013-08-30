@@ -135,7 +135,7 @@ def wrap_stationary_discretization(cls, wrapper):
             self.products = {k: self._wrapper[d.get_product(k)] for k in list(d.available_products())}
             self.linear = all(op.linear for op in operators.itervalues())
             self.build_parameter_type(inherits=operators.values())
-            assert self.parameter_type == self._wrapper.parameter_type(d.parameter_type())
+            assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.lock()
 
         with_arguments = StationaryDiscretization.with_arguments
