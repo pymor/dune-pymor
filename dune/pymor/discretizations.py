@@ -12,7 +12,7 @@ import pybindgen
 from pybindgen import retval, param
 
 from pymor.discretizations import DiscretizationInterface, StationaryDiscretization
-from pymor.la import NumpyVectorArray
+from pymor.la import NumpyVectorArray, induced_norm
 from pymor.tools.frozendict import FrozenDict
 
 
@@ -133,6 +133,10 @@ def wrap_stationary_discretization(cls, wrapper):
             self.operator = operators['operator']
             self.rhs = operators['rhs']
             self.products = {k: self._wrapper[d.get_product(k)] for k in list(d.available_products())}
+            if self.products:
+                for k, v in self.products.iteritems():
+                    setattr(self, '{}_product'.format(k), v)
+                    setattr(self, '{}_norm'.format(k), induced_norm(v))
             self.linear = all(op.linear for op in operators.itervalues())
             self.build_parameter_type(inherits=operators.values())
             assert self.parameter_type == self._wrapper[d.parameter_type()]
