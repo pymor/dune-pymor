@@ -221,6 +221,9 @@ protected:
   void inherit_parameter_type(const Parameter& mu, const std::string id) throw (Exception::sizes_do_not_match,
                                                                                 Exception::key_is_not_valid);
 
+  void inherit_parameter_type(const Parametric& other, const std::string id) throw (Exception::sizes_do_not_match,
+                                                                                    Exception::key_is_not_valid);
+
   const ParameterType& map_parameter_type(const std::string id) const throw (Exception::key_is_not_valid,
                                                                              Exception::requirements_not_met);
 

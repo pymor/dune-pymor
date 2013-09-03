@@ -405,12 +405,6 @@ bool Parametric::parametric() const
   return !parameter_type().empty();
 }
 
-void Parametric::inherit_parameter_type(const Parameter& mu, const std::string id)
-  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
-{
-  inherit_parameter_type(mu.type(), id);
-}
-
 void Parametric::inherit_parameter_type(const ParameterType& tt, const std::string id)
   throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
 {
@@ -430,6 +424,18 @@ void Parametric::inherit_parameter_type(const ParameterType& tt, const std::stri
     else
       type_.set(key, tt.get(key));
   }
+}
+
+void Parametric::inherit_parameter_type(const Parameter& mu, const std::string id)
+  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
+{
+  inherit_parameter_type(mu.type(), id);
+}
+
+void Parametric::inherit_parameter_type(const Parametric& other, const std::string id)
+  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
+{
+  inherit_parameter_type(other.parameter_type(), id);
 }
 
 Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) const
