@@ -9,6 +9,11 @@
   #include "config.h"
 #endif // HAVE_CMAKE_CONFIG
 
+#include <limits>
+#include <sstream>
+
+#include <dune/stuff/common/print.hh>
+
 #include "functional.hh"
 
 namespace Dune {
@@ -91,6 +96,17 @@ void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
     *(arg_[ii]) = serialized_mu[ii];
   // copy ret
   ret = op_->Val();
+  // perform sanity check
+  if (std::abs(ret) > (0.9 * std::numeric_limits< double >::max())) {
+    std::stringstream ss;
+    Stuff::Common::print(variables_, "the variables of this functional thus are", ss);
+    DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
+                     "evaluating this functional yielded an unlikely value!\n"
+                     << "The parameter_type() of this functional is: " << parameter_type() << "\n,"
+                     << ss.str() << ",\n"
+                     << "you tried to evaluate it with mu = " << mu << ",\n"
+                     << "and the result was " << ret << "!");
+  }
 }
 
 double ParameterFunctional::evaluate(const Parameter& mu) const throw (Exception::wrong_parameter_type)
@@ -106,9 +122,10 @@ void ParameterFunctional::setup() throw (Exception::sizes_do_not_match)
   const ParameterType& type = parameter_type();
   for (auto variable_prefix : type.keys()) {
     const size_t variable_size = type.get(variable_prefix);
-    if (variable_size == 1)
+    if (variable_size == 1) {
       variables_.push_back(variable_prefix);
-    else {
+      variables_.push_back(variable_prefix + "[0]");
+    } else {
       for (size_t ii = 0; ii < variable_size; ++ii) {
         std::stringstream ss;
         ss << variable_prefix << "[" << ii << "]";
