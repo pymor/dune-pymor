@@ -511,7 +511,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
                                         ::Eigen::Lower,
                                         ::Eigen::DiagonalPreconditioner< double > > EigenSolverType;
     EigenSolverType eigenSolver(matrix_->backend_->backend());
-    eigenSolver.setMaxIterations(5000);
+    eigenSolver.setMaxIterations(dim_source());
     eigenSolver.setTolerance(1e-15);
     range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
     if (eigenSolver.info() != ::Eigen::Success)
@@ -523,7 +523,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
                                           ::Eigen::Upper,
                                           ::Eigen::DiagonalPreconditioner< double > > EigenSolverType;
       EigenSolverType eigenSolver(matrix_->backend_->backend());
-      eigenSolver.setMaxIterations(5000);
+      eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
       range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
       if (eigenSolver.info() != ::Eigen::Success)
@@ -534,7 +534,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType::BackendType,
                                   ::Eigen::IdentityPreconditioner > EigenSolverType;
       EigenSolverType eigenSolver(matrix_->backend_->backend());
-      eigenSolver.setMaxIterations(5000);
+      eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
       range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
       if (eigenSolver.info() != ::Eigen::Success)
@@ -545,7 +545,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType::BackendType,
                                   ::Eigen::DiagonalPreconditioner< double > > EigenSolverType;
       EigenSolverType eigenSolver(matrix_->backend_->backend());
-      eigenSolver.setMaxIterations(5000);
+      eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
       range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
       if (eigenSolver.info() != ::Eigen::Success)
@@ -556,7 +556,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType::BackendType,
                                   ::Eigen::IncompleteLUT< double > > EigenSolverType;
       EigenSolverType eigenSolver(matrix_->backend_->backend());
-      eigenSolver.setMaxIterations(5000);
+      eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
       eigenSolver.preconditioner().setDroptol(1e-4);
       eigenSolver.preconditioner().setFillfactor(10);
@@ -603,7 +603,7 @@ typename EigenRowMajorSparseInverse< S >::FrozenType EigenRowMajorSparseInverse<
 {
   if (!mu.empty())
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "do not call freeze_parameter(" << mu << ") is parametric() == false!");
+                     "do not call freeze_parameter(" << mu << ") if parametric() == false!");
   return FrozenType(nullptr, invert_options()[0]);
 }
 
@@ -696,7 +696,7 @@ typename EigenRowMajorSparse< S >::FrozenType EigenRowMajorSparse< S >::freeze_p
 {
   if (!mu.empty())
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "do not call freeze_parameter(" << mu << ") is parametric() == false!");
+                     "do not call freeze_parameter(" << mu << ") if parametric() == false!");
   return FrozenType(nullptr);
 }
 
