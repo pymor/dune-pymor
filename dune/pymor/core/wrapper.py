@@ -58,7 +58,7 @@ class Wrapper(object):
 
     def _parameter_functional(self, dune_functional):
         pt = self[dune_functional.parameter_type()]
-        expression = dune_functional.expression()
+        expression = dune_functional.expression() + '.reshape(tuple())'
         return ExpressionParameterFunctional(expression, pt)
 
     def dune_parameter(self, parameter):
