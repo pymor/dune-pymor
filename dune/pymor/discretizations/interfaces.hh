@@ -21,6 +21,8 @@ namespace Pymor {
 
 class StationaryDiscretizationInterfaceDynamic {};
 
+class StationaryMultiscaleDiscretiztionInterfaceDynamic {};
+
 
 template< class Traits >
 class StationaryDiscretizationInterface

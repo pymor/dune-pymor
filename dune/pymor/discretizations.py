@@ -134,14 +134,12 @@ def inject_StationaryMultiscaleDiscretizationImplementation(module, exceptions, 
     for key in Traits.keys():
         assert(isinstance(Traits[key], str))
         assert(len(Traits[key].strip()) > 0)
-    assert('LocalOperatorType' in Traits)
-    LocalOperatorType = Traits['LocalOperatorType']
-    assert('LocalFunctionalType' in Traits)
-    FunctionalType = Traits['LocalFunctionalType']
-    assert('CouplingOperatorType' in Traits)
-    CouplingOperatorType = Traits['CouplingOperatorType']
-    assert('LocalProductType' in Traits)
-    LocalProductType = Traits['LocalProductType']
+    assert('OperatorType' in Traits)
+    OperatorType = Traits['OperatorType']
+    assert('FunctionalType' in Traits)
+    FunctionalType = Traits['FunctionalType']
+    assert('ProductType' in Traits)
+    ProductType = Traits['ProductType']
     assert('VectorType' in Traits)
     VectorType = Traits['VectorType']
     if template_parameters is not None:
@@ -152,10 +150,13 @@ def inject_StationaryMultiscaleDiscretizationImplementation(module, exceptions, 
             for element in template_parameters:
                 assert(isinstance(element, str))
                 assert(len(element.strip()) > 0)
-    ## add interface if necessary
-    #if not 'Dune::Pymor::StationaryDiscretizationInterfaceDynamic' in interfaces:
-        #(interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic']
-         #) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_class('StationaryDiscretizationInterfaceDynamic')
+    # add interface if necessary
+    if not 'Dune::Pymor::StationaryDiscretizationInterfaceDynamic' in interfaces:
+        (interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic']
+         ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_class('StationaryDiscretizationInterfaceDynamic')
+    if not 'Dune::Pymor::StationaryMultiscaleDiscretiztionInterfaceDynamic' in interfaces:
+        (interfaces['Dune::Pymor::StationaryMultiscaleDiscretiztionInterfaceDynamic']
+         ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_class('StationaryMultiscaleDiscretiztionInterfaceDynamic')
     namespace = module
     namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
     name = name.split('::')[-1].strip()
@@ -163,28 +164,30 @@ def inject_StationaryMultiscaleDiscretizationImplementation(module, exceptions, 
         for nspace in namespaces:
             namespace = namespace.add_cpp_namespace(nspace)
     Class = namespace.add_class(name,
-                                parent=[interfaces['Dune::Pymor::Parametric']],
+                                parent=[interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic'],
+                                        interfaces['Dune::Pymor::Parametric'],
+                                        interfaces['Dune::Pymor::StationaryMultiscaleDiscretiztionInterfaceDynamic']],
                                 template_parameters=template_parameters)
-    #Class.add_method('get_operator_and_return_ptr',
-                     #retval(OperatorType + ' *', caller_owns_return=True),
-                     #[],
-                     #is_const=True, throw=[exceptions['PymorException']],
-                     #custom_name='get_operator')
-    #Class.add_method('get_rhs_and_return_ptr',
-                     #retval(FunctionalType + ' *', caller_owns_return=True),
-                     #[],
-                     #is_const=True, throw=[exceptions['PymorException']],
-                     #custom_name='get_rhs')
-    #Class.add_method('available_products',
-                     #retval('std::vector< std::string >'),
-                     #[], is_const=True, throw=[exceptions['PymorException']])
-    #Class.add_method('get_product_and_return_ptr',
-                     #retval(ProductType + ' *', caller_owns_return=True),
-                     #[param('const std::string', 'id')],
-                     #is_const=True, throw=[exceptions['PymorException']],
-                     #custom_name='get_product')
+    Class.add_method('get_operator_and_return_ptr',
+                     retval(OperatorType + ' *', caller_owns_return=True),
+                     [],
+                     is_const=True, throw=[exceptions['PymorException']],
+                     custom_name='get_operator')
+    Class.add_method('get_rhs_and_return_ptr',
+                     retval(FunctionalType + ' *', caller_owns_return=True),
+                     [],
+                     is_const=True, throw=[exceptions['PymorException']],
+                     custom_name='get_rhs')
+    Class.add_method('available_products',
+                     retval('std::vector< std::string >'),
+                     [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('get_product_and_return_ptr',
+                     retval(ProductType + ' *', caller_owns_return=True),
+                     [param('const std::string', 'id')],
+                     is_const=True, throw=[exceptions['PymorException']],
+                     custom_name='get_product')
     Class.add_method('create_vector_and_return_ptr',
-                     retval(VectorType + ' *'),
+                     retval(VectorType + ' *', caller_owns_return=True),
                      [], is_const=True, throw=[exceptions['PymorException']],
                      custom_name='create_vector')
     #Class.add_method('solver_options',
@@ -216,6 +219,47 @@ def inject_StationaryMultiscaleDiscretizationImplementation(module, exceptions, 
                       param('const std::string', 'filename'),
                       param('const std::string', 'name')],
                      is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('num_subdomains',
+                                 retval('unsigned int'),
+                                 [], is_const=True, throw=[exceptions['PymorException'],
+                                                           exceptions['DuneException']])
+    Class.add_method('neighbouring_subdomains',
+                                 retval('std::set< unsigned int >'),
+                                 [param('const int', 'ss')],
+                                 is_const=True, throw=[exceptions['PymorException'],
+                                                       exceptions['DuneException']])
+    Class.add_method('get_local_operator_and_return_ptr',
+                                 retval(OperatorType + ' *', caller_owns_return=True),
+                                 [param('const int', 'ss')],
+                                 is_const=True, throw=[exceptions['PymorException'],
+                                                       exceptions['DuneException']],
+                                 custom_name='get_local_operator')
+    Class.add_method('get_local_product_and_return_ptr',
+                                 retval(ProductType + ' *', caller_owns_return=True),
+                                 [param('const int', 'ss'),
+                                  param('const std::string', 'id')],
+                                 is_const=True, throw=[exceptions['PymorException'],
+                                                       exceptions['DuneException']],
+                                 custom_name='get_local_product')
+    Class.add_method('get_coupling_operator_and_return_ptr',
+                                 retval(OperatorType + ' *', caller_owns_return=True),
+                                 [param('const int', 'ss'), param('const int', 'nn')],
+                                 is_const=True, throw=[exceptions['PymorException'],
+                                                       exceptions['DuneException']],
+                                 custom_name='get_coupling_operator')
+    Class.add_method('get_local_functional_and_return_ptr',
+                                 retval(FunctionalType + ' *', caller_owns_return=True),
+                                 [param('const int', 'ss')],
+                                 is_const=True, throw=[exceptions['PymorException'],
+                                                       exceptions['DuneException']],
+                                 custom_name='get_local_functional')
+    Class.add_method('localize_vector_and_return_ptr',
+                                 retval(VectorType + ' *', caller_owns_return=True),
+                                 [param('const ' + VectorType + ' &',  'global_vector'),
+                                  param('const int', 'ss')],
+                                 is_const=True, throw=[exceptions['PymorException'],
+                                                       exceptions['DuneException']],
+                                 custom_name='localize_vector')
     return Class
 
 
@@ -283,6 +327,96 @@ def wrap_stationary_discretization(cls, wrapper):
             subprocess.call(['paraview', file_name])
             if delete:
                 os.remove(file_name)
+
+    WrappedDiscretization.__name__ = cls.__name__
+    return WrappedDiscretization
+
+
+def wrap_multiscale_discretization(cls, wrapper):
+
+    class WrappedDiscretization(DiscretizationInterface):
+
+        wrapped_type = cls
+
+        _wrapper = wrapper
+
+        def __init__(self, d):
+            self._impl = d
+            operators = {'operator': self._wrapper[d.get_operator()],
+                         'rhs': self._wrapper[d.get_rhs()]}
+            self.operators = FrozenDict(operators)
+            self.operator = operators['operator']
+            self.rhs = operators['rhs']
+            self.products = {k: self._wrapper[d.get_product(k)] for k in list(d.available_products())}
+            if self.products:
+                for k, v in self.products.iteritems():
+                    setattr(self, '{}_product'.format(k), v)
+                    setattr(self, '{}_norm'.format(k), induced_norm(v))
+            self.linear = all(op.linear for op in operators.itervalues())
+            self.build_parameter_type(inherits=operators.values())
+            assert self.parameter_type == self._wrapper[d.parameter_type()]
+            self.lock()
+
+        with_arguments = StationaryDiscretization.with_arguments
+
+        def with_(self, **kwargs):
+            assert 'operators' in kwargs or kwargs.keys() == ['parameter_space']
+            if 'operators' in kwargs:
+                operators = kwargs.pop('operators')
+                assert set(operators.keys()) == {'operator', 'rhs'}
+                assert all(op.type_source == NumpyVectorArray for op in operators.itervalues())
+                assert all(op.type_range == NumpyVectorArray for op in operators.itervalues())
+                d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
+                return d.with_(**kwargs)
+            else:
+                d = type(self)(self._impl)
+                d.unlock()
+                d.parameter_space = kwargs['parameter_space']
+                d.lock()
+                return d
+
+        def solve(self, mu=None):
+            mu = self.parse_parameter(mu)
+            if not self.logging_disabled:
+                self.logger.info('Solving {} for {} ...'.format(self.name, mu))
+            mu = self._wrapper.dune_parameter(mu)
+            return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
+
+        _solve = solve
+
+        def visualize(self, U, file_name=None, name='solution', delete=True):
+            assert len(U) == 1
+            if file_name is None:
+                _, file_name = mkstemp(suffix='.vtu')
+            if not file_name.endswith('.vtu'):
+                file_name = file_name + '.vtu'
+            self._impl.visualize(U._list[0]._impl, file_name[:-4], name)
+            subprocess.call(['paraview', file_name])
+            if delete:
+                os.remove(file_name)
+
+        def localize_vector(self, global_vector, subdomain):
+            assert len(global_vector) == 1
+            return self._wrapper.vector_array(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
+                                                                                       subdomain)])
+
+        def local_product(self, subdomain, id):
+            assert subdomain < self._impl.num_subdomains()
+            assert id in { 'l2', 'h1' }
+            return self._wrapper[self._impl.get_local_product(subdomain, id)]
+
+        def local_operator(self, subdomain):
+            assert subdomain < self._impl.num_subdomains()
+            return self._wrapper[self._impl.get_local_operator(subdomain)]
+
+        def local_rhs(self, subdomain):
+            assert subdomain < self._impl.num_subdomains()
+            return self._wrapper[self._impl.get_local_functional(subdomain)]
+
+        def coupling_operator(self, subdomain, neighbour):
+            assert subdomain < self._impl.num_subdomains()
+            assert neighbour in self._impl.neighbouring_subdomains(subdomain)
+            return self._wrapper[self._impl.get_coupling_operator(subdomain, neighbour)]
 
 
     WrappedDiscretization.__name__ = cls.__name__
