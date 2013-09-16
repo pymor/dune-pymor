@@ -231,6 +231,57 @@ public:
   std::shared_ptr< const NonparametricType > affinePart_;
 }; // class AffinelyDecomposableDefault
 
+
+template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
+class FrozenDefault
+  : public Stuff::FunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+{
+  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > ParametricType;
+  typedef FrozenDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows > ThisType;
+public:
+  typedef typename ParametricType::DomainType DomainType;
+  typedef typename ParametricType::RangeType RangeType;
+
+  FrozenDefault(const std::shared_ptr< const ParametricType > func, const Parameter mu)
+    : func_(func)
+    , mu_(mu)
+  {}
+
+  FrozenDefault(const ThisType& other)
+    : func_(other.func_)
+    , mu_(other.mu_)
+  {}
+
+  ThisType& operator=(const ThisType& other)
+  {
+    if (this != &other) {
+      func_ = other.func_;
+      mu_ = other.mu_;
+    }
+    return this;
+  }
+
+  virtual std::string name() const
+  {
+    return func_->name() + " with mu = " + mu_.report();
+  }
+
+  virtual int order() const
+  {
+    return func_->order();
+  }
+
+  virtual void evaluate(const DomainType& xx, RangeType& ret) const
+  {
+    func_->evaluate(xx, ret, mu_);
+  }
+
+private:
+  std::shared_ptr< const ParametricType > func_;
+  Parameter mu_;
+}; // class FrozenDefault
+
+
 } // namespace Function
 } // namespace Pymor
 } // namespace Dune
