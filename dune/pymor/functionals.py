@@ -99,7 +99,7 @@ class WrappedFunctionalBase(OperatorBase):
         assert isinstance(U, self.type_source)
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             R = np.array([self._impl.apply(v._impl, mu) for v in vectors])[..., np.newaxis]
             return NumpyVectorArray(R, copy=False)
         else:
@@ -109,7 +109,7 @@ class WrappedFunctionalBase(OperatorBase):
 
     def as_vector(self, mu=None):
         if self.parametric:
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             if hasattr(self._impl, 'as_vector'):
                 return self._wrapper.vector_array(self.vec_type_source(self._impl.as_vector(mu)))
             elif hasattr(self._impl, 'freeze_parameter'):

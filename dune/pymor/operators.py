@@ -309,7 +309,7 @@ class WrappedOperatorBase(OperatorBase):
         assert isinstance(U, self.type_source)
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             return self.type_range([self.vec_type_range(self._impl.apply(v._impl, mu)) for v in vectors],
                                    dim=self.dim_range)
         else:
@@ -328,7 +328,7 @@ class WrappedOperatorBase(OperatorBase):
             options = next(self.invert_options.iterkeys())
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
-            mu = self._wrapper.dune_parameter(self.parse_parameter(mu))
+            mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
                                      for v in vectors], dim=self.dim_source)
         else:
