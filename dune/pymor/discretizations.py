@@ -138,6 +138,8 @@ def wrap_stationary_discretization(cls, wrapper):
                     setattr(self, '{}_product'.format(k), v)
                     setattr(self, '{}_norm'.format(k), induced_norm(v))
             self.linear = all(op.linear for op in operators.itervalues())
+            self.dim_solution = self.operator.dim_source
+            self.type_solution = self.operator.type_source
             self.build_parameter_type(inherits=operators.values())
             assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.lock()
