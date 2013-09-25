@@ -10,9 +10,12 @@ import subprocess
 
 import pybindgen
 from pybindgen import retval, param
+import numpy as np
 
 from pymor.discretizations import DiscretizationInterface, StationaryDiscretization
 from pymor.la import NumpyVectorArray, induced_norm
+from pymor.la.blockvectorarray import BlockVectorArray
+from pymor.operators.block import BlockOperator
 from pymor.tools.frozendict import FrozenDict
 
 
@@ -342,12 +345,24 @@ def wrap_multiscale_discretization(cls, wrapper):
 
         def __init__(self, d):
             self._impl = d
-            operators = {'operator': self._wrapper[d.get_operator()],
-                         'rhs': self._wrapper[d.get_rhs()]}
+            lhs_op = BlockOperator([[wrapper[d.get_local_operator(ss)] if ss == nn
+                                     else wrapper[d.get_coupling_operator(ss, nn)] if nn in list(d.neighbouring_subdomains(ss))
+                                     else None
+                                     for nn in np.arange(d.num_subdomains())] for ss in np.arange(d.num_subdomains())],
+                                   [d.get_local_operator(ss).dim_source() for ss in np.arange(d.num_subdomains())],
+                                   [d.get_local_operator(ss).dim_range() for ss in np.arange(d.num_subdomains())])
+            rhs_op = BlockOperator([wrapper[d.get_local_functional(ss)] for ss in np.arange(d.num_subdomains())])
+            operators = {'operator': lhs_op,
+                         'rhs': rhs_op}
             self.operators = FrozenDict(operators)
             self.operator = operators['operator']
             self.rhs = operators['rhs']
-            self.products = {k: self._wrapper[d.get_product(k)] for k in list(d.available_products())}
+            self.products = {k: BlockOperator([[wrapper[d.get_local_product(ss, k)] if ss == nn else None
+                                                for nn in np.arange(d.num_subdomains())]
+                                               for ss in np.arange(d.num_subdomains())],
+                                              [d.get_local_operator(ss).dim_source() for ss in np.arange(d.num_subdomains())],
+                                              [d.get_local_operator(ss).dim_range() for ss in np.arange(d.num_subdomains())])
+                                for k in list(d.available_products())}
             if self.products:
                 for k, v in self.products.iteritems():
                     setattr(self, '{}_product'.format(k), v)
@@ -364,8 +379,8 @@ def wrap_multiscale_discretization(cls, wrapper):
             if 'operators' in kwargs:
                 operators = kwargs.pop('operators')
                 assert set(operators.keys()) == {'operator', 'rhs'}
-                assert all(op.type_source == NumpyVectorArray for op in operators.itervalues())
-                assert all(op.type_range == NumpyVectorArray for op in operators.itervalues())
+                assert all(op.type_source == NumpyVectorArray or op.type_source == BlockVectorArray for op in operators.itervalues())
+                assert all(op.type_range == NumpyVectorArray or op.type_range == BlockVectorArray for op in operators.itervalues())
                 d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
                 return d.with_(**kwargs)
             else:
@@ -380,11 +395,13 @@ def wrap_multiscale_discretization(cls, wrapper):
             if not self.logging_disabled:
                 self.logger.info('Solving {} for {} ...'.format(self.name, mu))
             mu = self._wrapper.dune_parameter(mu)
-            return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
+            global_solution = self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
+            return BlockVectorArray([self.localize_vector(global_solution, ss) for ss in np.arange(self._impl.num_subdomains())])
 
         _solve = solve
 
         def visualize(self, U, file_name=None, name='solution', delete=True):
+            raise Exception('Not implemented yet!')
             assert len(U) == 1
             if file_name is None:
                 _, file_name = mkstemp(suffix='.vtu')
