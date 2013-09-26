@@ -255,21 +255,19 @@ DuneDynamicMatrix< S >::DuneDynamicMatrix(BackendType* backend_ptr)
 {}
 
 template< class S >
-DuneDynamicMatrix< S >::DuneDynamicMatrix(std::unique_ptr< BackendType >&& backend_ptr)
-  : backend_(std::move(backend_ptr))
+DuneDynamicMatrix< S >::DuneDynamicMatrix(std::shared_ptr< BackendType >& backend_ptr)
+  : backend_(backend_ptr)
 {}
 
 template< class S >
-DuneDynamicMatrix< S >::DuneDynamicMatrix(ThisType&& source)
-  : backend_(std::move(source.backend_))
+DuneDynamicMatrix< S >::DuneDynamicMatrix(const ThisType& other)
+  : backend_(other.backend_)
 {}
 
 template< class S >
-typename DuneDynamicMatrix< S >::ThisType& DuneDynamicMatrix< S >::operator=(ThisType&& source)
+typename DuneDynamicMatrix< S >::ThisType& DuneDynamicMatrix< S >::operator=(const ThisType& other)
 {
-  if (this != &source) {
-    backend_ = std::move(source.backend_);
-  }
+  backend_ = other.backend_;
   return *this;
 }
 
@@ -300,6 +298,7 @@ bool DuneDynamicMatrix< S >::has_equal_shape(const ThisType& other) const
 template< class S >
 void DuneDynamicMatrix< S >::scal(const ScalarType& alpha)
 {
+  ensure_uniqueness();
   backend_->operator*=(alpha);
 }
 
@@ -314,18 +313,21 @@ void DuneDynamicMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx) t
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "the dim_range of xx (" << xx.dim_range() << ") does not match the dim_range of this ("
                      << dim_range() << ")!");
+  ensure_uniqueness();
   backend_->axpy(alpha, *(xx.backend_));
 }
 
 template< class S >
 typename DuneDynamicMatrix< S >::BackendType& DuneDynamicMatrix< S >::backend()
 {
+  ensure_uniqueness();
   return *backend_;
 }
 
 template< class S >
 const typename DuneDynamicMatrix< S >::BackendType& DuneDynamicMatrix< S >::backend() const
 {
+  const_cast< ThisType& >(*this).ensure_uniqueness();
   return *backend_;
 }
 
@@ -334,6 +336,13 @@ int DuneDynamicMatrix< S >::assert_is_not_negative(const int ii) throw (Exceptio
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
+}
+
+template< class S >
+inline void DuneDynamicMatrix< S >::ensure_uniqueness()
+{
+  if (!backend_.unique())
+    backend_ = std::make_shared< BackendType >(*backend_);
 }
 
 template class DuneDynamicMatrix< double >;
