@@ -48,6 +48,7 @@ template< class S >
 typename EigenDenseVector< S >::ThisType& EigenDenseVector< S >::operator=(const ThisType& other)
 {
   backend_ = other.backend_;
+  return *this;
 }
 
 template< class S >
@@ -264,6 +265,7 @@ template< class S >
 typename EigenRowMajorSparseMatrix< S >::ThisType& EigenRowMajorSparseMatrix< S >::operator=(const ThisType& other)
 {
   backend_ = other.backend_;
+  return *this;
 }
 
 template< class S >
