@@ -35,22 +35,19 @@ EigenDenseVector< S >::EigenDenseVector(BackendType* backend_ptr)
 {}
 
 template< class S >
-EigenDenseVector< S >::EigenDenseVector(std::unique_ptr< BackendType >&& backend_ptr)
+EigenDenseVector< S >::EigenDenseVector(std::shared_ptr< BackendType > backend_ptr)
   : backend_(std::move(backend_ptr))
 {}
 
 template< class S >
-EigenDenseVector< S >::EigenDenseVector(ThisType&& source)
-  : backend_(std::move(source.backend_))
+EigenDenseVector< S >::EigenDenseVector(const ThisType& other)
+  : backend_(other.backend_)
 {}
 
 template< class S >
-typename EigenDenseVector< S >::ThisType& EigenDenseVector< S >::operator=(ThisType&& source)
+typename EigenDenseVector< S >::ThisType& EigenDenseVector< S >::operator=(const ThisType& other)
 {
-  if (this != &source) {
-    backend_ = std::move(source.backend_);
-  }
-  return *this;
+  backend_ = other.backend_;
 }
 
 template< class S >
@@ -62,12 +59,14 @@ typename EigenDenseVector< S >::ThisType EigenDenseVector< S >::copy() const
 template< class S >
 void EigenDenseVector< S >::scal(const ScalarType& alpha)
 {
+  ensure_uniqueness();
   backend_->backend() *= alpha;
 }
 
 template< class S >
 void EigenDenseVector< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
 {
+  ensure_uniqueness();
   auto& thisRef = *backend_;
   const auto& xRef = *(xx.backend_);
   thisRef.backend() += alpha * xRef.backend();
@@ -87,7 +86,7 @@ bool EigenDenseVector< S >::has_equal_shape(const ThisType& other) const
 
 template< class S >
 bool EigenDenseVector< S >::almost_equal(const ThisType& other,
-                                          const ScalarType epsilon) const
+                                         const ScalarType epsilon) const
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -180,6 +179,7 @@ void EigenDenseVector< S >::iadd(const ThisType& other) throw (Exception::sizes_
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
+  ensure_uniqueness();
   backend_->backend() += other.backend_->backend();
 }
 
@@ -200,18 +200,21 @@ void EigenDenseVector< S >::isub(const ThisType& other) throw (Exception::sizes_
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
+  ensure_uniqueness();
   backend_->backend() -= other.backend_->backend();
 }
 
 template< class S >
 typename EigenDenseVector< S >::BackendType& EigenDenseVector< S >::backend()
 {
+  ensure_uniqueness();
   return *backend_;
 }
 
 template< class S >
 const typename EigenDenseVector< S >::BackendType& EigenDenseVector< S >::backend() const
 {
+  const_cast< ThisType& >(*this).ensure_uniqueness();
   return *backend_;
 }
 
@@ -220,6 +223,13 @@ int EigenDenseVector< S >::assert_is_not_negative(const int ii) throw (Exception
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
+}
+
+template< class S >
+inline void EigenDenseVector< S >::ensure_uniqueness()
+{
+  if (!backend_.unique())
+    backend_ = std::make_shared< BackendType >(*backend_);
 }
 
 template class EigenDenseVector< double >;
