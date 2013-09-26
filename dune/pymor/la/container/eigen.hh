@@ -169,15 +169,11 @@ public:
    */
   EigenRowMajorSparseMatrix(BackendType* backend_ptr);
 
-  EigenRowMajorSparseMatrix(std::unique_ptr< BackendType >&& backend_ptr);
+  EigenRowMajorSparseMatrix(std::shared_ptr< BackendType >& backend_ptr);
 
-  EigenRowMajorSparseMatrix(const ThisType& other) = delete;
+  EigenRowMajorSparseMatrix(const ThisType& other);
 
-  ThisType& operator=(const ThisType& other) = delete;
-
-  EigenRowMajorSparseMatrix(ThisType&& source);
-
-  ThisType& operator=(ThisType&& source);
+  ThisType& operator=(const ThisType& other);
 
   ThisType copy() const;
 
@@ -196,10 +192,12 @@ public:
   const BackendType& backend() const;
 
 private:
+  void ensure_uniqueness();
+
   friend class Operators::EigenRowMajorSparse< ScalarType >;
   friend class Operators::EigenRowMajorSparseInverse< ScalarType >;
 
-  std::unique_ptr< BackendType > backend_;
+  std::shared_ptr< BackendType > backend_;
 }; // class EigenRowMajorSparseMatrix
 
 

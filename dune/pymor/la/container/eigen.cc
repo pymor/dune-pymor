@@ -251,22 +251,19 @@ EigenRowMajorSparseMatrix< S >::EigenRowMajorSparseMatrix(BackendType* backend_p
 {}
 
 template< class S >
-EigenRowMajorSparseMatrix< S >::EigenRowMajorSparseMatrix(std::unique_ptr< BackendType >&& backend_ptr)
-  : backend_(std::move(backend_ptr))
+EigenRowMajorSparseMatrix< S >::EigenRowMajorSparseMatrix(std::shared_ptr< BackendType >& backend_ptr)
+  : backend_(backend_ptr)
 {}
 
 template< class S >
-EigenRowMajorSparseMatrix< S >::EigenRowMajorSparseMatrix(ThisType&& source)
-  : backend_(std::move(source.backend_))
+EigenRowMajorSparseMatrix< S >::EigenRowMajorSparseMatrix(const ThisType& other)
+  : backend_(other.backend_)
 {}
 
 template< class S >
-typename EigenRowMajorSparseMatrix< S >::ThisType& EigenRowMajorSparseMatrix< S >::operator=(ThisType&& source)
+typename EigenRowMajorSparseMatrix< S >::ThisType& EigenRowMajorSparseMatrix< S >::operator=(const ThisType& other)
 {
-  if (this != &source) {
-    backend_ = std::move(source.backend_);
-  }
-  return *this;
+  backend_ = other.backend_;
 }
 
 template< class S >
@@ -296,6 +293,7 @@ bool EigenRowMajorSparseMatrix< S >::has_equal_shape(const ThisType& other) cons
 template< class S >
 void EigenRowMajorSparseMatrix< S >::scal(const ScalarType& alpha)
 {
+  ensure_uniqueness();
   backend_->backend() *= alpha;
 }
 
@@ -310,19 +308,29 @@ void EigenRowMajorSparseMatrix< S >::axpy(const ScalarType& alpha, const ThisTyp
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "the dim_range of xx (" << xx.dim_range() << ") does not match the dim_range of this ("
                      << dim_range() << ")!");
+  ensure_uniqueness();
   backend_->backend() += alpha * xx.backend_->backend();
 }
 
 template< class S >
 typename EigenRowMajorSparseMatrix< S >::BackendType& EigenRowMajorSparseMatrix< S >::backend()
 {
+  ensure_uniqueness();
   return *backend_;
 }
 
 template< class S >
 const typename EigenRowMajorSparseMatrix< S >::BackendType& EigenRowMajorSparseMatrix< S >::backend() const
 {
+  const_cast< ThisType& >(*this).ensure_uniqueness();
   return *backend_;
+}
+
+template< class S >
+inline void EigenRowMajorSparseMatrix< S >::ensure_uniqueness()
+{
+  if (!backend_.unique())
+    backend_ = std::make_shared< BackendType >(*backend_);
 }
 
 template class EigenRowMajorSparseMatrix< double >;
