@@ -70,15 +70,11 @@ public:
    */
   DuneDynamicVector(BackendType* backend_ptr);
 
-  DuneDynamicVector(std::unique_ptr< BackendType >&& backend_ptr);
+  DuneDynamicVector(std::shared_ptr< BackendType >& backend_ptr);
 
-  DuneDynamicVector(const ThisType& other) = delete;
+  DuneDynamicVector(const ThisType& other);
 
-  ThisType& operator=(const ThisType& other) = delete;
-
-  DuneDynamicVector(ThisType&& source);
-
-  ThisType& operator=(ThisType&& source);
+  ThisType& operator=(const ThisType& other);
 
   ThisType copy() const;
 
@@ -134,11 +130,12 @@ public:
 
 private:
   static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
+  void ensure_uniqueness();
 
   friend class Operators::DuneDynamic< ScalarType >;
   friend class Operators::DuneDynamicInverse< ScalarType >;
 
-  std::unique_ptr< BackendType > backend_;
+  std::shared_ptr< BackendType > backend_;
 }; // class DuneDynamicVector
 
 

@@ -40,21 +40,19 @@ DuneDynamicVector< S >::DuneDynamicVector(BackendType* backend_ptr)
 {}
 
 template< class S >
-DuneDynamicVector< S >::DuneDynamicVector(std::unique_ptr< BackendType >&& backend_ptr)
+DuneDynamicVector< S >::DuneDynamicVector(std::shared_ptr< BackendType >& backend_ptr)
   : backend_(std::move(backend_ptr))
 {}
 
 template< class S >
-DuneDynamicVector< S >::DuneDynamicVector(ThisType&& source)
-  : backend_(std::move(source.backend_))
+DuneDynamicVector< S >::DuneDynamicVector(const ThisType& other)
+  : backend_(other.backend_)
 {}
 
 template< class S >
-typename DuneDynamicVector< S >::ThisType& DuneDynamicVector< S >::operator=(ThisType&& source)
+typename DuneDynamicVector< S >::ThisType& DuneDynamicVector< S >::operator=(const ThisType& other)
 {
-  if (this != &source) {
-    backend_ = std::move(source.backend_);
-  }
+  backend_ = other.backend_;
   return *this;
 }
 
@@ -67,12 +65,14 @@ typename DuneDynamicVector< S >::ThisType DuneDynamicVector< S >::copy() const
 template< class S >
 void DuneDynamicVector< S >::scal(const ScalarType& alpha)
 {
+  ensure_uniqueness();
   backend_->operator*=(alpha);
 }
 
 template< class S >
 void DuneDynamicVector< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
 {
+  ensure_uniqueness();
   auto& thisRef = *backend_;
   const auto& xRef = *(xx.backend_);
   for (size_t ii = 0; ii < thisRef.size(); ++ii)
@@ -92,8 +92,7 @@ bool DuneDynamicVector< S >::has_equal_shape(const ThisType& other) const
 }
 
 template< class S >
-bool DuneDynamicVector< S >::almost_equal(const ThisType& other,
-                                          const ScalarType epsilon) const
+bool DuneDynamicVector< S >::almost_equal(const ThisType& other, const ScalarType epsilon) const
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -184,6 +183,7 @@ void DuneDynamicVector< S >::iadd(const ThisType& other) throw (Exception::sizes
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
+  ensure_uniqueness();
   backend_->operator+=(*(other.backend_));
 }
 
@@ -204,18 +204,21 @@ void DuneDynamicVector< S >::isub(const ThisType& other) throw (Exception::sizes
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
+  ensure_uniqueness();
   backend_->operator-=(*(other.backend_));
 }
 
 template< class S >
 typename DuneDynamicVector< S >::BackendType& DuneDynamicVector< S >::backend()
 {
+  ensure_uniqueness();
   return *backend_;
 }
 
 template< class S >
 const typename DuneDynamicVector< S >::BackendType& DuneDynamicVector< S >::backend() const
 {
+  const_cast< ThisType& >(*this).ensure_uniqueness();
   return *backend_;
 }
 
@@ -224,6 +227,13 @@ int DuneDynamicVector< S >::assert_is_not_negative(const int ii) throw (Exceptio
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
+}
+
+template< class S >
+inline void DuneDynamicVector< S >::ensure_uniqueness()
+{
+  if (!backend_.unique())
+    backend_ = std::make_shared< BackendType >(*backend_);
 }
 
 template class DuneDynamicVector< double >;
