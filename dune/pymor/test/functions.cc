@@ -3,13 +3,8 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include <config.h>
-#endif // HAVE_CMAKE_CONFIG
-
 #include <dune/stuff/test/test_common.hh>
+
 #include <dune/stuff/functions.hh>
 #include <dune/stuff/common/float_cmp.hh>
 
@@ -17,26 +12,27 @@
 #include <dune/pymor/functions/default.hh>
 
 
+#if HAVE_DUNE_GRID
 using namespace Dune;
 using namespace Dune::Pymor;
 
 
 typedef testing::Types<
-                        Dune::Stuff::FunctionExpression< double, 1, double, 1 >
-                      , Dune::Stuff::FunctionExpression< double, 2, double, 1 >
-                      , Dune::Stuff::FunctionExpression< double, 3, double, 1 >
-                      , Dune::Stuff::FunctionExpression< double, 1, double, 2 >
-                      , Dune::Stuff::FunctionExpression< double, 2, double, 2 >
-                      , Dune::Stuff::FunctionExpression< double, 2, double, 3 >
-                      , Dune::Stuff::FunctionExpression< double, 1, double, 3 >
-                      , Dune::Stuff::FunctionExpression< double, 2, double, 3 >
-                      , Dune::Stuff::FunctionExpression< double, 3, double, 3 >
-                      , Dune::Stuff::FunctionCheckerboard< double, 1, double, 1 >
-                      , Dune::Stuff::FunctionCheckerboard< double, 2, double, 1 >
-                      , Dune::Stuff::FunctionCheckerboard< double, 3, double, 1 >
-                      , Dune::Stuff::FunctionConstant< double, 1, double, 1 >
-                      , Dune::Stuff::FunctionConstant< double, 2, double, 1 >
-                      , Dune::Stuff::FunctionConstant< double, 3, double, 1 >
+                        Dune::Stuff::Function::Expression< double, 1, double, 1 >
+                      , Dune::Stuff::Function::Expression< double, 2, double, 1 >
+                      , Dune::Stuff::Function::Expression< double, 3, double, 1 >
+                      , Dune::Stuff::Function::Expression< double, 1, double, 2 >
+                      , Dune::Stuff::Function::Expression< double, 2, double, 2 >
+                      , Dune::Stuff::Function::Expression< double, 2, double, 3 >
+                      , Dune::Stuff::Function::Expression< double, 1, double, 3 >
+                      , Dune::Stuff::Function::Expression< double, 2, double, 3 >
+                      , Dune::Stuff::Function::Expression< double, 3, double, 3 >
+                      , Dune::Stuff::Function::Checkerboard< double, 1, double, 1 >
+                      , Dune::Stuff::Function::Checkerboard< double, 2, double, 1 >
+                      , Dune::Stuff::Function::Checkerboard< double, 3, double, 1 >
+                      , Dune::Stuff::Function::Constant< double, 1, double, 1 >
+                      , Dune::Stuff::Function::Constant< double, 2, double, 1 >
+                      , Dune::Stuff::Function::Constant< double, 3, double, 1 >
                       > NonparametricFunctions;
 
 
@@ -126,6 +122,7 @@ TEST(AffineParametricDefaultTest, FUNCTIONS)
   if (!Dune::FloatCmp::eq(result, 1.0)) DUNE_PYMOR_THROW(PymorException, "");
 } // AffineParametricDefaultTest
 
+#endif // HAVE_DUNE_GRID
 
 int main(int argc, char** argv)
 {
