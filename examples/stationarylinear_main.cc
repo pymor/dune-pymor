@@ -3,8 +3,6 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include <dune/common/mpihelper.hh>
-
 #include <dune/stuff/common/color.hh>
 
 #include <dune/pymor/common/exceptions.hh>
@@ -14,11 +12,9 @@
 using namespace Dune;
 using namespace Dune::Pymor;
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   try {
-    MPIHelper& DUNE_UNUSED(helper) = MPIHelper::instance(argc, argv);
-
     std::cout << "creating analytical problem... ";
     const Example::AnalyticalProblem* problem = new Example::AnalyticalProblem();
     std::cout << "done" << std::endl;
