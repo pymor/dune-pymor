@@ -211,7 +211,12 @@ static EigenDenseVector< S > createContainer(const EigenDenseVector< S >&, const
 template< class S >
 static EigenRowMajorSparseMatrix< S > createContainer(const EigenRowMajorSparseMatrix< S >&, const size_t size)
 {
-  return EigenRowMajorSparseMatrix< S >(Dune::Stuff::LA::createIdentityEigenRowMajorSparseMatrix(size));
+  Dune::Stuff::LA::SparsityPatternDefault pattern(size);
+  for (size_t ii = 0; ii < size; ++ii)
+    pattern.inner(ii).insert(ii);
+  auto backend_ptr = new Dune::Stuff::LA::EigenRowMajorSparseMatrix< S >(size, size, pattern);
+  backend_ptr->backend().setIdentity();
+  return EigenRowMajorSparseMatrix< S >(backend_ptr);
 }
 
 
