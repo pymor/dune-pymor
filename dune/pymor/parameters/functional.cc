@@ -21,7 +21,6 @@ namespace Pymor {
 
 
 ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::string& exp)
-   throw (Exception::sizes_do_not_match)
   : Parametric(tt)
   , expression_(exp)
 {
@@ -29,7 +28,6 @@ ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::str
 }
 
 ParameterFunctional::ParameterFunctional(const std::string& kk, const int& vv, const std::string& exp)
-  throw (Exception::key_is_not_valid, Exception::index_out_of_range, Exception::sizes_do_not_match)
   : Parametric(ParameterType(kk, vv))
   , expression_(exp)
 {
@@ -38,10 +36,7 @@ ParameterFunctional::ParameterFunctional(const std::string& kk, const int& vv, c
 
 ParameterFunctional::ParameterFunctional(const std::vector< std::string >& kk,
                                          const std::vector< int >& vv,
-                                         const std::string& exp) throw (Exception::key_is_not_valid,
-                                                                        Exception::index_out_of_range,
-                                                                        Exception::sizes_do_not_match,
-                                                                        Exception::sizes_do_not_match)
+                                         const std::string& exp)
   : Parametric(ParameterType(kk, vv))
   , expression_(exp)
 {
@@ -49,7 +44,6 @@ ParameterFunctional::ParameterFunctional(const std::vector< std::string >& kk,
 }
 
 ParameterFunctional::ParameterFunctional(const ParameterFunctional& other)
-   throw (Exception::sizes_do_not_match)
   : Parametric(other.parameter_type())
   , expression_(other.expression_)
 {
@@ -62,7 +56,6 @@ ParameterFunctional::~ParameterFunctional()
 }
 
 ParameterFunctional& ParameterFunctional::operator=(const ParameterFunctional& other)
-   throw (Exception::sizes_do_not_match)
 {
   if (this != &other) {
     cleanup();
@@ -84,7 +77,6 @@ std::string ParameterFunctional::report(const std::string name) const
 }
 
 void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
-  throw (Exception::wrong_parameter_type)
 {
   if (mu.type() != parameter_type())
     DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
@@ -109,14 +101,14 @@ void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
   }
 }
 
-double ParameterFunctional::evaluate(const Parameter& mu) const throw (Exception::wrong_parameter_type)
+double ParameterFunctional::evaluate(const Parameter& mu) const
 {
   double ret = 0.0;
   evaluate(mu, ret);
   return ret;
 }
 
-void ParameterFunctional::setup() throw (Exception::sizes_do_not_match)
+void ParameterFunctional::setup()
 {
   // create variables from parameter type
   const ParameterType& type = parameter_type();

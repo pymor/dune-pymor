@@ -25,33 +25,28 @@ class ParameterFunctional
   : public Parametric
 {
 public:
-  ParameterFunctional(const ParameterType& tt, const std::string& exp) throw (Exception::sizes_do_not_match);
+  ParameterFunctional(const ParameterType& tt, const std::string& exp);
 
-  ParameterFunctional(const std::string& kk, const int& vv, const std::string& exp)
-    throw (Exception::key_is_not_valid, Exception::index_out_of_range, Exception::sizes_do_not_match);
+  ParameterFunctional(const std::string& kk, const int& vv, const std::string& exp);
 
-  ParameterFunctional(const std::vector< std::string >& kk, const std::vector< int >& vv, const std::string& exp)
-    throw (Exception::key_is_not_valid,
-           Exception::index_out_of_range,
-           Exception::sizes_do_not_match,
-           Exception::sizes_do_not_match);
+  ParameterFunctional(const std::vector< std::string >& kk, const std::vector< int >& vv, const std::string& exp);
 
-  ParameterFunctional(const ParameterFunctional& other) throw (Exception::sizes_do_not_match);
+  ParameterFunctional(const ParameterFunctional& other);
 
   ~ParameterFunctional();
 
-  ParameterFunctional& operator=(const ParameterFunctional& other) throw (Exception::sizes_do_not_match);
+  ParameterFunctional& operator=(const ParameterFunctional& other);
 
   const std::string& expression() const;
 
   std::string report(const std::string name = "ParameterFunctional") const;
 
-  void evaluate(const Parameter& mu, double& ret) const throw (Exception::wrong_parameter_type);
+  void evaluate(const Parameter& mu, double& ret) const;
 
-  double evaluate(const Parameter& mu) const throw (Exception::wrong_parameter_type);
+  double evaluate(const Parameter& mu) const;
 
 private:
-  void setup() throw (Exception::sizes_do_not_match);
+  void setup();
 
   void cleanup();
 
