@@ -22,13 +22,14 @@ namespace Pymor {
 namespace Function {
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
+template< class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1 >
 class NonparametricDefault
-  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+  : public ParametricFunctionInterface< EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >
 {
-  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
+  typedef ParametricFunctionInterface< EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >
+    BaseType;
+  typedef NonparametricDefault< EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > ThisType;
 public:
-  typedef NonparametricDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >        ThisType;
   typedef typename BaseType::NonparametricType    NonparametricType;
   typedef typename NonparametricType::DomainType  DomainType;
   typedef typename NonparametricType::RangeType   RangeType;
@@ -41,13 +42,6 @@ public:
   NonparametricDefault(const std::shared_ptr< const NonparametricType > nonparametric_ptr);
 
   virtual std::string name() const;
-
-  virtual int order() const;
-
-  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
-    throw (Exception::wrong_parameter_type);
-
-  using BaseType::evaluate;
 
   virtual bool affinely_decomposable() const;
 
@@ -62,77 +56,75 @@ private:
 }; // class NonparametricDefault
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim >
-class NonparametricExpression
-  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1 >
-{
-  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1 > BaseType;
-  typedef Dune::Stuff::FunctionExpression<  DomainFieldImp, domainDim,
-                                            RangeFieldImp, rangeDim > ExpressionFunctionType;
-public:
-  typedef typename BaseType::NonparametricType        NonparametricType;
-  typedef typename ExpressionFunctionType::DomainType DomainType;
-  typedef typename ExpressionFunctionType::RangeType  RangeType;
+//template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim >
+//class NonparametricExpression
+//  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1 >
+//{
+//  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDim, 1 > BaseType;
+//  typedef Dune::Stuff::FunctionExpression<  DomainFieldImp, domainDim,
+//                                            RangeFieldImp, rangeDim > ExpressionFunctionType;
+//public:
+//  typedef typename BaseType::NonparametricType        NonparametricType;
+//  typedef typename ExpressionFunctionType::DomainType DomainType;
+//  typedef typename ExpressionFunctionType::RangeType  RangeType;
 
-  NonparametricExpression(const std::string var,
-                          const std::string expr,
-                          const int oo = -1,
-                          const std::string nm = ExpressionFunctionType::static_id());
+//  NonparametricExpression(const std::string var,
+//                          const std::string expr,
+//                          const int oo = -1,
+//                          const std::string nm = ExpressionFunctionType::static_id());
 
-  NonparametricExpression(const std::string var,
-                          const std::vector< std::string > exprs,
-                          const int oo = -1,
-                          const std::string nm = ExpressionFunctionType::static_id());
+//  NonparametricExpression(const std::string var,
+//                          const std::vector< std::string > exprs,
+//                          const int oo = -1,
+//                          const std::string nm = ExpressionFunctionType::static_id());
 
-  virtual std::string name() const;
+//  virtual std::string name() const;
 
-  virtual int order() const;
+//  virtual int order() const;
 
-  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
-    throw (Exception::wrong_parameter_type);
+//  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
+//    throw (Exception::wrong_parameter_type);
 
-  using BaseType::evaluate;
+//  using BaseType::evaluate;
 
-  virtual bool affinely_decomposable() const;
+//  virtual bool affinely_decomposable() const;
 
-  virtual bool has_affine_part() const;
+//  virtual bool has_affine_part() const;
 
-  virtual std::shared_ptr< const NonparametricType > affine_part() const;
+//  virtual std::shared_ptr< const NonparametricType > affine_part() const;
 
-  virtual unsigned int num_components() const;
+//  virtual unsigned int num_components() const;
 
-private:
-  std::shared_ptr< const ExpressionFunctionType > expressionFunction_;
-}; // class NonparametricExpression
+//private:
+//  std::shared_ptr< const ExpressionFunctionType > expressionFunction_;
+//}; // class NonparametricExpression
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
+template< class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1 >
 class AffinelyDecomposableDefault
-  : public ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+  : public ParametricFunctionInterface< EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >
 {
-  typedef ParametricFunctionInterface<  DomainFieldImp, domainDim,
-                                        RangeFieldImp, rangeDimRows, rangeDimCols > BaseType;
+  typedef ParametricFunctionInterface<  EntityImp, DomainFieldImp, domainDim,
+                                        RangeFieldImp, rangeDim, rangeDimCols > BaseType;
+  typedef AffinelyDecomposableDefault<  EntityImp, DomainFieldImp, domainDim,
+                                        RangeFieldImp, rangeDim, rangeDimCols > ThisType;
 public:
-  typedef AffinelyDecomposableDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > ThisType;
   typedef typename BaseType::NonparametricType  NonparametricType;
   typedef typename BaseType::DomainType         DomainType;
   typedef typename BaseType::RangeType          RangeType;
 
   static std::string static_id();
 
-  AffinelyDecomposableDefault(const std::string nm = static_id(),
-                              const int ord = -1);
+  AffinelyDecomposableDefault(const std::string nm = static_id());
 
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposableDefault(const NonparametricType* aff_ptr,
-                              const std::string nm = static_id(),
-                              const int ord = 0);
+                              const std::string nm = static_id());
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > aff_ptr,
-                              const std::string nm = static_id(),
-                              const int ord = 0);
+                              const std::string nm = static_id());
 
   /**
    * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it
@@ -140,38 +132,32 @@ public:
    */
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const ParameterFunctional* coeff_ptr,
-                              const std::string nm = static_id(),
-                              const int ord = 0);
+                              const std::string nm = static_id());
 
   /**
    * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposableDefault(const NonparametricType* comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
-                              const std::string nm = static_id(),
-                              const int ord = 0);
+                              const std::string nm = static_id());
 
   /**
    * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
    */
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const ParameterFunctional* coeff_ptr,
-                              const std::string nm = static_id(),
-                              const int ord = 0);
+                              const std::string nm = static_id());
 
   AffinelyDecomposableDefault(const std::shared_ptr< const NonparametricType > comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr,
-                              const std::string nm = static_id(),
-                              const int ord = 0);
+                              const std::string nm = static_id());
 
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
-  void register_affine_part(const NonparametricType* aff_ptr)
-    throw (Exception::this_does_not_make_any_sense);
+  void register_affine_part(const NonparametricType* aff_ptr);
 
-  void register_affine_part(const std::shared_ptr< const NonparametricType > aff_ptr)
-    throw (Exception::this_does_not_make_any_sense);
+  void register_affine_part(const std::shared_ptr< const NonparametricType > aff_ptr);
 
   /**
    * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it
@@ -194,28 +180,19 @@ public:
   void register_component(const std::shared_ptr< const NonparametricType > comp_ptr,
                           const std::shared_ptr< const ParameterFunctional > coeff_ptr);
 
-  virtual int order() const;
-
   virtual std::string name() const;
-
-  virtual void evaluate(const DomainType& x, RangeType& ret, const Parameter mu = Parameter()) const
-    throw (Exception::wrong_parameter_type, Exception::requirements_not_met);
-
-  using BaseType::evaluate;
 
   virtual bool affinely_decomposable() const;
 
   virtual bool has_affine_part() const;
 
-  virtual std::shared_ptr< const NonparametricType > affine_part() const throw(Exception::requirements_not_met);
+  virtual std::shared_ptr< const NonparametricType > affine_part() const;
 
   virtual unsigned int num_components() const;
 
-  virtual std::shared_ptr< const NonparametricType > component(const int qq) const
-    throw (Exception::requirements_not_met, Exception::index_out_of_range);
+  virtual std::shared_ptr< const NonparametricType > component(const int qq) const;
 
-  virtual std::shared_ptr< const ParameterFunctional > coefficient(const int qq) const
-    throw (Exception::requirements_not_met, Exception::index_out_of_range);
+  virtual std::shared_ptr< const ParameterFunctional > coefficient(const int qq) const;
 
   static Dune::ParameterTree defaultSettings(const std::string subName = "");
 
@@ -223,7 +200,6 @@ public:
 
 public:
   std::string name_;
-  int order_;
   unsigned int num_components_;
   bool hasAffinePart_;
   std::vector< std::shared_ptr< const NonparametricType > > components_;
@@ -232,58 +208,60 @@ public:
 }; // class AffinelyDecomposableDefault
 
 
-template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
-class FrozenDefault
-  : public Stuff::FunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
-{
-  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > ParametricType;
-  typedef FrozenDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows > ThisType;
-public:
-  typedef typename ParametricType::DomainType DomainType;
-  typedef typename ParametricType::RangeType RangeType;
+//template< class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDimRows, int rangeDimCols = 1 >
+//class FrozenDefault
+//  : public Stuff::FunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols >
+//{
+//  typedef ParametricFunctionInterface< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows, rangeDimCols > ParametricType;
+//  typedef FrozenDefault< DomainFieldImp, domainDim, RangeFieldImp, rangeDimRows > ThisType;
+//public:
+//  typedef typename ParametricType::DomainType DomainType;
+//  typedef typename ParametricType::RangeType RangeType;
 
-  FrozenDefault(const std::shared_ptr< const ParametricType > func, const Parameter mu)
-    : func_(func)
-    , mu_(mu)
-  {}
+//  FrozenDefault(const std::shared_ptr< const ParametricType > func, const Parameter mu)
+//    : func_(func)
+//    , mu_(mu)
+//  {}
 
-  FrozenDefault(const ThisType& other)
-    : func_(other.func_)
-    , mu_(other.mu_)
-  {}
+//  FrozenDefault(const ThisType& other)
+//    : func_(other.func_)
+//    , mu_(other.mu_)
+//  {}
 
-  ThisType& operator=(const ThisType& other)
-  {
-    if (this != &other) {
-      func_ = other.func_;
-      mu_ = other.mu_;
-    }
-    return this;
-  }
+//  ThisType& operator=(const ThisType& other)
+//  {
+//    if (this != &other) {
+//      func_ = other.func_;
+//      mu_ = other.mu_;
+//    }
+//    return this;
+//  }
 
-  virtual std::string name() const
-  {
-    return func_->name() + " with mu = " + mu_.report();
-  }
+//  virtual std::string name() const
+//  {
+//    return func_->name() + " with mu = " + mu_.report();
+//  }
 
-  virtual int order() const
-  {
-    return func_->order();
-  }
+//  virtual int order() const
+//  {
+//    return func_->order();
+//  }
 
-  virtual void evaluate(const DomainType& xx, RangeType& ret) const
-  {
-    func_->evaluate(xx, ret, mu_);
-  }
+//  virtual void evaluate(const DomainType& xx, RangeType& ret) const
+//  {
+//    func_->evaluate(xx, ret, mu_);
+//  }
 
-private:
-  std::shared_ptr< const ParametricType > func_;
-  Parameter mu_;
-}; // class FrozenDefault
+//private:
+//  std::shared_ptr< const ParametricType > func_;
+//  Parameter mu_;
+//}; // class FrozenDefault
 
 
 } // namespace Function
 } // namespace Pymor
 } // namespace Dune
+
+#include "default.cc"
 
 #endif // DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
