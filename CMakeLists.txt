@@ -71,6 +71,5 @@ set( COMMON_LIBS
 include(PymorUtils)
 
 add_subdirectory(doc)
-add_subdirectory(dune)
 add_subdirectory(examples)
-
+add_subdirectory(tests)
