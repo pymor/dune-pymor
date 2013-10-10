@@ -6,12 +6,14 @@
 #ifndef DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 #define DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 
+#include <dune/stuff/functions/expression.hh>
+
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/discretizations/interfaces.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
 #include <dune/pymor/operators/dunedynamic.hh>
 #include <dune/pymor/operators/affine.hh>
-#include <dune/pymor/functions.hh>
+#include <dune/pymor/functions/default.hh>
 #include <dune/pymor/functionals/default.hh>
 #include <dune/pymor/functionals/affine.hh>
 
@@ -24,8 +26,8 @@ class AnalyticalProblem
   : public Dune::Pymor::Parametric
 {
 public:
-  typedef Dune::Stuff::FunctionExpression< double, 1, double, 1 > ExpressionFunctionType;
-  typedef Dune::Pymor::Function::AffinelyDecomposableDefault< double, 1, double, 1 > FunctionType;
+  typedef Dune::Stuff::Function::Constant< std::string, double, 1, double, 1 > ConstantFunctionType;
+  typedef Dune::Pymor::Function::AffinelyDecomposableDefault< std::string, double, 1, double, 1 > FunctionType;
 
   AnalyticalProblem(const int dd = 4);
 

@@ -22,9 +22,9 @@ AnalyticalProblem::AnalyticalProblem(const int dd)
   // build the data functions
   // * diffusion
   const Dune::Pymor::ParameterType muDiffusion = {"diffusion", dim_};
-  diffusion_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
+  diffusion_ = new FunctionType(new ConstantFunctionType(1));
   for (size_t ii = 0; ii < dim_; ++ii)
-    diffusion_->register_component(new ExpressionFunctionType("x", "1.0"),
+    diffusion_->register_component(new ConstantFunctionType(1),
                                    new Dune::Pymor::ParameterFunctional(muDiffusion,
                                                                         "diffusion["
                                                                         + Dune::Stuff::Common::toString(ii) + "]"));
@@ -32,27 +32,27 @@ AnalyticalProblem::AnalyticalProblem(const int dd)
   // * force
   const Dune::Pymor::ParameterType muForce = {"force", dim_};
   force_ = new FunctionType();
-  force_->register_affine_part(new ExpressionFunctionType("x", "1.0"));
+  force_->register_affine_part(new ConstantFunctionType(1));
   for (size_t ii = 0; ii < dim_; ++ii)
-    force_->register_component(new ExpressionFunctionType("x", "1.0"),
+    force_->register_component(new ConstantFunctionType(1),
                                new Dune::Pymor::ParameterFunctional(muForce,
                                                                     "force["
                                                                     + Dune::Stuff::Common::toString(ii) + "]"));
   inherit_parameter_type(muForce, "force");
   // * dirichlet
   const Dune::Pymor::ParameterType muDirichlet = {"dirichlet", dim_};
-  dirichlet_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
+  dirichlet_ = new FunctionType(new ConstantFunctionType(1));
   for (size_t ii = 0; ii < dim_; ++ii)
-    dirichlet_->register_component(new ExpressionFunctionType("x", "1.0"),
+    dirichlet_->register_component(new ConstantFunctionType(1),
                                    new Dune::Pymor::ParameterFunctional(muDirichlet,
                                                                         "dirichlet["
                                                                         + Dune::Stuff::Common::toString(ii) + "]"));
   inherit_parameter_type(muDirichlet, "dirichlet");
   // * neumann
   const Dune::Pymor::ParameterType muNeumann = {"neumann", dim_};
-  neumann_ = new FunctionType(new ExpressionFunctionType("x", "1.0"));
+  neumann_ = new FunctionType(new ConstantFunctionType(1));
   for (size_t ii = 0; ii < dim_; ++ii)
-    neumann_->register_component(new ExpressionFunctionType("x", "1.0"),
+    neumann_->register_component(new ConstantFunctionType(1),
                                  new Dune::Pymor::ParameterFunctional(muNeumann,
                                                                       "neumann["
                                                                       + Dune::Stuff::Common::toString(ii) + "]"));
