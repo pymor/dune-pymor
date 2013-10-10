@@ -27,6 +27,10 @@ set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_CURRENT_SOURCE_
 include(DuneUtils)
 include(GridUtils)
 
+# adjust CXX_FLAGS
+set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3" )
+set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -ggdb" )
+
 # needs to come first to include correct config.h
 include_dir( ${dune-pymor_BINARY_DIR} ${dune-pymor_SOURCE_DIR} )
 
@@ -50,19 +54,18 @@ add_dune_modules(
 link_directories( "/usr/lib" ${CCGNU_LIBRARY_DIRS} )
 
 # header
-file( GLOB_RECURSE pymor "${CMAKE_CURRENT_SOURCE_DIR}/dune/*.hh" )
+file( GLOB_RECURSE pymor "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
 set( COMMON_HEADER ${pymor} ${DUNE_HEADERS} )
 set_source_files_properties( ${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1 )
 
 # libs
 set( COMMON_LIBS
      ${DUNE_LIBS}
+     ${DUNE_DEFAULT_LIBS}
      ${PARALIBS}
      ${CCGNU_LIBRARIES}
-     ${BOOST_LIBS}
+     ${BOOST_SYSTEM_LIBS}
      ${GRIDLIBS}
-     ${FASPLIB}
-     -lpthread
 )
 
 include(PymorUtils)

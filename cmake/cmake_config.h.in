@@ -6,6 +6,6 @@
 #ifndef DUNE_PYMOR_CONFIG_H
 #define DUNE_PYMOR_CONFIG_H
 
-#include "config.h"
+#include "../dune-pymor/config.h"
 
 #endif // DUNE_PYMOR_CONFIG_H
