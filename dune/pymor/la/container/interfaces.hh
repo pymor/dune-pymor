@@ -12,7 +12,7 @@
 #include <type_traits>
 
 #include <dune/stuff/common/disable_warnings.hh>
-  #include <dune/common/float_cmp.hh>
+# include <dune/common/float_cmp.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 
 #include <dune/stuff/common/type_utils.hh>
@@ -38,7 +38,7 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType   ScalarType;
 
-  static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
+  static std::string type_this() { return Stuff::Common::Typename< derived_type >::value(); }
 
   /**
    * \brief   Creates a (deep) copy of the underlying resource
@@ -147,7 +147,7 @@ public:
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    */
-  unsigned int dim() const
+  DUNE_PYMOR_SSIZE_T dim() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim());
     return CRTP::as_imp(*this).dim();
@@ -162,7 +162,6 @@ public:
    */
   bool almost_equal(const derived_type& other,
                     const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon< ScalarType >::value()) const
-    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).almost_equal(other, epsilon));
     return CRTP::as_imp(*this).almost_equal(other, epsilon);
@@ -170,7 +169,6 @@ public:
 
   bool almost_equal(const ThisType& other,
                     const ScalarType epsilon = Dune::FloatCmp::DefaultEpsilon< ScalarType >::value()) const
-    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).almost_equal(CRTP::as_imp(other), epsilon));
     return CRTP::as_imp(*this).almost_equal(CRTP::as_imp(other), epsilon);
@@ -182,14 +180,12 @@ public:
    * \return        The scalar product.
    */
   ScalarType dot(const derived_type& other) const
-    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dot(other));
     return CRTP::as_imp(*this).dot(other);
   }
 
   ScalarType dot(const ThisType& other) const
-    throw (Exception::sizes_do_not_match, Exception::you_have_to_implement_this)
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dot(CRTP::as_imp(other)));
     return CRTP::as_imp(*this).dot(CRTP::as_imp(other));
@@ -231,8 +227,7 @@ public:
    * \return                  A std::vector< ScalarType > `result` such that `result[i]` is the `component_indices[i]`-th
                               component of the vector.
    */
-  std::vector< ScalarType > components(const std::vector< int >& component_indices) const
-    throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
+  std::vector< ScalarType > components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).components(component_indices));
     return CRTP::as_imp(*this).components(component_indices);
@@ -254,12 +249,12 @@ public:
    * \param other   The right summand.
    * \param result  Vector to write the result of this + other to
    */
-  void add(const derived_type& other, derived_type& result) const throw (Exception::sizes_do_not_match)
+  void add(const derived_type& other, derived_type& result) const
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).add(other, result));
   }
 
-  void add(const ThisType& other, ThisType& result) const throw (Exception::sizes_do_not_match)
+  void add(const ThisType& other, ThisType& result) const
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).add(CRTP::as_imp(other), CRTP::as_imp(result)));
   }
@@ -270,14 +265,14 @@ public:
    * \param
    * \return  The sum of this and other.
    */
-  derived_type add(const derived_type& other) const throw (Exception::sizes_do_not_match)
+  derived_type add(const derived_type& other) const
   {
     derived_type result = this->copy();
     result.iadd(other);
     return result;
   }
 
-  derived_type add(const ThisType& other) const throw (Exception::sizes_do_not_match)
+  derived_type add(const ThisType& other) const
   {
     derived_type result = this->copy();
     result.iadd(other);
@@ -298,12 +293,12 @@ public:
    * \brief Inplace variant of add().
    * \param other The right summand.
    */
-  void iadd(const derived_type& other) throw (Exception::sizes_do_not_match)
+  void iadd(const derived_type& other)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).iadd(other));
   }
 
-  void iadd(const ThisType& other) throw (Exception::sizes_do_not_match)
+  void iadd(const ThisType& other)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).iadd(CRTP::as_imp(other)));
   }
@@ -313,12 +308,12 @@ public:
    * \param other   The subtrahend.
    * \param result  The vectror to write the difference between this and other to.
    */
-  void sub(const derived_type& other, derived_type& result) const throw (Exception::sizes_do_not_match)
+  void sub(const derived_type& other, derived_type& result) const
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).sub(other, result));
   }
 
-  void sub(const ThisType& other, ThisType& result) const throw (Exception::sizes_do_not_match)
+  void sub(const ThisType& other, ThisType& result) const
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).sub(CRTP::as_imp(other), CRTP::as_imp(result)));
   }
@@ -328,14 +323,14 @@ public:
    * \param   other The subtrahend.
    * \return        The difference between this and other.
    */
-  derived_type sub(const derived_type& other) const throw (Exception::sizes_do_not_match)
+  derived_type sub(const derived_type& other) const
   {
     derived_type result = this->copy();
     result.isub(other);
     return result;
   }
 
-  derived_type sub(const ThisType& other) const throw (Exception::sizes_do_not_match)
+  derived_type sub(const ThisType& other) const
   {
     derived_type result = this->copy();
     result.isub(other);
@@ -356,12 +351,12 @@ public:
    * \brief Inplace variant of sub().
    * \param other The subtrahend.
    */
-  void isub(const derived_type& other) throw (Exception::sizes_do_not_match)
+  void isub(const derived_type& other)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).isub(other));
   }
 
-  void isub(const ThisType& other) throw (Exception::sizes_do_not_match)
+  void isub(const ThisType& other)
   {
     CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).isub(CRTP::as_imp(other)));
   }
@@ -381,13 +376,13 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType   ScalarType;
 
-  unsigned int dim_source() const
+  DUNE_PYMOR_SSIZE_T dim_source() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
     return CRTP::as_imp(*this).dim_source();
   }
 
-  unsigned int dim_range() const
+  DUNE_PYMOR_SSIZE_T dim_range() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_range());
     return CRTP::as_imp(*this).dim_range();
