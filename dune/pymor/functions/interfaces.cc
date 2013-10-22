@@ -3,135 +3,60 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-namespace Dune {
-namespace Pymor {
+#include "config.h"
 
+#include "interfaces.hh"
 
-// =======================================
-// ===== ParametricFunctionInterface =====
-// =======================================
-template< class E, class D, int d, class R, int r, int rC >
-ParametricFunctionInterface< E, D, d, R, r, rC >::ParametricFunctionInterface(const ParameterType tt)
-  : Parametric(tt)
-{}
+// we use this macro so we can add ParametricFunctionInterface at some point
+#define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(etype, ddim) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGE(Dune::Pymor::AffinelyDecomposableFunctionInterface, etype, ddim)
 
-template< class E, class D, int d, class R, int r, int rC >
-ParametricFunctionInterface< E, D, d, R, r, rC >::ParametricFunctionInterface(const Parametric& other)
-  : Parametric(other)
-{}
+#define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGE(cname, etype, ddim) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGECOLS(cname, etype, ddim, 1) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGECOLS(cname, etype, ddim, 2) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGECOLS(cname, etype, ddim, 3)
 
-template< class E, class D, int d, class R, int r, int rC >
-ParametricFunctionInterface< E, D, d, R, r, rC >::~ParametricFunctionInterface()
-{}
+#define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGECOLS(cname, etype, ddim, rdim) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 1) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 2) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, 3)
 
-template< class E, class D, int d, class R, int r, int rC >
-std::string ParametricFunctionInterface< E, D, d, R, r, rC >::static_id()
-{
-  return "dune.pymor.parametricfunction";
-}
+#define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DOMAINFIELDTYPES(cname, etype, ddim, rdim, rcdim) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_RANGEFIELDTYPES(cname, etype, double, ddim, rdim, rcdim)
 
-template< class E, class D, int d, class R, int r, int rC >
-std::string ParametricFunctionInterface< E, D, d, R, r, rC >::name() const
-{
-  return "dune.pymor.parametricfunction";
-}
+#define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_RANGEFIELDTYPES(cname, etype, dftype, ddim, rdim, rcdim) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LAST_EXPANSION(cname, etype, dftype, ddim, double, rdim, rcdim) \
+  DUNE_PYMOR_FUNCTION_INTERFACES_CC_LAST_EXPANSION(cname, etype, dftype, ddim, long double, rdim, rcdim)
 
-template< class E, class D, int d, class R, int r, int rC >
-bool ParametricFunctionInterface< E, D, d, R, r, rC >::affinely_decomposable() const
-{
-  if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call affinely_decomposable() if parametric() == false!");
-  return false;
-}
+#define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LAST_EXPANSION(cname, etype, dftype, ddim, rftype, rdim, rcdim) \
+  template class cname< etype, dftype, ddim, rftype, rdim, rcdim >;
 
-template< class E, class D, int d, class R, int r, int rC >
-bool ParametricFunctionInterface< E, D, d, R, r, rC >::has_affine_part() const
-{
-  if (!parametric())
-    return true;
-  if (affinely_decomposable())
-    DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                     "Since affinely_decomposable() == true, youe really do!");
-  else
-    DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                     "Do not call has_affine_part() if affinely_decomposable() == false!");
-  return false;
-}
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesStuffFakeGrid1dEntityType, 1)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesStuffFakeGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesStuffFakeGrid3dEntityType, 3)
 
-template< class E, class D, int d, class R, int r, int rC >
-std::shared_ptr< const typename ParametricFunctionInterface< E, D, d, R, r, rC >::NonparametricType >
-ParametricFunctionInterface< E, D, d, R, r, rC >::affine_part() const
-{
-  if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call affine_part() if parametric() == false!");
-  if (affinely_decomposable()) {
-    if (has_affine_part())
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since affinely_decomposable() == true, youe really do!");
-    else
-      DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                       "Do not call affine_part() if has_affine_part() == false!");
-  } else
-    DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                     "Do not call affine_part() if affinely_decomposable() == false!");
-  return nullptr;
-}
+#ifdef HAVE_DUNE_GRID
 
-template< class E, class D, int d, class R, int r, int rC >
-unsigned int ParametricFunctionInterface< E, D, d, R, r, rC >::num_components() const
-{
-  if (!parametric())
-    return 0;
-  if (affinely_decomposable())
-    DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                     "since affinely_decomposable() == true, youe really do!");
-  else
-    DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                     "Do not call num_components() if affinely_decomposable() == false!");
-  return false;
-}
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesSGrid1dEntityType, 1)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesSGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesSGrid3dEntityType, 3)
 
-template< class E, class D, int d, class R, int r, int rC >
-std::shared_ptr< const typename ParametricFunctionInterface< E, D, d, R, r, rC >::NonparametricType >
-ParametricFunctionInterface< E, D, d, R, r, rC >::component(int qq) const
-{
-  if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call component(" << qq << ") if parametric() == false!");
-  if (affinely_decomposable()) {
-    if (num_components() > 0)
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since num_components() == " << num_components() << ", youe really do!");
-    else
-      DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                       "Do not call component(" << qq << ") if num_components() == 0!");
-  } else
-    DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                     "Do not call component(" << qq << ") if affinely_decomposable() == false!");
-  return nullptr;
-}
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesYaspGrid1dEntityType, 1)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesYaspGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesYaspGrid3dEntityType, 3)
 
-template< class E, class D, int d, class R, int r, int rC >
-std::shared_ptr< const ParameterFunctional > ParametricFunctionInterface< E, D, d, R, r, rC >::coefficient(int qq) const
-{
-  if (!parametric())
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "Do not call coefficient(" << qq << ") if parametric() == false!");
-  if (affinely_decomposable()) {
-    if (num_components() > 0)
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since num_components() == " << num_components() << ", youe really do!");
-    else
-      DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                       "Do not call coefficient(" << qq << ") if num_components() == 0!");
-  } else
-    DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                     "Do not call coefficient(" << qq << ") if affinely_decomposable() == false!");
-  return nullptr;
-}
+# if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
+DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesAluCubeGrid3dEntityType, 3)
 
-} // namespace Pymor
-} // namespace Dune
+# endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
+#endif // HAVE_DUNE_GRID
+
+#undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LAST_EXPANSION
+#undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_RANGEFIELDTYPES
+#undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DOMAINFIELDTYPES
+#undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGECOLS
+#undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGE
+#undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES
