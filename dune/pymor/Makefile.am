@@ -18,8 +18,8 @@ libpymor_la_SOURCES = \
   parameters/base.cc \
   parameters/functional.cc
 
-libpymor_la_LIBADD = $(DUNE_LIBS)
+libpymor_la_LIBADD = $(DUNE_LIBS) $(ALUGRID_LIBS)
 
-libpymor_la_CPPFLAGS = ${DUNE_CPPFLAGS}
+libpymor_la_CPPFLAGS = $(DUNE_CPPFLAGS) $(ALUGRID_CPPFLAGS)
 
 include $(top_srcdir)/am/global-rules
