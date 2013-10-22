@@ -137,7 +137,7 @@ DuneDynamicVector< S >::components(const std::vector< int >& component_indices) 
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "size of component_indices (" << component_indices.size()
                      << ") is larger than the dim of this (" << dim() << ")!");
-  std::vector< double > values(component_indices.size(), 0);
+  std::vector< ScalarType > values(component_indices.size(), 0);
   for (size_t ii = 0; ii < component_indices.size(); ++ii) {
     const int component = component_indices[ii];
     if (component < 0)
@@ -154,9 +154,9 @@ DuneDynamicVector< S >::components(const std::vector< int >& component_indices) 
 template< class S >
 std::vector< typename DuneDynamicVector< S >::ScalarType > DuneDynamicVector< S >::amax() const
 {
-  std::vector< double > result(2, 0.0);
+  std::vector< ScalarType > result(2, 0.0);
   for (size_t ii = 0; ii < dim(); ++ii) {
-    const double value = std::abs(backend_->operator[](ii));
+    const ScalarType value = std::abs(backend_->operator[](ii));
     if (value > result[1]) {
       result[0] = ii;
       result[1] = value;
