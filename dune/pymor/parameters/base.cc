@@ -95,9 +95,9 @@ bool KeyValueBase< KeyType, ValueType >::operator!=(const KeyValueBase< KeyType,
 }
 
 template< class KeyType, class ValueType >
-unsigned int KeyValueBase< KeyType, ValueType >::size() const
+DUNE_PYMOR_SSIZE_T KeyValueBase< KeyType, ValueType >::size() const
 {
-  return dict_.size();
+  return (DUNE_PYMOR_SSIZE_T)(dict_.size());
 }
 
 template< class KeyType, class ValueType >
@@ -114,7 +114,7 @@ void KeyValueBase< KeyType, ValueType >::update()
   }
 } // void update()
 
-template class KeyValueBase< std::string, int >;
+template class KeyValueBase< std::string, DUNE_PYMOR_SSIZE_T >;
 template class KeyValueBase< std::string, std::vector< double > >;
 
 
@@ -230,7 +230,7 @@ Parameter::Parameter(const ParameterType& tt, const ValueType& vv)
   if (tt.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "tt is empty!");
   if (tt.size() != 1) DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                                        "tt should be of size 1 (is " << tt.size() << ")!");
-  if (tt.values()[0] != int(vv.size()))
+  if (tt.values()[0] != vv.size())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "vv should be of size " << tt.values()[0] << " (is " << vv.size() << ")!");
 }
@@ -243,7 +243,7 @@ Parameter::Parameter(const std::vector< KeyType >& kk,
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
   if (kk.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "kk and vv are empty!");
-  std::vector< int > valueSizes(vv.size());
+  std::vector< DUNE_PYMOR_SSIZE_T > valueSizes(vv.size());
   for (size_t ii = 0; ii < vv.size(); ++ii) {
     if (vv[ii].size() == 0)
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -264,7 +264,7 @@ Parameter::Parameter(const ParameterType& tt,
   if (tt.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "tt and vv are empty!");
   const auto& valueSizes = type_.values();
   for (size_t ii = 0; ii < vv.size(); ++ii) {
-    if (int(vv[ii].size()) != valueSizes[ii])
+    if (vv[ii].size() != valueSizes[ii])
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                        "vv[" << ii << "] has to be of size " << valueSizes[ii] << " (is " << vv[ii].size() << ")!");
   }
@@ -360,11 +360,11 @@ Parametric::Parametric(const ParameterType& tt)
   : type_(tt)
 {}
 
-Parametric::Parametric(const std::string& kk, const int& vv)
+Parametric::Parametric(const std::string& kk, const DUNE_PYMOR_SSIZE_T & vv)
   : type_(kk, vv)
 {}
 
-Parametric::Parametric(const std::vector< std::string >& kk, const std::vector< int >& vv)
+Parametric::Parametric(const std::vector< std::string >& kk, const std::vector< DUNE_PYMOR_SSIZE_T >& vv)
   : type_(kk, vv)
 {}
 
