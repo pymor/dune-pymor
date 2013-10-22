@@ -24,6 +24,7 @@ AC_SUBST(AM_LDFLAGS, $DUNE_LDFLAGS)
 LIBS="$DUNE_LIBS"
 
 AC_DEFINE([HAVE_DUNE_PYMOR], [1], [We are always here.])
+AC_DEFINE([DUNE_PYMOR_SSIZE_T], [long int], [We need this for the python bindings.])
 
 AC_CONFIG_FILES([
   Makefile
