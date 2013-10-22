@@ -86,10 +86,11 @@ template< class EntityImp, class DomainFieldImp, int domainDim, class RangeField
 class AffinelyDecomposableDefault
   : public AffinelyDecomposableFunctionInterface< EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >
 {
-  typedef AffinelyDecomposableFunctionInterface
-      < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > BaseType;
   typedef AffinelyDecomposableDefault
       < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > ThisType;
+protected:
+  typedef AffinelyDecomposableFunctionInterface
+      < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > BaseType;
 public:
   typedef typename BaseType::NonparametricType  NonparametricType;
   typedef typename BaseType::EntityType         EntityType;
