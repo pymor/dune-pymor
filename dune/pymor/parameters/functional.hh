@@ -27,9 +27,11 @@ class ParameterFunctional
 public:
   ParameterFunctional(const ParameterType& tt, const std::string& exp);
 
-  ParameterFunctional(const std::string& kk, const int& vv, const std::string& exp);
+  ParameterFunctional(const std::string& kk, const DUNE_PYMOR_SSIZE_T & vv, const std::string& exp);
 
-  ParameterFunctional(const std::vector< std::string >& kk, const std::vector< int >& vv, const std::string& exp);
+  ParameterFunctional(const std::vector< std::string >& kk,
+                      const std::vector< DUNE_PYMOR_SSIZE_T >& vv,
+                      const std::string& exp);
 
   ParameterFunctional(const ParameterFunctional& other);
 

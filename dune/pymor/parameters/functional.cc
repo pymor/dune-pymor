@@ -3,11 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
 #include <limits>
 #include <sstream>
@@ -27,7 +23,9 @@ ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::str
   setup();
 }
 
-ParameterFunctional::ParameterFunctional(const std::string& kk, const int& vv, const std::string& exp)
+ParameterFunctional::ParameterFunctional(const std::string& kk,
+                                         const DUNE_PYMOR_SSIZE_T & vv,
+                                         const std::string& exp)
   : Parametric(ParameterType(kk, vv))
   , expression_(exp)
 {
@@ -35,7 +33,7 @@ ParameterFunctional::ParameterFunctional(const std::string& kk, const int& vv, c
 }
 
 ParameterFunctional::ParameterFunctional(const std::vector< std::string >& kk,
-                                         const std::vector< int >& vv,
+                                         const std::vector< DUNE_PYMOR_SSIZE_T >& vv,
                                          const std::string& exp)
   : Parametric(ParameterType(kk, vv))
   , expression_(exp)
