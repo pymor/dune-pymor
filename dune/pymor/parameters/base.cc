@@ -3,11 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
 #include "base.hh"
 
@@ -34,9 +30,7 @@ KeyValueBase< KeyType, ValueType >::KeyValueBase(const KeyType& kk, const ValueT
 }
 
 template< class KeyType, class ValueType >
-KeyValueBase< KeyType, ValueType >::KeyValueBase(const std::vector< KeyType >& kk,
-                                                 const std::vector< ValueType >& vv)
-  throw (Exception::key_is_not_valid, Exception::sizes_do_not_match)
+KeyValueBase< KeyType, ValueType >::KeyValueBase(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv)
 {
   if (kk.size() != vv.size())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -81,7 +75,7 @@ bool KeyValueBase< KeyType, ValueType >::hasKey(const KeyType& key) const
 }
 
 template< class KeyType, class ValueType >
-const ValueType& KeyValueBase< KeyType, ValueType >::get(const KeyType& key) const throw (Exception::key_is_not_valid)
+const ValueType& KeyValueBase< KeyType, ValueType >::get(const KeyType& key) const
 {
   const auto result = dict_.find(key);
   if (result == dict_.end()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key does not exist!");
@@ -130,18 +124,14 @@ template class KeyValueBase< std::string, std::vector< double > >;
 ParameterType::ParameterType()
 {}
 
-ParameterType::ParameterType(const KeyType& kk, const ValueType& vv) throw (Exception::key_is_not_valid,
-                                                                            Exception::index_out_of_range)
+ParameterType::ParameterType(const KeyType& kk, const ValueType& vv)
   : BaseType(kk, vv)
 {
   if (kk.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "kk is empty!");
   if (vv <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "vv has to be positive (is " << vv << ")!");
 }
 
-ParameterType::ParameterType(const std::vector< KeyType >& kk,
-                             const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                                        Exception::index_out_of_range,
-                                                                        Exception::sizes_do_not_match)
+ParameterType::ParameterType(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv)
   : BaseType(kk, vv)
 {
   if (kk.size() != vv.size())
@@ -162,8 +152,7 @@ ParameterType::ParameterType(const std::vector< KeyType >& kk,
   }
 }
 
-void ParameterType::set(const KeyType& key, const ValueType& value) throw (Exception::key_is_not_valid,
-                                                                           Exception::index_out_of_range)
+void ParameterType::set(const KeyType& key, const ValueType& value)
 {
   if (key.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key is empty!");
   if (value <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "value has to be positive (is " << value << ")!");
@@ -214,7 +203,7 @@ Parameter::Parameter(const KeyType& kk, const double& vv)
   , type_(kk, 1)
 {}
 
-Parameter::Parameter(const ParameterType& tt, const double& vv) throw (Exception::sizes_do_not_match)
+Parameter::Parameter(const ParameterType& tt, const double& vv)
   : BaseType(tt.keys(), {{vv}})
   , type_(tt)
 {
@@ -226,8 +215,7 @@ Parameter::Parameter(const ParameterType& tt, const double& vv) throw (Exception
                      "tt.get(\"" << tt.keys()[0] << "\") should be 1 (is " << tt.values()[0] << ")!");
 }
 
-Parameter::Parameter(const KeyType& kk, const ValueType& vv) throw (Exception::key_is_not_valid,
-                                                                    Exception::sizes_do_not_match)
+Parameter::Parameter(const KeyType& kk, const ValueType& vv)
   : BaseType(kk, vv)
   , type_(kk, vv.size())
 {
@@ -235,7 +223,7 @@ Parameter::Parameter(const KeyType& kk, const ValueType& vv) throw (Exception::k
   if (vv.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "vv is empty!");
 }
 
-Parameter::Parameter(const ParameterType& tt, const ValueType& vv) throw (Exception::sizes_do_not_match)
+Parameter::Parameter(const ParameterType& tt, const ValueType& vv)
   : BaseType(tt.keys(), {vv})
   , type_(tt)
 {
@@ -248,8 +236,7 @@ Parameter::Parameter(const ParameterType& tt, const ValueType& vv) throw (Except
 }
 
 Parameter::Parameter(const std::vector< KeyType >& kk,
-                     const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                                Exception::sizes_do_not_match)
+                     const std::vector< ValueType >& vv)
   : BaseType(kk, vv)
 {
   if (kk.size() != vv.size())
@@ -267,8 +254,7 @@ Parameter::Parameter(const std::vector< KeyType >& kk,
 }
 
 Parameter::Parameter(const ParameterType& tt,
-                     const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                                Exception::sizes_do_not_match)
+                     const std::vector< ValueType >& vv)
   : BaseType(tt.keys(), vv)
   , type_(tt)
 {
@@ -289,8 +275,7 @@ const ParameterType& Parameter::type() const
   return type_;
 }
 
-void Parameter::set(const KeyType& key, const ValueType& value) throw (Exception::key_is_not_valid,
-                                                                       Exception::sizes_do_not_match)
+void Parameter::set(const KeyType& key, const ValueType& value)
 {
   if (key.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key is empty!");
   if (value.size() == 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "value is empty!");
@@ -375,15 +360,11 @@ Parametric::Parametric(const ParameterType& tt)
   : type_(tt)
 {}
 
-Parametric::Parametric(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                                    Exception::index_out_of_range)
+Parametric::Parametric(const std::string& kk, const int& vv)
   : type_(kk, vv)
 {}
 
-Parametric::Parametric(const std::vector< std::string >& kk,
-                       const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                            Exception::index_out_of_range,
-                                                            Exception::sizes_do_not_match)
+Parametric::Parametric(const std::vector< std::string >& kk, const std::vector< int >& vv)
   : type_(kk, vv)
 {}
 
@@ -406,7 +387,6 @@ bool Parametric::parametric() const
 }
 
 void Parametric::inherit_parameter_type(const ParameterType& tt, const std::string id)
-  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
 {
   if (id.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "id must not be empty!");
   const auto result = inherits_map_.find(id);
@@ -427,19 +407,16 @@ void Parametric::inherit_parameter_type(const ParameterType& tt, const std::stri
 }
 
 void Parametric::inherit_parameter_type(const Parameter& mu, const std::string id)
-  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
 {
   inherit_parameter_type(mu.type(), id);
 }
 
 void Parametric::inherit_parameter_type(const Parametric& other, const std::string id)
-  throw (Exception::sizes_do_not_match, Exception::key_is_not_valid)
 {
   inherit_parameter_type(other.parameter_type(), id);
 }
 
 Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) const
-  throw (Exception::key_is_not_valid, Exception::requirements_not_met)
 {
   if (inherits_map_.empty())
     DUNE_PYMOR_THROW(Exception::requirements_not_met, "there is nothing to map!");
@@ -471,8 +448,7 @@ Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) c
   return muLocal;
 }
 
-const ParameterType& Parametric::map_parameter_type(const std::string id) const throw (Exception::key_is_not_valid,
-                                                                                       Exception::requirements_not_met)
+const ParameterType& Parametric::map_parameter_type(const std::string id) const
 {
   if (inherits_map_.empty())
     DUNE_PYMOR_THROW(Exception::requirements_not_met, "there is nothing to map!");

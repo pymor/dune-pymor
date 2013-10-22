@@ -33,9 +33,7 @@ public:
 
   KeyValueBase(const KeyType& kk, const ValueType& vv);
 
-  KeyValueBase(const std::vector< KeyType >& kk,
-               const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                          Exception::sizes_do_not_match);
+  KeyValueBase(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv);
 
   bool empty() const;
 
@@ -45,11 +43,9 @@ public:
 
   bool hasKey(const KeyType& key) const;
 
-  virtual void set(const KeyType& key, const ValueType& value) throw (Exception::index_out_of_range,
-                                                                      Exception::key_is_not_valid,
-                                                                      Exception::sizes_do_not_match) = 0;
+  virtual void set(const KeyType& key, const ValueType& value) = 0;
 
-  const ValueType& get(const KeyType& key) const throw (Exception::key_is_not_valid);
+  const ValueType& get(const KeyType& key) const;
 
   bool operator==(const KeyValueBase< KeyType, ValueType >& other) const;
 
@@ -97,16 +93,11 @@ public:
    */
   ParameterType();
 
-  ParameterType(const KeyType& kk, const ValueType& vv) throw (Exception::key_is_not_valid,
-                                                               Exception::index_out_of_range);
+  ParameterType(const KeyType& kk, const ValueType& vv);
 
-  ParameterType(const std::vector< KeyType >& kk,
-                const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                           Exception::index_out_of_range,
-                                                           Exception::sizes_do_not_match);
+  ParameterType(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv);
 
-  virtual void set(const KeyType& key, const ValueType& value) throw (Exception::key_is_not_valid,
-                                                                      Exception::index_out_of_range);
+  virtual void set(const KeyType& key, const ValueType& value);
 
   virtual std::string report() const;
 
@@ -135,24 +126,19 @@ public:
 
   Parameter(const KeyType& kk, const double& vv);
 
-  Parameter(const ParameterType& tt, const double& vv) throw (Exception::sizes_do_not_match);
+  Parameter(const ParameterType& tt, const double& vv);
 
-  Parameter(const KeyType& kk, const ValueType& vv) throw (Exception::key_is_not_valid, Exception::sizes_do_not_match);
+  Parameter(const KeyType& kk, const ValueType& vv);
 
-  Parameter(const ParameterType& tt, const ValueType& vv) throw (Exception::sizes_do_not_match);
+  Parameter(const ParameterType& tt, const ValueType& vv);
 
-  Parameter(const std::vector< KeyType >& kk,
-            const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                       Exception::sizes_do_not_match);
+  Parameter(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv);
 
-  Parameter(const ParameterType& tt,
-            const std::vector< ValueType >& vv) throw (Exception::key_is_not_valid,
-                                                       Exception::sizes_do_not_match);
+  Parameter(const ParameterType& tt, const std::vector< ValueType >& vv);
 
   const ParameterType& type() const;
 
-  void set(const KeyType& key, const ValueType& value) throw (Exception::key_is_not_valid,
-                                                              Exception::sizes_do_not_match);
+  void set(const KeyType& key, const ValueType& value);
 
   std::string report() const;
 
@@ -198,13 +184,9 @@ public:
 
   Parametric(const ParameterType& tt);
 
-  Parametric(const std::string& kk, const int& vv) throw (Exception::key_is_not_valid,
-                                                          Exception::index_out_of_range);
+  Parametric(const std::string& kk, const int& vv);
 
-  Parametric(const std::vector< std::string >& kk,
-             const std::vector< int >& vv) throw (Exception::key_is_not_valid,
-                                                  Exception::index_out_of_range,
-                                                  Exception::sizes_do_not_match);
+  Parametric(const std::vector< std::string >& kk, const std::vector< int >& vv);
 
   Parametric(const Parametric& other);
 
@@ -215,20 +197,15 @@ public:
   bool parametric() const;
 
 protected:
-  void inherit_parameter_type(const ParameterType& tt, const std::string id) throw (Exception::sizes_do_not_match,
-                                                                                    Exception::key_is_not_valid);
+  void inherit_parameter_type(const ParameterType& tt, const std::string id);
 
-  void inherit_parameter_type(const Parameter& mu, const std::string id) throw (Exception::sizes_do_not_match,
-                                                                                Exception::key_is_not_valid);
+  void inherit_parameter_type(const Parameter& mu, const std::string id);
 
-  void inherit_parameter_type(const Parametric& other, const std::string id) throw (Exception::sizes_do_not_match,
-                                                                                    Exception::key_is_not_valid);
+  void inherit_parameter_type(const Parametric& other, const std::string id);
 
-  const ParameterType& map_parameter_type(const std::string id) const throw (Exception::key_is_not_valid,
-                                                                             Exception::requirements_not_met);
+  const ParameterType& map_parameter_type(const std::string id) const;
 
-  Parameter map_parameter(const Parameter& mu, const std::string id) const throw (Exception::key_is_not_valid,
-                                                                                  Exception::requirements_not_met);
+  Parameter map_parameter(const Parameter& mu, const std::string id) const;
 
   void replace_parameter_type(const ParameterType tt = ParameterType());
 
