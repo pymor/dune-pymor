@@ -132,7 +132,7 @@ EigenDenseVector< S >::components(const std::vector< int >& component_indices) c
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "size of component_indices (" << component_indices.size()
                      << ") is larger than the dim of this (" << dim() << ")!");
-  std::vector< double > values(component_indices.size(), 0);
+  std::vector< ScalarType > values(component_indices.size(), 0);
   for (size_t ii = 0; ii < component_indices.size(); ++ii) {
     const int component = component_indices[ii];
     if (component < 0)
