@@ -16,7 +16,7 @@ namespace LA {
 
 
 template< class T >
-static T createContainer(const T&, const size_t size);
+static T createContainer(const T&, const DUNE_PYMOR_SSIZE_T size);
 
 
 } // namespace LA
