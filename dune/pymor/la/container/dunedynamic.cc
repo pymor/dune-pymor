@@ -3,11 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
 #include <utility>
 #include <vector>
@@ -30,7 +26,7 @@ namespace LA {
 // ===== DuneDynamicVector =====
 // =============================
 template< class S >
-DuneDynamicVector< S >::DuneDynamicVector(const int size, const ScalarType value)
+DuneDynamicVector< S >::DuneDynamicVector(const DUNE_PYMOR_SSIZE_T size, const ScalarType value)
   : backend_(new BackendType(assert_is_not_negative(size), value))
 {}
 
@@ -70,7 +66,7 @@ void DuneDynamicVector< S >::scal(const ScalarType& alpha)
 }
 
 template< class S >
-void DuneDynamicVector< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
+void DuneDynamicVector< S >::axpy(const ScalarType& alpha, const ThisType& xx)
 {
   ensure_uniqueness();
   auto& thisRef = *backend_;
@@ -80,7 +76,7 @@ void DuneDynamicVector< S >::axpy(const ScalarType& alpha, const ThisType& xx) t
 }
 
 template< class S >
-unsigned int DuneDynamicVector< S >::dim() const
+DUNE_PYMOR_SSIZE_T DuneDynamicVector< S >::dim() const
 {
   return backend_->size();
 }
@@ -102,7 +98,6 @@ bool DuneDynamicVector< S >::almost_equal(const ThisType& other, const ScalarTyp
 
 template< class S >
 typename DuneDynamicVector< S >::ScalarType DuneDynamicVector< S >::dot(const ThisType& other) const
-  throw (Exception::sizes_do_not_match)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -130,8 +125,7 @@ typename DuneDynamicVector< S >::ScalarType DuneDynamicVector< S >::sup_norm() c
 
 template< class S >
 std::vector< typename DuneDynamicVector< S >::ScalarType >
-DuneDynamicVector< S >::components(const std::vector< int >& component_indices) const
-  throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
+DuneDynamicVector< S >::components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const
 {
   if (component_indices.size() > dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -139,11 +133,11 @@ DuneDynamicVector< S >::components(const std::vector< int >& component_indices) 
                      << ") is larger than the dim of this (" << dim() << ")!");
   std::vector< ScalarType > values(component_indices.size(), 0);
   for (size_t ii = 0; ii < component_indices.size(); ++ii) {
-    const int component = component_indices[ii];
+    const auto& component = component_indices[ii];
     if (component < 0)
       DUNE_PYMOR_THROW(Exception::index_out_of_range,
                        "component_indices[" << ii << "] is negative (" << component << ")!");
-    if (component >= int(dim()))
+    if (component >= dim())
       DUNE_PYMOR_THROW(Exception::index_out_of_range,
                        "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
     values[ii] = backend_->operator[](component);
@@ -168,17 +162,16 @@ std::vector< typename DuneDynamicVector< S >::ScalarType > DuneDynamicVector< S 
 
 template< class S >
 void DuneDynamicVector< S >::add(const ThisType& other, ThisType& result) const
-  throw (Exception::sizes_do_not_match)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
-  for (unsigned int ii = 0; ii < dim(); ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim(); ++ii)
     result.backend_->operator[](ii) = backend_->operator[](ii) + other.backend_->operator[](ii);
 }
 
 template< class S >
-void DuneDynamicVector< S >::iadd(const ThisType& other) throw (Exception::sizes_do_not_match)
+void DuneDynamicVector< S >::iadd(const ThisType& other)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -189,17 +182,16 @@ void DuneDynamicVector< S >::iadd(const ThisType& other) throw (Exception::sizes
 
 template< class S >
 void DuneDynamicVector< S >::sub(const ThisType& other, ThisType& result) const
-  throw (Exception::sizes_do_not_match)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
-  for (unsigned int ii = 0; ii < dim(); ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim(); ++ii)
     result.backend_->operator[](ii) = backend_->operator[](ii) - other.backend_->operator[](ii);
 }
 
 template< class S >
-void DuneDynamicVector< S >::isub(const ThisType& other) throw (Exception::sizes_do_not_match)
+void DuneDynamicVector< S >::isub(const ThisType& other)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -223,7 +215,7 @@ const typename DuneDynamicVector< S >::BackendType& DuneDynamicVector< S >::back
 }
 
 template< class S >
-int DuneDynamicVector< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
+DUNE_PYMOR_SSIZE_T DuneDynamicVector< S >::assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
@@ -245,7 +237,9 @@ template class AffinelyDecomposedContainer< DuneDynamicVector< double > >;
 // ===== DuneDynamicMatrix =====
 // =============================
 template< class S >
-DuneDynamicMatrix< S >::DuneDynamicMatrix(const int rr, const int cc, const ScalarType value)
+DuneDynamicMatrix< S >::DuneDynamicMatrix(const DUNE_PYMOR_SSIZE_T rr,
+                                          const DUNE_PYMOR_SSIZE_T cc,
+                                          const ScalarType value)
   : backend_(new BackendType(assert_is_not_negative(rr), assert_is_not_negative(cc), value))
 {}
 
@@ -278,13 +272,13 @@ typename DuneDynamicMatrix< S >::ThisType DuneDynamicMatrix< S >::copy() const
 }
 
 template< class S >
-unsigned int DuneDynamicMatrix< S >::dim_source() const
+DUNE_PYMOR_SSIZE_T DuneDynamicMatrix< S >::dim_source() const
 {
   return backend_->cols();
 }
 
 template< class S >
-unsigned int DuneDynamicMatrix< S >::dim_range() const
+DUNE_PYMOR_SSIZE_T DuneDynamicMatrix< S >::dim_range() const
 {
   return backend_->rows();
 }
@@ -303,7 +297,7 @@ void DuneDynamicMatrix< S >::scal(const ScalarType& alpha)
 }
 
 template< class S >
-void DuneDynamicMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
+void DuneDynamicMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx)
 {
   if (xx.dim_source() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -332,7 +326,7 @@ const typename DuneDynamicMatrix< S >::BackendType& DuneDynamicMatrix< S >::back
 }
 
 template< class S >
-int DuneDynamicMatrix< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
+DUNE_PYMOR_SSIZE_T DuneDynamicMatrix< S >::assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
