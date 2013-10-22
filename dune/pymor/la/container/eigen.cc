@@ -25,7 +25,7 @@ namespace LA {
 // ===== EigenDenseVector =====
 // ============================
 template< class S >
-EigenDenseVector< S >::EigenDenseVector(const int size, const ScalarType value)
+EigenDenseVector< S >::EigenDenseVector(const DUNE_PYMOR_SSIZE_T size, const ScalarType value)
   : backend_(new BackendType(assert_is_not_negative(size), value))
 {}
 
@@ -65,7 +65,7 @@ void EigenDenseVector< S >::scal(const ScalarType& alpha)
 }
 
 template< class S >
-void EigenDenseVector< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
+void EigenDenseVector< S >::axpy(const ScalarType& alpha, const ThisType& xx)
 {
   ensure_uniqueness();
   auto& thisRef = *backend_;
@@ -74,7 +74,7 @@ void EigenDenseVector< S >::axpy(const ScalarType& alpha, const ThisType& xx) th
 }
 
 template< class S >
-unsigned int EigenDenseVector< S >::dim() const
+DUNE_PYMOR_SSIZE_T EigenDenseVector< S >::dim() const
 {
   return backend_->size();
 }
@@ -97,7 +97,6 @@ bool EigenDenseVector< S >::almost_equal(const ThisType& other,
 
 template< class S >
 typename EigenDenseVector< S >::ScalarType EigenDenseVector< S >::dot(const ThisType& other) const
-  throw (Exception::sizes_do_not_match)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -125,8 +124,7 @@ typename EigenDenseVector< S >::ScalarType EigenDenseVector< S >::sup_norm() con
 
 template< class S >
 std::vector< typename EigenDenseVector< S >::ScalarType >
-EigenDenseVector< S >::components(const std::vector< int >& component_indices) const
-  throw (Exception::sizes_do_not_match, Exception::index_out_of_range)
+EigenDenseVector< S >::components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const
 {
   if (component_indices.size() > dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -134,11 +132,11 @@ EigenDenseVector< S >::components(const std::vector< int >& component_indices) c
                      << ") is larger than the dim of this (" << dim() << ")!");
   std::vector< ScalarType > values(component_indices.size(), 0);
   for (size_t ii = 0; ii < component_indices.size(); ++ii) {
-    const int component = component_indices[ii];
+    const auto& component = component_indices[ii];
     if (component < 0)
       DUNE_PYMOR_THROW(Exception::index_out_of_range,
                        "component_indices[" << ii << "] is negative (" << component << ")!");
-    if (component >= int(dim()))
+    if (component >= dim())
       DUNE_PYMOR_THROW(Exception::index_out_of_range,
                        "component_indices[" << ii << "] is too large for this (" << dim() << ")!");
     values[ii] = backend_->backend()[component];
@@ -166,7 +164,6 @@ std::vector< typename EigenDenseVector< S >::ScalarType > EigenDenseVector< S >:
 
 template< class S >
 void EigenDenseVector< S >::add(const ThisType& other, ThisType& result) const
-  throw (Exception::sizes_do_not_match)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -175,7 +172,7 @@ void EigenDenseVector< S >::add(const ThisType& other, ThisType& result) const
 }
 
 template< class S >
-void EigenDenseVector< S >::iadd(const ThisType& other) throw (Exception::sizes_do_not_match)
+void EigenDenseVector< S >::iadd(const ThisType& other)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -186,17 +183,16 @@ void EigenDenseVector< S >::iadd(const ThisType& other) throw (Exception::sizes_
 
 template< class S >
 void EigenDenseVector< S >::sub(const ThisType& other, ThisType& result) const
-  throw (Exception::sizes_do_not_match)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
-  for (unsigned int ii = 0; ii < dim(); ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim(); ++ii)
     result.backend_->backend() = backend_->backend() - other.backend_->backend();
 }
 
 template< class S >
-void EigenDenseVector< S >::isub(const ThisType& other) throw (Exception::sizes_do_not_match)
+void EigenDenseVector< S >::isub(const ThisType& other)
 {
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -220,7 +216,7 @@ const typename EigenDenseVector< S >::BackendType& EigenDenseVector< S >::backen
 }
 
 template< class S >
-int EigenDenseVector< S >::assert_is_not_negative(const int ii) throw (Exception::index_out_of_range)
+DUNE_PYMOR_SSIZE_T EigenDenseVector< S >::assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
@@ -275,13 +271,13 @@ typename EigenRowMajorSparseMatrix< S >::ThisType EigenRowMajorSparseMatrix< S >
 }
 
 template< class S >
-unsigned int EigenRowMajorSparseMatrix< S >::dim_source() const
+DUNE_PYMOR_SSIZE_T EigenRowMajorSparseMatrix< S >::dim_source() const
 {
   return backend_->cols();
 }
 
 template< class S >
-unsigned int EigenRowMajorSparseMatrix< S >::dim_range() const
+DUNE_PYMOR_SSIZE_T EigenRowMajorSparseMatrix< S >::dim_range() const
 {
   return backend_->rows();
 }
@@ -300,7 +296,7 @@ void EigenRowMajorSparseMatrix< S >::scal(const ScalarType& alpha)
 }
 
 template< class S >
-void EigenRowMajorSparseMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match)
+void EigenRowMajorSparseMatrix< S >::axpy(const ScalarType& alpha, const ThisType& xx)
 {
   if (xx.dim_source() != dim_source())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,

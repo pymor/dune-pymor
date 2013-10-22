@@ -60,7 +60,7 @@ public:
   typedef typename Traits::ScalarType         ScalarType;
   typedef typename Traits::BackendType        BackendType;
 
-  EigenDenseVector(const int size = 0, const ScalarType value = ScalarType(0));
+  EigenDenseVector(const DUNE_PYMOR_SSIZE_T size = 0, const ScalarType value = ScalarType(0));
 
   /**
    * \attention This class takes ownership of backend_ptr!
@@ -75,7 +75,7 @@ public:
 
   ThisType copy() const;
 
-  unsigned int dim() const;
+  DUNE_PYMOR_SSIZE_T dim() const;
 
   bool has_equal_shape(const ThisType& other) const;
 
@@ -86,11 +86,11 @@ public:
 
   void scal(const ScalarType& alpha);
 
-  void axpy(const ScalarType& alpha, const ThisType& xx) throw (Exception::sizes_do_not_match);
+  void axpy(const ScalarType& alpha, const ThisType& xx);
 
   using BaseType::axpy;
 
-  ScalarType dot(const ThisType& other) const throw (Exception::sizes_do_not_match);
+  ScalarType dot(const ThisType& other) const;
 
   using BaseType::dot;
 
@@ -100,24 +100,23 @@ public:
 
   ScalarType sup_norm() const;
 
-  std::vector< ScalarType > components(const std::vector< int >& component_indices) const
-    throw (Exception::sizes_do_not_match, Exception::index_out_of_range);
+  std::vector< ScalarType > components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const;
 
   std::vector< ScalarType > amax() const;
 
-  void add(const ThisType& other, ThisType& result) const throw (Exception::sizes_do_not_match);
+  void add(const ThisType& other, ThisType& result) const;
 
   using BaseType::add;
 
-  void iadd(const ThisType& other) throw (Exception::sizes_do_not_match);
+  void iadd(const ThisType& other);
 
   using BaseType::iadd;
 
-  void sub(const ThisType& other, ThisType& result) const throw (Exception::sizes_do_not_match);
+  void sub(const ThisType& other, ThisType& result) const;
 
   using BaseType::sub;
 
-  void isub(const ThisType& other) throw (Exception::sizes_do_not_match);
+  void isub(const ThisType& other);
 
   using BaseType::isub;
 
@@ -126,7 +125,7 @@ public:
   const BackendType& backend() const;
 
 private:
-  static int assert_is_not_negative(const int ii) throw (Exception::index_out_of_range);
+  static DUNE_PYMOR_SSIZE_T assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii);
   void ensure_uniqueness();
 
   friend class Operators::EigenRowMajorSparse< ScalarType >;
@@ -177,15 +176,15 @@ public:
 
   ThisType copy() const;
 
-  unsigned int dim_source() const;
+  DUNE_PYMOR_SSIZE_T dim_source() const;
 
-  unsigned int dim_range() const;
+  DUNE_PYMOR_SSIZE_T dim_range() const;
 
   bool has_equal_shape(const ThisType& other) const;
 
   void scal(const ScalarType& alpha);
 
-  void axpy(const ScalarType& alpha, const ThisType& x) throw (Exception::sizes_do_not_match);
+  void axpy(const ScalarType& alpha, const ThisType& x);
 
   BackendType& backend();
 
