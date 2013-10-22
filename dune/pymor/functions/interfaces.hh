@@ -39,6 +39,7 @@ public:
 
   typedef typename NonparametricType::RangeFieldType  RangeFieldType;
   static const unsigned int                           dimRange = NonparametricType::dimRange;
+  static const unsigned int                           dimRangeCols = NonparametricType::dimRangeCols;
   typedef typename NonparametricType::RangeType       RangeType;
 
   typedef typename NonparametricType::JacobianRangeType JacobianRangeType;
