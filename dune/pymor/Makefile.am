@@ -11,6 +11,7 @@ SUBDIRDS = . common discretizations functionals functions la operators parameter
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
+  functions.cc \
   functions/checkerboard.cc \
   functions/default.cc \
   functions/interfaces.cc \
