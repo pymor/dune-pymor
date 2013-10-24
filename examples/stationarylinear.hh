@@ -6,7 +6,8 @@
 #ifndef DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 #define DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 
-#include <dune/stuff/functions/expression.hh>
+#include <dune/stuff/functions/constant.hh>
+#include <dune/stuff/grid/fakeentity.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/discretizations/interfaces.hh>
@@ -26,8 +27,10 @@ class AnalyticalProblem
   : public Dune::Pymor::Parametric
 {
 public:
-  typedef Dune::Stuff::Function::Constant< std::string, double, 1, double, 1 > ConstantFunctionType;
-  typedef Dune::Pymor::Function::AffinelyDecomposableDefault< std::string, double, 1, double, 1 > FunctionType;
+  typedef Dune::Stuff::Function::Constant< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
+    ConstantFunctionType;
+  typedef Dune::Pymor::Function::AffinelyDecomposableDefault< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
+    FunctionType;
 
   AnalyticalProblem(const DUNE_PYMOR_SSIZE_T dd = 4);
 
