@@ -7,6 +7,7 @@
 
 #include "interfaces.hh"
 
+#ifdef DUNE_PYMOR_FUNCTIONS_TO_LIB
 // we use this macro so we can add ParametricFunctionInterface at some point
 #define DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(etype, ddim) \
   DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGE(Dune::Pymor::AffinelyDecomposableFunctionInterface, etype, ddim)
@@ -60,3 +61,4 @@ DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES(DunePymorFunctionsInterfacesAluCu
 #undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGECOLS
 #undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_DIMRANGE
 #undef DUNE_PYMOR_FUNCTION_INTERFACES_CC_LIST_CLASSES
+#endif // DUNE_PYMOR_FUNCTIONS_TO_LIB

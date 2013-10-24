@@ -131,6 +131,7 @@ public:
 } // namespace Pymor
 } // namespace Dune
 
+#ifdef DUNE_PYMOR_FUNCTIONS_TO_LIB
 // we use this macro so we can add ParametricFunctionInterface at some point
 #define DUNE_PYMOR_FUNCTION_INTERFACES_LIST_CLASSES(etype, ddim) \
   DUNE_PYMOR_FUNCTION_INTERFACES_LIST_DIMRANGE(Dune::Pymor::AffinelyDecomposableFunctionInterface, etype, ddim)
@@ -228,5 +229,6 @@ DUNE_PYMOR_FUNCTION_INTERFACES_LIST_CLASSES(DunePymorFunctionsInterfacesAluCubeG
 #undef DUNE_PYMOR_FUNCTION_INTERFACES_LIST_DIMRANGECOLS
 #undef DUNE_PYMOR_FUNCTION_INTERFACES_LIST_DIMRANGE
 #undef DUNE_PYMOR_FUNCTION_INTERFACES_LIST_CLASSES
+#endif // DUNE_PYMOR_FUNCTIONS_TO_LIB
 
 #endif // DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
