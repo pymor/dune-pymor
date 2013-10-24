@@ -3,11 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
 #include "affine.hh"
 #include "dunedynamic.hh"
@@ -45,13 +41,13 @@ bool DuneDynamicInverse< S >::linear() const
 }
 
 template< class S >
-unsigned int DuneDynamicInverse< S >::dim_source() const
+DUNE_PYMOR_SSIZE_T DuneDynamicInverse< S >::dim_source() const
 {
   return matrix_->dim_range();
 }
 
 template< class S >
-unsigned int DuneDynamicInverse< S >::dim_range() const
+DUNE_PYMOR_SSIZE_T DuneDynamicInverse< S >::dim_range() const
 {
   return matrix_->dim_source();
 }
@@ -122,13 +118,13 @@ bool DuneDynamic< S >::linear() const
 }
 
 template< class S >
-unsigned int DuneDynamic< S >::dim_source() const
+DUNE_PYMOR_SSIZE_T DuneDynamic< S >::dim_source() const
 {
   return matrix_->dim_source();
 }
 
 template< class S >
-unsigned int DuneDynamic< S >::dim_range() const
+DUNE_PYMOR_SSIZE_T DuneDynamic< S >::dim_range() const
 {
   return matrix_->dim_range();
 }

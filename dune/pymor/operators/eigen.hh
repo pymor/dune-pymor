@@ -60,9 +60,9 @@ public:
 
   bool linear() const;
 
-  unsigned int dim_source() const;
+  DUNE_PYMOR_SSIZE_T dim_source() const;
 
-  unsigned int dim_range() const;
+  DUNE_PYMOR_SSIZE_T dim_range() const;
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 
@@ -120,9 +120,9 @@ public:
 
   bool linear() const;
 
-  unsigned int dim_source() const;
+  DUNE_PYMOR_SSIZE_T dim_source() const;
 
-  unsigned int dim_range() const;
+  DUNE_PYMOR_SSIZE_T dim_range() const;
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 

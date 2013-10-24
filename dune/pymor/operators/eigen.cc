@@ -3,11 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
 #if HAVE_EIGEN
 
@@ -482,13 +478,13 @@ bool EigenRowMajorSparseInverse< S >::linear() const
 }
 
 template< class S >
-unsigned int EigenRowMajorSparseInverse< S >::dim_source() const
+DUNE_PYMOR_SSIZE_T EigenRowMajorSparseInverse< S >::dim_source() const
 {
   return matrix_->dim_range();
 }
 
 template< class S >
-unsigned int EigenRowMajorSparseInverse< S >::dim_range() const
+DUNE_PYMOR_SSIZE_T EigenRowMajorSparseInverse< S >::dim_range() const
 {
   return matrix_->dim_source();
 }
@@ -630,13 +626,13 @@ bool EigenRowMajorSparse< S >::linear() const
 }
 
 template< class S >
-unsigned int EigenRowMajorSparse< S >::dim_source() const
+DUNE_PYMOR_SSIZE_T EigenRowMajorSparse< S >::dim_source() const
 {
   return matrix_->dim_source();
 }
 
 template< class S >
-unsigned int EigenRowMajorSparse< S >::dim_range() const
+DUNE_PYMOR_SSIZE_T EigenRowMajorSparse< S >::dim_range() const
 {
   return matrix_->dim_range();
 }
