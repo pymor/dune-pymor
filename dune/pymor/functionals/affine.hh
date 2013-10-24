@@ -65,27 +65,27 @@ public:
       dim_ = affinelyDecomposedVector_.component(0)->dim();
   }
 
-  unsigned int num_components() const
+  DUNE_PYMOR_SSIZE_T num_components() const
   {
     return affinelyDecomposedVector_.num_components();
   }
 
-  ComponentType component(const int qq) const
+  ComponentType component(const DUNE_PYMOR_SSIZE_T qq) const
   {
     return ComponentType(affinelyDecomposedVector_.component(qq));
   }
 
-  ComponentType* component_and_return_ptr(const int qq)
+  ComponentType* component_and_return_ptr(const DUNE_PYMOR_SSIZE_T qq)
   {
     return new ComponentType(component(qq));
   }
 
-  ParameterFunctional coefficient(const int qq) const
+  ParameterFunctional coefficient(const DUNE_PYMOR_SSIZE_T qq) const
   {
     return ParameterFunctional(*(affinelyDecomposedVector_.coefficient(qq)));
   }
 
-  ParameterFunctional* coefficient_and_return_ptr(const int qq) const
+  ParameterFunctional* coefficient_and_return_ptr(const DUNE_PYMOR_SSIZE_T qq) const
   {
     return new ParameterFunctional(coefficient(qq));
   }
@@ -110,13 +110,12 @@ public:
     return true;
   }
 
-  unsigned int dim_source() const
+  DUNE_PYMOR_SSIZE_T dim_source() const
   {
     return dim_;
   }
 
   ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric)
   {
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
@@ -128,7 +127,6 @@ public:
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric, Exception::wrong_parameter_type)
   {
     if (!Parametric::parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"

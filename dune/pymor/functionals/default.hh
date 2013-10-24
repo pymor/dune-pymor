@@ -64,13 +64,12 @@ public:
     return true;
   }
 
-  unsigned int dim_source() const
+  DUNE_PYMOR_SSIZE_T dim_source() const
   {
     return vector_->dim();
   }
 
   ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric, Exception::sizes_do_not_match)
   {
     if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                       "mu has to be empty if parametric() == false (is " << mu << ")!");
@@ -82,7 +81,6 @@ public:
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric)
   {
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
                      << "if parametric() == false!");

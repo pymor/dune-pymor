@@ -70,7 +70,6 @@ public:
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric)
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).freeze_parameter(mu));
     return CRTP::as_imp(*this).freeze_parameter(mu);
@@ -107,14 +106,13 @@ public:
     return CRTP::as_imp(*this).num_components();
   }
 
-  ComponentType component(const int qq) const throw (Exception::requirements_not_met, Exception::index_out_of_range)
+  ComponentType component(const int qq) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).component(qq));
     return CRTP::as_imp(*this).component(qq);
   }
 
-  ParameterFunctional coefficient(const int qq) const throw (Exception::requirements_not_met,
-                                                             Exception::index_out_of_range)
+  ParameterFunctional coefficient(const int qq) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
     return CRTP::as_imp(*this).coefficient(qq);
@@ -126,7 +124,7 @@ public:
     return CRTP::as_imp(*this).has_affine_part();
   }
 
-  ComponentType affine_part() const throw (Exception::requirements_not_met)
+  ComponentType affine_part() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).affine_part());
     return CRTP::as_imp(*this).affine_part();

@@ -72,17 +72,17 @@ public:
     }
   }
 
-  unsigned int num_components() const
+  DUNE_PYMOR_SSIZE_T num_components() const
   {
     return affinelyDecomposedContainer_.num_components();
   }
 
-  ComponentType component(const int qq) const
+  ComponentType component(const DUNE_PYMOR_SSIZE_T qq) const
   {
     return ComponentType(affinelyDecomposedContainer_.component(qq));
   }
 
-  ParameterFunctional coefficient(const int qq) const
+  ParameterFunctional coefficient(const DUNE_PYMOR_SSIZE_T qq) const
   {
     return ParameterFunctional(*(affinelyDecomposedContainer_.coefficient(qq)));
   }
@@ -102,22 +102,17 @@ public:
     return true;
   }
 
-  unsigned int dim_source() const
+  DUNE_PYMOR_SSIZE_T dim_source() const
   {
     return dim_source_;
   }
 
-  unsigned int dim_range() const
+  DUNE_PYMOR_SSIZE_T dim_range() const
   {
     return dim_range_;
   }
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
-    throw (Exception::sizes_do_not_match,
-           Exception::wrong_parameter_type,
-           Exception::requirements_not_met,
-           Exception::linear_solver_failed,
-           Exception::this_does_not_make_any_sense)
   {
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
@@ -141,7 +136,6 @@ public:
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
-    throw (Exception::this_is_not_parametric, Exception::wrong_parameter_type)
   {
     if (!Parametric::parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
@@ -154,8 +148,8 @@ public:
 
 private:
   AffinelyDecomposedContainerType affinelyDecomposedContainer_;
-  unsigned int dim_source_;
-  unsigned int dim_range_;
+  DUNE_PYMOR_SSIZE_T dim_source_;
+  DUNE_PYMOR_SSIZE_T dim_range_;
 }; // class LinearAffinelyDecomposedContainerBased
 
 

@@ -29,11 +29,11 @@ public:
   typedef Dune::Stuff::Function::Constant< std::string, double, 1, double, 1 > ConstantFunctionType;
   typedef Dune::Pymor::Function::AffinelyDecomposableDefault< std::string, double, 1, double, 1 > FunctionType;
 
-  AnalyticalProblem(const int dd = 4);
+  AnalyticalProblem(const DUNE_PYMOR_SSIZE_T dd = 4);
 
   ~AnalyticalProblem();
 
-  unsigned int dim() const;
+  DUNE_PYMOR_SSIZE_T dim() const;
 
   const FunctionType* diffusion() const;
 
@@ -44,7 +44,7 @@ public:
   const FunctionType* neumann() const;
 
 private:
-  unsigned int dim_;
+  DUNE_PYMOR_SSIZE_T dim_;
   FunctionType* diffusion_;
   FunctionType* force_;
   FunctionType* dirichlet_;
@@ -99,7 +99,7 @@ public:
 
 private:
   const AnalyticalProblem* problem_;
-  const int dim_;
+  DUNE_PYMOR_SSIZE_T dim_;
   OperatorType* op_;
   FunctionalType* func_;
 }; // class SimpleDiscretization

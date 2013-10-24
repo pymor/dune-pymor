@@ -13,7 +13,7 @@
 namespace Example {
 
 
-AnalyticalProblem::AnalyticalProblem(const int dd)
+AnalyticalProblem::AnalyticalProblem(const DUNE_PYMOR_SSIZE_T dd)
   : Dune::Pymor::Parametric()
   , dim_(dd)
 {
@@ -23,7 +23,7 @@ AnalyticalProblem::AnalyticalProblem(const int dd)
   // * diffusion
   const Dune::Pymor::ParameterType muDiffusion = {"diffusion", dim_};
   diffusion_ = new FunctionType(new ConstantFunctionType(1));
-  for (size_t ii = 0; ii < dim_; ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim_; ++ii)
     diffusion_->register_component(new ConstantFunctionType(1),
                                    new Dune::Pymor::ParameterFunctional(muDiffusion,
                                                                         "diffusion["
@@ -33,7 +33,7 @@ AnalyticalProblem::AnalyticalProblem(const int dd)
   const Dune::Pymor::ParameterType muForce = {"force", dim_};
   force_ = new FunctionType();
   force_->register_affine_part(new ConstantFunctionType(1));
-  for (size_t ii = 0; ii < dim_; ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim_; ++ii)
     force_->register_component(new ConstantFunctionType(1),
                                new Dune::Pymor::ParameterFunctional(muForce,
                                                                     "force["
@@ -42,7 +42,7 @@ AnalyticalProblem::AnalyticalProblem(const int dd)
   // * dirichlet
   const Dune::Pymor::ParameterType muDirichlet = {"dirichlet", dim_};
   dirichlet_ = new FunctionType(new ConstantFunctionType(1));
-  for (size_t ii = 0; ii < dim_; ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim_; ++ii)
     dirichlet_->register_component(new ConstantFunctionType(1),
                                    new Dune::Pymor::ParameterFunctional(muDirichlet,
                                                                         "dirichlet["
@@ -51,7 +51,7 @@ AnalyticalProblem::AnalyticalProblem(const int dd)
   // * neumann
   const Dune::Pymor::ParameterType muNeumann = {"neumann", dim_};
   neumann_ = new FunctionType(new ConstantFunctionType(1));
-  for (size_t ii = 0; ii < dim_; ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim_; ++ii)
     neumann_->register_component(new ConstantFunctionType(1),
                                  new Dune::Pymor::ParameterFunctional(muNeumann,
                                                                       "neumann["
@@ -67,7 +67,7 @@ AnalyticalProblem::~AnalyticalProblem()
   delete diffusion_;
 }
 
-unsigned int AnalyticalProblem::dim() const
+DUNE_PYMOR_SSIZE_T AnalyticalProblem::dim() const
 {
   return dim_;
 }
@@ -104,8 +104,8 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   // left hand side
   // * diffusion operator
   const auto& diffusion = *(problem_->diffusion());
-  assert(int(diffusion.num_components()) == dim_);
-  for (int ii = 0; ii < dim_; ++ii) {
+  assert(diffusion.num_components() == dim_);
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim_; ++ii) {
     MatrixBackendType* compMatrix = new MatrixBackendType(dim_, dim_);
     compMatrix->operator[](ii)[ii] = 1.0;
     diffusionMatrix.register_component(new MatrixType(compMatrix),
@@ -113,7 +113,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   }
   if (diffusion.has_affine_part()) {
     MatrixBackendType* affMatrix = new MatrixBackendType(dim_, dim_);
-    for (int ii = 0; ii < dim_; ++ii)
+    for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim_; ++ii)
       affMatrix->operator[](ii)[ii] = 1.0;
     diffusionMatrix.register_affine_part(new MatrixType(affMatrix));
   }
@@ -124,11 +124,11 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   typedef typename VectorType::BackendType VectorBackendType;
   typedef Dune::Pymor::LA::AffinelyDecomposedConstContainer< VectorType > AffinelyDecomposedVectorType;
   const auto& force = *(problem_->force());
-  assert(int(force.num_components()) == dim_);
+  assert(force.num_components() == dim_);
   const auto& dirichlet = *(problem_->dirichlet());
-  assert(int(dirichlet.num_components()) == dim_);
+  assert(dirichlet.num_components() == dim_);
   const auto& neumann = *(problem_->neumann());
-  assert(int(neumann.num_components()) == dim_);
+  assert(neumann.num_components() == dim_);
   VectorType* affVector;
   const VectorType* ones = new VectorType(dim_, 1.0);
   if (diffusion.has_affine_part() || force.has_affine_part()
@@ -138,7 +138,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   AffinelyDecomposedVectorType rhsVector;
   if (force.has_affine_part())
     affVector->iadd(*ones);
-  for (size_t qq = 0; qq < force.num_components(); ++qq) {
+  for (DUNE_PYMOR_SSIZE_T qq = 0; qq < force.num_components(); ++qq) {
     VectorBackendType* compVector = new VectorBackendType(dim_);
     compVector->operator[](qq) = 1.0;
     rhsVector.register_component(new VectorType(compVector),
@@ -147,7 +147,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   // * neumann
   if (neumann.has_affine_part())
     affVector->iadd(*ones);
-  for (size_t qq = 0; qq < neumann.num_components(); ++qq) {
+  for (DUNE_PYMOR_SSIZE_T qq = 0; qq < neumann.num_components(); ++qq) {
     VectorBackendType* compVector = new VectorBackendType(dim_);
     compVector->operator[](qq) = 1.0;
     rhsVector.register_component(new VectorType(compVector),
@@ -160,7 +160,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
       affVector->iadd(tmp);
   }
   if (diffusion.has_affine_part()) {
-    for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
+    for (DUNE_PYMOR_SSIZE_T qq = 0; qq < dirichlet.num_components(); ++qq) {
       VectorBackendType* compVector = new VectorBackendType(dim_);
       compVector->operator[](qq) = 1.0;
       rhsVector.register_component(new VectorType(compVector),
@@ -168,7 +168,7 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
     }
   }
   if (dirichlet.has_affine_part()) {
-    for (size_t qq = 0; qq < diffusion.num_components(); ++qq) {
+    for (DUNE_PYMOR_SSIZE_T qq = 0; qq < diffusion.num_components(); ++qq) {
       VectorType* comp = new VectorType(dim_);
       op_->component(qq).apply(*ones, *comp);
       rhsVector.register_component(comp,
@@ -180,8 +180,8 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
     diffusionDirichletMu.set(key, diffusion.parameter_type().get(key));
   for (auto key : dirichlet.parameter_type().keys())
     diffusionDirichletMu.set(key, dirichlet.parameter_type().get(key));
-  for (size_t pp = 0; pp < diffusion.num_components(); ++pp) {
-    for (size_t qq = 0; qq < dirichlet.num_components(); ++qq) {
+  for (DUNE_PYMOR_SSIZE_T pp = 0; pp < diffusion.num_components(); ++pp) {
+    for (DUNE_PYMOR_SSIZE_T qq = 0; qq < dirichlet.num_components(); ++qq) {
       VectorType* comp = new VectorType(create_vector());
       VectorBackendType* dirichletCompVector = new VectorBackendType(dim_);
       dirichletCompVector->operator[](qq) = 1.0;
@@ -250,7 +250,7 @@ void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Paramete
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_parameter_type,
                      "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                      << parameter_type() << ")!");
-  if (int(vector.dim()) != dim_)
+  if (vector.dim() != dim_)
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
                      "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   // freeze lhs and rhs
@@ -267,7 +267,7 @@ void SimpleDiscretization::visualize(const VectorType& vector,
                                      const std::string filename,
                                      const std::string name) const
 {
-  if (int(vector.dim()) != dim_)
+  if (vector.dim() != dim_)
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
                      "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   if (filename.empty())
@@ -277,9 +277,9 @@ void SimpleDiscretization::visualize(const VectorType& vector,
   if (!file.is_open())
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::io_error, "could not open '" << filename << "' for writing!");
   file << name << " = [";
-  for (int ii = 0; ii < int(vector.dim()) - 1; ++ii)
+  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < vector.dim() - 1; ++ii)
     file << vector.components({ii})[0] << ", ";
-  file << vector.components({int(vector.dim() - 1)})[0] << "]" << std::endl;
+  file << vector.components({vector.dim() - 1})[0] << "]" << std::endl;
 }
 
 
