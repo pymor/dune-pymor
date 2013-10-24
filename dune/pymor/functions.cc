@@ -3,112 +3,54 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
-#include "functions/default.hh"
-#include "functions.hh"
+//#ifdef DUNE_PYMOR_FUNCTIONS_TO_LIB
+# include "functions.hh"
 
-namespace Dune {
-namespace Pymor {
+# define DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(etype, ddim) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGECOLS(etype, ddim, 1) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGECOLS(etype, ddim, 2) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGECOLS(etype, ddim, 3)
 
+# define DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGECOLS(etype, ddim, rdim) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, 1) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, 2) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, 3)
 
-template< class D, int d, class R, int rR, int rC >
-std::vector< std::string > ParametricFunctions< D, d, R, rR, rC >::available()
-{
-  auto availableFunctions = Stuff::Functions< D, d, R, rR, rC >::available();
-  availableFunctions.push_back(Function::AffinelyDecomposableDefault< D, d, R, rR, rC >::static_id());
-  return availableFunctions;
-}
+# define DUNE_PYMOR_FUNCTIONS_CC_LIST_DOMAINFIELDTYPES(etype, ddim, rdim, rcdim) \
+  DUNE_PYMOR_FUNCTIONS_CC_LIST_RANGEFIELDTYPES(etype, double, ddim, rdim, rcdim)
 
-template< class D, int d, class R, int rR, int rC >
-Dune::ParameterTree ParametricFunctions< D, d, R, rR, rC >::defaultSettings(const std::string type)
-{
-  auto dune_stuff_functions = Stuff::Functions< D, d, R, rR, rC >::available();
-  for (auto dune_stuff_function : dune_stuff_functions)
-    if (type == dune_stuff_function)
-      return Stuff::Functions< D, d, R, rR, rC >::defaultSettings(type);
-  if (type == Function::AffinelyDecomposableDefault< D, d, R, rR, rC >::static_id())
-    return Function::AffinelyDecomposableDefault< D, d, R, rR, rC >::defaultSettings();
-  else
-    DUNE_PYMOR_THROW(Exception::wrong_input,
-                     "unknown function '" << type << "' requested!");
-}
+# define DUNE_PYMOR_FUNCTIONS_CC_LIST_RANGEFIELDTYPES(etype, dftype, ddim, rdim, rcdim) \
+  DUNE_PYMOR_FUNCTIONS_CC_LAST_EXPANSION(etype, dftype, ddim, double, rdim, rcdim) \
+  DUNE_PYMOR_FUNCTIONS_CC_LAST_EXPANSION(etype, dftype, ddim, long double, rdim, rcdim)
 
-template< class D, int d, class R, int rR, int rC >
-ParametricFunctionInterface< D, d, R, rR, rC >*
-ParametricFunctions< D, d, R, rR, rC >::create(const std::string type, const Dune::ParameterTree settings)
-{
-  typedef Function::NonparametricDefault< D, d, R, rR, rC > NonparametricType;
-  auto dune_stuff_functions = Stuff::Functions< D, d, R, rR, rC >::available();
-  for (auto dune_stuff_function : dune_stuff_functions)
-    if (type == dune_stuff_function)
-      return new NonparametricType(Stuff::Functions< D, d, R, rR, rC >::create(type, settings));
-  if (type == Function::AffinelyDecomposableDefault< D, d, R, rR, rC >::static_id())
-    return Function::AffinelyDecomposableDefault< D, d, R, rR, rC >::create(settings);
-  else
-    DUNE_PYMOR_THROW(Exception::wrong_input,
-                     "unknown function '" << type << "' requested!");
-}
+# define DUNE_PYMOR_FUNCTIONS_CC_LAST_EXPANSION(etype, dftype, ddim, rftype, rdim, rcdim) \
+  template class Dune::Pymor::AffinelyDecomposableFunctions< etype, dftype, ddim, rftype, rdim, rcdim >;
 
-template class ParametricFunctions< double, 1, double, 2, 1 >;
-template class ParametricFunctions< double, 1, double, 3, 1 >;
-template class ParametricFunctions< double, 2, double, 2, 1 >;
-template class ParametricFunctions< double, 2, double, 3, 1 >;
-template class ParametricFunctions< double, 3, double, 2, 1 >;
-template class ParametricFunctions< double, 3, double, 3, 1 >;
+# ifdef HAVE_DUNE_GRID
 
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesSGrid1dEntityType, 1)
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesSGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesSGrid3dEntityType, 3)
 
-template< class D, int d, class R >
-std::vector< std::string > ParametricFunctions< D, d, R, 1, 1 >::available()
-{
-  auto availableFunctions = Stuff::Functions< D, d, R, 1, 1 >::available();
-  availableFunctions.push_back(Function::Checkerboard< D, d, R >::static_id());
-  availableFunctions.push_back(Function::AffinelyDecomposableDefault< D, d, R, 1, 1 >::static_id());
-  return availableFunctions;
-}
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesYaspGrid1dEntityType, 1)
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesYaspGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesYaspGrid3dEntityType, 3)
 
-template< class D, int d, class R >
-Dune::ParameterTree ParametricFunctions< D, d, R, 1, 1 >::defaultSettings(const std::string type)
-{
-  auto dune_stuff_functions = Stuff::Functions< D, d, R, 1, 1 >::available();
-  for (auto dune_stuff_function : dune_stuff_functions)
-    if (type == dune_stuff_function)
-      return Stuff::Functions< D, d, R, 1, 1 >::defaultSettings(type);
-  if (type == Function::Checkerboard< D, d, R >::static_id())
-    return Function::Checkerboard< D, d, R >::defaultSettings();
-  else if (type == Function::AffinelyDecomposableDefault< D, d, R, 1, 1 >::static_id())
-    return Function::AffinelyDecomposableDefault< D, d, R, 1, 1 >::defaultSettings();
-  else
-    DUNE_PYMOR_THROW(Exception::wrong_input,
-                     "unknown function '" << type << "' requested!");
-}
+#   if HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
 
-template< class D, int d, class R >
-ParametricFunctionInterface< D, d, R, 1, 1 >*
-ParametricFunctions< D, d, R, 1, 1 >::create(const std::string type, const Dune::ParameterTree settings)
-{
-  typedef Function::NonparametricDefault< D, d, R, 1, 1 > NonparametricType;
-  auto dune_stuff_functions = Stuff::Functions< D, d, R, 1, 1 >::available();
-  for (auto dune_stuff_function : dune_stuff_functions)
-    if (type == dune_stuff_function)
-      return new NonparametricType(Stuff::Functions< D, d, R, 1, 1 >::create(type, settings));
-  if (type == Function::Checkerboard< D, d, R >::static_id())
-    return Function::Checkerboard< D, d, R >::create(settings);
-  else if (type == Function::AffinelyDecomposableDefault< D, d, R, 1, 1 >::static_id())
-    return Function::AffinelyDecomposableDefault< D, d, R, 1, 1 >::create(settings);
-  else
-    DUNE_PYMOR_THROW(Exception::wrong_input,
-                     "unknown function '" << type << "' requested!");
-}
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesAluSimplexGrid2dEntityType, 2)
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesAluSimplexGrid3dEntityType, 3)
+DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesAluCubeGrid3dEntityType, 3)
 
-template class ParametricFunctions< double, 1, double, 1, 1 >;
-template class ParametricFunctions< double, 2, double, 1, 1 >;
-template class ParametricFunctions< double, 3, double, 1, 1 >;
+#   endif // HAVE_ALUGRID_SERIAL_H || HAVE_ALUGRID_PARALLEL_H
+# endif // HAVE_DUNE_GRID
 
+# undef DUNE_PYMOR_FUNCTIONS_CC_LAST_EXPANSION
+# undef DUNE_PYMOR_FUNCTIONS_CC_LIST_RANGEFIELDTYPES
+# undef DUNE_PYMOR_FUNCTIONS_CC_LIST_DOMAINFIELDTYPES
+# undef DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE
+# undef DUNE_PYMOR_FUNCTIONS_CC_LIST_CLASSES
 
-} // namespace Pymor
-} // namespace Dune
+//#endif // DUNE_PYMOR_FUNCTIONS_TO_LIB
