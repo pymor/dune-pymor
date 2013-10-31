@@ -5,7 +5,7 @@
 
 #include "config.h"
 
-//#ifdef DUNE_PYMOR_FUNCTIONS_TO_LIB
+#ifdef DUNE_PYMOR_FUNCTIONS_TO_LIB
 # include "functions.hh"
 
 # define DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(etype, ddim) \
@@ -53,4 +53,4 @@ DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE(DunePymorFunctionsInterfacesAluCubeGrid3dE
 # undef DUNE_PYMOR_FUNCTIONS_CC_LIST_DIMRANGE
 # undef DUNE_PYMOR_FUNCTIONS_CC_LIST_CLASSES
 
-//#endif // DUNE_PYMOR_FUNCTIONS_TO_LIB
+#endif // DUNE_PYMOR_FUNCTIONS_TO_LIB
