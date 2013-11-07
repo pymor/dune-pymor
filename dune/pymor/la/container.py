@@ -45,8 +45,8 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                                 parent=interfaces['Dune::Pymor::LA::VectorInterfaceDynamic'],
                                 template_parameters=template_parameters)
     Class.add_constructor([])
-    Class.add_constructor([param('int', 'size')])
-    Class.add_constructor([param('int', 'size'), param(ScalarType, 'value')])
+    Class.add_constructor([param(CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'size')])
+    Class.add_constructor([param(CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'size'), param(ScalarType, 'value')])
     # what we want from ContainerInterface
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['PymorException'], exceptions['DuneException']])
@@ -67,7 +67,7 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      throw=[exceptions['PymorException']])
     # what we want from VectorInterface
     Class.add_method('dim',
-                     retval('unsigned int'),
+                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
                      [],
                      is_const=True,
                      throw=[exceptions['PymorException']])
@@ -92,7 +92,7 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_method('sup_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('components',
                      retval('std::vector< ' + ScalarType + ' >'),
-                     [param('const std::vector< int > &', 'component_indices')],
+                     [param('const std::vector< ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'] + ' > &', 'component_indices')],
                      is_const=True,
                      throw=[exceptions['PymorException']])
     Class.add_method('amax',
@@ -191,15 +191,11 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      throw=[exceptions['PymorException']])
     # what we want from MatrixInterface
     Class.add_method('dim_source',
-                     retval('unsigned int'),
-                     [],
-                     is_const=True,
-                     throw=[exceptions['PymorException']])
+                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                     [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('dim_range',
-                     retval('unsigned int'),
-                     [],
-                     is_const=True,
-                     throw=[exceptions['PymorException']])
+                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                     [], is_const=True, throw=[exceptions['PymorException']])
     return module, Class
 
 
