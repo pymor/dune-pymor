@@ -89,7 +89,7 @@ public:
    */
   RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
-    RangeType range = source.copy();
+    RangeType range(dim_range());
     apply(source, range, mu);
     return range;
   }
@@ -140,7 +140,7 @@ public:
                            const std::string option = invert_options()[0],
                            const Parameter mu = Parameter()) const
   {
-    SourceType source = range.copy();
+    SourceType source(dim_source());
     apply_inverse(range, source, option, mu);
     return source;
   }
