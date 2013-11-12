@@ -379,7 +379,6 @@ try:
                 self.linear = all(op.linear for op in operators.itervalues())
                 self.build_parameter_type(inherits=operators.values())
                 assert self.parameter_type == self._wrapper[d.parameter_type()]
-                self.lock()
 
             with_arguments = StationaryDiscretization.with_arguments
 
