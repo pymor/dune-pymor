@@ -357,7 +357,6 @@ def wrap_operator(cls, wrapper):
 
         def __init__(self, op):
             WrappedOperatorBase.__init__(self, op)
-            self.lock()
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator
@@ -546,7 +545,6 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
             else:
                 self.affine_part = False
             LincombOperatorBase.__init__(self, operators, coefficients)
-            self.lock()
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator

@@ -134,7 +134,6 @@ def wrap_functional(cls, wrapper):
 
         def __init__(self, op):
             WrappedFunctionalBase.__init__(self, op)
-            self.lock()
 
     WrappedFunctional.__name__ = cls.__name__
     return WrappedFunctional
@@ -250,7 +249,6 @@ def wrap_affinely_decomposed_functional(cls, wrapper):
             else:
                 self.affine_part = False
             LincombOperatorBase.__init__(self, operators, coefficients)
-            self.lock()
 
     WrappedFunctional.__name__ = cls.__name__
     return WrappedFunctional

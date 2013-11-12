@@ -277,12 +277,15 @@ def wrap_stationary_discretization(cls, wrapper):
 
         def __init__(self, d):
             self._impl = d
-            operators = {'operator': self._wrapper[d.get_operator()],
-                         'rhs': self._wrapper[d.get_rhs()]}
+            operators = {'operator': self._wrapper[d.get_operator()]}
+            functionals = {'rhs': self._wrapper[d.get_rhs()]}
+            vector_operators = {}
             self.operators = FrozenDict(operators)
+            self.functionals = FrozenDict(functionals)
+            self.vector_operators = FrozenDict(vector_operators)
             self.operator = operators['operator']
-            self.rhs = operators['rhs']
-            self.products = {k: self._wrapper[d.get_product(k)] for k in list(d.available_products())}
+            self.rhs = functionals['rhs']
+            self.products = FrozenDict({k: self._wrapper[d.get_product(k)] for k in list(d.available_products())})
             if self.products:
                 for k, v in self.products.iteritems():
                     setattr(self, '{}_product'.format(k), v)
@@ -292,18 +295,22 @@ def wrap_stationary_discretization(cls, wrapper):
             self.type_solution = self.operator.type_source
             self.build_parameter_type(inherits=operators.values())
             assert self.parameter_type == self._wrapper[d.parameter_type()]
-            self.lock()
 
         with_arguments = StationaryDiscretization.with_arguments
 
         def with_(self, **kwargs):
-            assert 'operators' in kwargs or kwargs.keys() == ['parameter_space']
+            assert 'operators' in kwargs and 'functionals' in kwargs or kwargs.keys() == ['parameter_space']
+            assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
             if 'operators' in kwargs:
                 operators = kwargs.pop('operators')
-                assert set(operators.keys()) == {'operator', 'rhs'}
-                assert all(op.type_source == NumpyVectorArray for op in operators.itervalues())
-                assert all(op.type_range == NumpyVectorArray for op in operators.itervalues())
-                d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
+                functionals = kwargs.pop('functionals')
+                assert set(operators.keys()) == {'operator'}
+                assert set(functionals.keys()) == {'rhs'}
+                operator = operators['operator']
+                rhs = functionals['rhs']
+                assert all(op.type_source == NumpyVectorArray for op in {operator, rhs})
+                assert all(op.type_range == NumpyVectorArray for op in {operator, rhs})
+                d = StationaryDiscretization(operator=operator, rhs=rhs)
                 return d.with_(**kwargs)
             else:
                 d = type(self)(self._impl)
