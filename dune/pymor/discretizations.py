@@ -361,11 +361,14 @@ try:
                                        [d.get_local_operator(ss).dim_source() for ss in np.arange(d.num_subdomains())],
                                        [d.get_local_operator(ss).dim_range() for ss in np.arange(d.num_subdomains())])
                 rhs_op = BlockOperator([wrapper[d.get_local_functional(ss)] for ss in np.arange(d.num_subdomains())])
-                operators = {'operator': lhs_op,
-                             'rhs': rhs_op}
+                operators = {'operator': lhs_op}
+                functionals = {'rhs': rhs_op}
+                vector_operators = {}
                 self.operators = FrozenDict(operators)
+                self.functionals = FrozenDict(functionals)
+                self.vector_operators = FrozenDict(vector_operators)
                 self.operator = operators['operator']
-                self.rhs = operators['rhs']
+                self.rhs = functionals['rhs']
                 self.products = {k: BlockOperator([[wrapper[d.get_local_product(ss, k)] if ss == nn else None
                                                     for nn in np.arange(d.num_subdomains())]
                                                    for ss in np.arange(d.num_subdomains())],
@@ -383,13 +386,18 @@ try:
             with_arguments = StationaryDiscretization.with_arguments
 
             def with_(self, **kwargs):
-                assert 'operators' in kwargs or kwargs.keys() == ['parameter_space']
+                assert 'operators' and 'functionals' in kwargs or kwargs.keys() == ['parameter_space']
+                assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
                 if 'operators' in kwargs:
                     operators = kwargs.pop('operators')
-                    assert set(operators.keys()) == {'operator', 'rhs'}
-                    assert all(op.type_source == NumpyVectorArray or op.type_source == BlockVectorArray for op in operators.itervalues())
-                    assert all(op.type_range == NumpyVectorArray or op.type_range == BlockVectorArray for op in operators.itervalues())
-                    d = StationaryDiscretization(operator=operators['operator'], rhs=operators['rhs'])
+                    functionals = kwargs.pop('functionals')
+                    assert set(operators.keys()) == {'operator'}
+                    assert set(functionals.keys()) == {'rhs'}
+                    operator = operators['operator']
+                    rhs = functionals['rhs']
+                    assert all(op.type_source == NumpyVectorArray or op.type_source == BlockVectorArray for op in (operator, rhs))
+                    assert all(op.type_range == NumpyVectorArray or op.type_range == BlockVectorArray for op in (operator, rhs))
+                    d = StationaryDiscretization(operator=operator, rhs=rhs)
                     return d.with_(**kwargs)
                 else:
                     d = type(self)(self._impl)
