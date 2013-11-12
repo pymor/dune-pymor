@@ -8,9 +8,15 @@ from types import ModuleType
 
 from dune.pymor.core.wrapper import Wrapper
 from dune.pymor.la.container import wrap_vector
-from dune.pymor.discretizations import wrap_stationary_discretization, wrap_multiscale_discretization
+from dune.pymor.discretizations import wrap_stationary_discretization
 from dune.pymor.functionals import wrap_affinely_decomposed_functional, wrap_functional
 from dune.pymor.operators import wrap_affinely_decomposed_operator, wrap_operator
+
+try:
+    from dune.pymor.discretizations import wrap_multiscale_discretization
+    HAVE_MULTISCALE = True
+except ImportError:
+    HAVE_MULTISCALE = False
 
 
 def wrap_module(mod):
@@ -24,7 +30,8 @@ def wrap_module(mod):
     ParameterFunctional = mod.Dune.Pymor.ParameterFunctional
     ParameterType = mod.Dune.Pymor.ParameterType
     StationaryDiscretizationInterface = mod.Dune.Pymor.StationaryDiscretizationInterfaceDynamic
-    StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.StationaryMultiscaleDiscretiztionInterfaceDynamic
+    if HAVE_MULTISCALE:
+        StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.StationaryMultiscaleDiscretiztionInterfaceDynamic
 
     wrapped_modules = {}
 
@@ -86,7 +93,7 @@ def wrap_module(mod):
                     wrapped_class = wrap_functional(v, wrapper)
                 elif issubclass(v, OperatorInterface):
                     wrapped_class = wrap_operator(v, wrapper)
-                elif issubclass(v, StationaryMultiscaleDiscretiztionInterface):
+                elif HAVE_MULTISCALE and issubclass(v, StationaryMultiscaleDiscretiztionInterface):
                     wrapped_class = wrap_multiscale_discretization(v, wrapper)
                 elif issubclass(v, StationaryDiscretizationInterface):
                     wrapped_class = wrap_stationary_discretization(v, wrapper)
