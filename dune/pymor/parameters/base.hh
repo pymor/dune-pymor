@@ -47,6 +47,8 @@ public:
 
   const ValueType& get(const KeyType& key) const;
 
+  bool operator<(const KeyValueBase< KeyType, ValueType >& other) const;
+
   bool operator==(const KeyValueBase< KeyType, ValueType >& other) const;
 
   bool operator!=(const KeyValueBase< KeyType, ValueType >& other) const;

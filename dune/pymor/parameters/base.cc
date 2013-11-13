@@ -83,6 +83,12 @@ const ValueType& KeyValueBase< KeyType, ValueType >::get(const KeyType& key) con
 }
 
 template< class KeyType, class ValueType >
+bool KeyValueBase< KeyType, ValueType >::operator<(const KeyValueBase< KeyType, ValueType >& other) const
+{
+  return dict_ < other.dict_;
+}
+
+template< class KeyType, class ValueType >
 bool KeyValueBase< KeyType, ValueType >::operator==(const KeyValueBase< KeyType, ValueType >& other) const
 {
   return dict_ == other.dict_;
