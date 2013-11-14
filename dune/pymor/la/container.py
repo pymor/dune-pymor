@@ -8,7 +8,7 @@ import pybindgen
 from pybindgen import retval, param
 
 from pymor import defaults
-from pymor.la.listvectorarray import VectorInterface, ListVectorArray
+from pymor.la.listvectorarray import VectorInterface, ListVectorArray, create_list_vector_array_type
 
 def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
@@ -274,9 +274,4 @@ def wrap_vector(cls):
 
     WrappedVector.__name__ = cls.__name__
 
-    class VectorArray(ListVectorArray):
-        vector_type = WrappedVector
-
-    VectorArray.__name__ = '{}_ListVectorArray'.format(cls.__name__)
-
-    return WrappedVector, VectorArray
+    return WrappedVector, create_list_vector_array_type(WrappedVector)
