@@ -1,5 +1,5 @@
 # This file is part of the dune-pymor project:
-#   https://github.com/pyMor/dune-pymor
+#   https://github.com/pymor/dune-pymor
 # Copyright Holders: Felix Albrecht, Stephan Rave
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
@@ -7,8 +7,8 @@ dune-pymor is a DUNE (http://www.dune-project.org) module which provides
 low level interfaces (and default implementations) for several discretization
 related DUNE classes, such as operators and vectors. It also provides
 python bindings for these classes. This module is intended to be used in the
-context of pyMor (http://www.pymor.org).
+context of pymor (http://www.pymor.org).
 
 New users may best try out this module by using the git supermodule
-dune-pymor-demos (https://github.com/pyMor/dune-pymor-demos). Experienced
+dune-pymor-demos (https://github.com/pymor/dune-pymor-demos). Experienced
 DUNE users may go ahead...
