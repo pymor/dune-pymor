@@ -6,6 +6,7 @@
 
 import pybindgen
 from pybindgen import retval, param
+import numpy as np
 
 from pymor import defaults
 from pymor.la.listvectorarray import VectorInterface, ListVectorArray
