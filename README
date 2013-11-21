@@ -7,7 +7,7 @@ dune-pymor is a DUNE (http://www.dune-project.org) module which provides
 low level interfaces (and default implementations) for several discretization
 related DUNE classes, such as operators and vectors. It also provides
 python bindings for these classes. This module is intended to be used in the
-context of pymor (http://www.pymor.org).
+context of pyMOR (http://www.pymor.org).
 
 New users may best try out this module by using the git supermodule
 dune-pymor-demos (https://github.com/pymor/dune-pymor-demos). Experienced
