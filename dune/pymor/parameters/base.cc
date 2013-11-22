@@ -190,6 +190,26 @@ std::string ParameterType::report() const
   return ret.str();
 }
 
+std::string ParameterType::report_for_filename() const
+{
+  std::ostringstream ret;
+  if (dict_.size() == 1) {
+    const auto element = dict_.begin();
+    ret << element->first << "_" << element->second;
+  } else if (dict_.size() > 1) {
+    const auto& kk = keys();
+    const auto& vv = values();
+    for (size_t ii = 0; ii < (kk.size() - 1); ++ii)
+      ret << kk[ii] << "_";
+    ret << kk[kk.size() - 1] << "_";
+    for (size_t ii = 0; ii < (vv.size() - 1); ++ii)
+      ret << vv[ii] << "_";
+    ret << vv[vv.size() - 1];
+  }
+  return ret.str();
+}
+
+
 std::ostream& operator<<(std::ostream& oo, const ParameterType& pp)
 {
   oo << pp.report();
@@ -333,6 +353,46 @@ std::string Parameter::report() const
     }
   }
   ret << ")";
+  return ret.str();
+}
+
+std::string Parameter::report_for_filename() const
+{
+  std::ostringstream ret;
+  if (dict_.size() == 1) {
+    const auto element = dict_.begin();
+    ret << element->first << "_";
+    const auto& second = element->second;
+    if (second.size() == 1) {
+      ret << second[0];
+    } else {
+      for (size_t ii = 0; ii < (second.size() - 1); ++ii)
+        ret << second[ii] << "_";
+      ret << second[second.size() - 1];
+    }
+  } else if (dict_.size() > 1) {
+    const auto& kk = keys();
+    const auto& vv = values();
+    for (size_t ii = 0; ii < (kk.size() - 1); ++ii)
+      ret << kk[ii] << "_";
+    ret << kk[kk.size() - 1] << "_";
+    for (size_t ii = 0; ii < (vv.size() - 1); ++ii) {
+      if (vv[ii].size() == 1) {
+        ret << vv[ii][0];
+      } else {
+        for (size_t jj = 0; jj < (vv[ii].size() - 1); ++jj)
+          ret << vv[ii][jj] << "_";
+        ret << vv[ii][vv[ii].size() - 1];
+      }
+    }
+    if (vv[vv.size() - 1].size() == 1) {
+      ret << vv[vv.size() - 1][0];
+    } else {
+      for (size_t jj = 0; jj < (vv[vv.size() - 1].size() - 1); ++jj)
+        ret << vv[vv.size() - 1][jj] << "_";
+      ret << vv[vv.size() - 1][vv[vv.size() - 1].size() - 1];
+    }
+  }
   return ret.str();
 }
 

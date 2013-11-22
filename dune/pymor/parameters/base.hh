@@ -99,9 +99,11 @@ public:
 
   ParameterType(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv);
 
-  virtual void set(const KeyType& key, const ValueType& value);
+  virtual void set(const KeyType& key, const ValueType& value) DS_OVERRIDE;
 
-  virtual std::string report() const;
+  virtual std::string report() const DS_OVERRIDE;
+
+  std::string report_for_filename() const;
 
   using BaseType::keys;
   using BaseType::values;
@@ -140,9 +142,11 @@ public:
 
   const ParameterType& type() const;
 
-  void set(const KeyType& key, const ValueType& value);
+  virtual void set(const KeyType& key, const ValueType& value) DS_OVERRIDE;
 
-  std::string report() const;
+  virtual std::string report() const DS_OVERRIDE;
+
+  std::string report_for_filename() const;
 
   ValueType serialize() const;
 
