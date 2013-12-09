@@ -3,6 +3,8 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
+#include "config.h"
+
 #include <dune/stuff/common/color.hh>
 
 #include <dune/pymor/common/exceptions.hh>
