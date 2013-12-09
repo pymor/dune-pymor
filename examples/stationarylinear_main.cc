@@ -26,15 +26,13 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << "done" << std::endl;
 
     const auto lhsOperator = discretization.get_operator();
-    std::cout << "parameter_type of the left hand side is:\n  "
-              << lhsOperator.parameter_type() << std::endl;
+    std::cout << "parameter_type of the left hand side is:\n  " << lhsOperator.parameter_type() << std::endl;
 
     const auto rhsFunctional = discretization.get_rhs();
-    std::cout << "parameter_type of the right hand side is:\n  "
-              << rhsFunctional.parameter_type() << std::endl;
+    std::cout << "parameter_type of the right hand side is:\n  " << rhsFunctional.parameter_type() << std::endl;
 
-    Dune::Pymor::Parameter mu = {{"diffusion",         "dirichlet",          "force",              "neumann"},
-                                {{1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}}};
+    Dune::Pymor::Parameter mu = {{"diffusion", "dirichlet",  "force",      "neumann"},
+                                {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}}};
     std::cout << "solving for mu = " << mu << "... ";
     auto solution = discretization.create_vector();
     discretization.solve(solution, mu);
