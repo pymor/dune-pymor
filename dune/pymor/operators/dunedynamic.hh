@@ -3,6 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
+#if 0
 #ifndef DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 #define DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 
@@ -148,3 +149,4 @@ private:
 } // namespace Dune
 
 #endif // DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
+#endif
