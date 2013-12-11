@@ -15,10 +15,10 @@
 #include <type_traits>
 
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
-#include "interfaces.hh"
 
 namespace Dune {
 namespace Pymor {
@@ -29,10 +29,10 @@ template< class ContainerImp >
 class AffinelyDecomposedConstContainer
   : public Parametric
 {
-  static_assert(std::is_base_of< ContainerInterface< typename ContainerImp::Traits >, ContainerImp >::value,
+  static_assert(std::is_base_of< Stuff::LA::ContainerInterface< typename ContainerImp::Traits >, ContainerImp >::value,
                 "ContainerType must be derived from ContainerInterface");
 public:
-  typedef ContainerImp                        ContainerType;
+  typedef ContainerImp ContainerType;
 
   AffinelyDecomposedConstContainer()
     : hasAffinePart_(false)
@@ -256,7 +256,7 @@ class AffinelyDecomposedContainer
 {
   typedef AffinelyDecomposedConstContainer< ContainerImp > BaseType;
 public:
-  typedef ContainerImp                        ContainerType;
+  typedef ContainerImp ContainerType;
 
   AffinelyDecomposedContainer()
     : BaseType()

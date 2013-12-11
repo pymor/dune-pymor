@@ -12,7 +12,8 @@
 # define DUNE_STUFF_SSIZE_T long int
 #endif
 
-#include <dune/pymor/la/container/eigen.hh>
+#include <dune/stuff/la/container/eigen.hh>
+
 #include <dune/pymor/parameters/base.hh>
 
 #include "interfaces.hh"
@@ -33,13 +34,13 @@ template< class ScalarImp >
 class EigenRowMajorSparseInverseTraits
 {
 public:
-  typedef ScalarImp                                   ScalarType;
-  typedef EigenRowMajorSparseInverse< ScalarType >    derived_type;
-  typedef LA::EigenRowMajorSparseMatrix< ScalarType > ContainerType;
-  typedef LA::EigenDenseVector< ScalarType >          SourceType;
-  typedef LA::EigenDenseVector< ScalarType >          RangeType;
-  typedef derived_type                                FrozenType;
-  typedef EigenRowMajorSparse< ScalarType >           InverseType;
+  typedef ScalarImp                                           ScalarType;
+  typedef EigenRowMajorSparseInverse< ScalarType >            derived_type;
+  typedef Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  ContainerType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType >           SourceType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType >           RangeType;
+  typedef derived_type                                        FrozenType;
+  typedef EigenRowMajorSparse< ScalarType >                   InverseType;
 };
 
 
@@ -89,20 +90,20 @@ template< class ScalarImp >
 class EigenRowMajorSparseTraits
 {
 public:
-  typedef ScalarImp                                   ScalarType;
-  typedef EigenRowMajorSparse< ScalarType >           derived_type;
-  typedef LA::EigenRowMajorSparseMatrix< ScalarType > ContainerType;
-  typedef LA::EigenDenseVector< ScalarType >          SourceType;
-  typedef LA::EigenDenseVector< ScalarType >          RangeType;
-  typedef derived_type                                FrozenType;
-  typedef EigenRowMajorSparseInverse< ScalarType >    InverseType;
+  typedef ScalarImp                                           ScalarType;
+  typedef EigenRowMajorSparse< ScalarType >                   derived_type;
+  typedef Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  ContainerType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType >           SourceType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType >           RangeType;
+  typedef derived_type                                        FrozenType;
+  typedef EigenRowMajorSparseInverse< ScalarType >            InverseType;
 };
 
 
 template< class ScalarImp >
 class EigenRowMajorSparse
   : public OperatorInterface< EigenRowMajorSparseTraits< ScalarImp > >
-  , public LA::ProvidesContainer< EigenRowMajorSparseTraits< ScalarImp > >
+  , public Stuff::LA::ProvidesContainer< EigenRowMajorSparseTraits< ScalarImp > >
 {
   typedef OperatorInterface< EigenRowMajorSparseTraits< ScalarImp > > BaseType;
 public:

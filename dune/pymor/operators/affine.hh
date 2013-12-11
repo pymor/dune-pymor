@@ -12,7 +12,8 @@
 
 #include <type_traits>
 
-#include <dune/pymor/la/container/interfaces.hh>
+#include <dune/stuff/la/container/interfaces.hh>
+
 #include <dune/pymor/la/container/affine.hh>
 #include "interfaces.hh"
 
@@ -30,8 +31,8 @@ class LinearAffinelyDecomposedContainerBasedTraits
 {
 public:
   typedef LinearAffinelyDecomposedContainerBased< OperatorType >  derived_type;
-  static_assert(std::is_base_of< LA::ProvidesContainer< typename OperatorType::Traits >, OperatorType > ::value,
-                "OperatorType has to be derived from LA::ProvidesContainer!");
+  static_assert(std::is_base_of< Stuff::LA::ProvidesContainer< typename OperatorType::Traits >, OperatorType > ::value,
+                "OperatorType has to be derived from Stuff::LA::ProvidesContainer!");
   typedef typename OperatorType::ContainerType                    ContainerType;
   static_assert(std::is_base_of< OperatorInterface< typename OperatorType::Traits >, OperatorType > ::value,
                 "OperatorType has to be derived from OperatorInterface!");

@@ -503,70 +503,70 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
                      "the dim of range (" << range.dim() << ") does not match the dim_range of this ("
                      << dim_range() << ")!");
   if (option_ == "cg.diagonal.lower") {
-    typedef ::Eigen::ConjugateGradient< typename ContainerType::BackendType::BackendType,
+    typedef ::Eigen::ConjugateGradient< typename ContainerType::BackendType,
                                         ::Eigen::Lower,
                                         ::Eigen::DiagonalPreconditioner< double > > EigenSolverType;
-    EigenSolverType eigenSolver(matrix_->backend_->backend());
+    EigenSolverType eigenSolver(*(matrix_->backend_));
     eigenSolver.setMaxIterations(dim_source());
     eigenSolver.setTolerance(1e-15);
-    range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
+    *(range.backend_) = eigenSolver.solve(*(source.backend_));
     if (eigenSolver.info() != ::Eigen::Success)
       DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                        "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
                        "see: http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b !");
   } else if (option_ == "cg.diagonal.upper") {
-      typedef ::Eigen::ConjugateGradient< typename ContainerType::BackendType::BackendType,
+      typedef ::Eigen::ConjugateGradient< typename ContainerType::BackendType,
                                           ::Eigen::Upper,
                                           ::Eigen::DiagonalPreconditioner< double > > EigenSolverType;
-      EigenSolverType eigenSolver(matrix_->backend_->backend());
+      EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
-      range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
+      *(range.backend_) = eigenSolver.solve(*(source.backend_));
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
                          "see: http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b !");
   } else if (option_ == "bicgstab.identity") {
-      typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType::BackendType,
+      typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType,
                                   ::Eigen::IdentityPreconditioner > EigenSolverType;
-      EigenSolverType eigenSolver(matrix_->backend_->backend());
+      EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
-      range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
+      *(range.backend_) = eigenSolver.solve(*(source.backend_));
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
                          "see: http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b !");
   } else if (option_ == "bicgstab.diagonal") {
-      typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType::BackendType,
+      typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType,
                                   ::Eigen::DiagonalPreconditioner< double > > EigenSolverType;
-      EigenSolverType eigenSolver(matrix_->backend_->backend());
+      EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
-      range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
+      *(range.backend_) = eigenSolver.solve(*(source.backend_));
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
                          "see: http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b !");
   } else if (option_ == "bicgstab.ilut") {
-      typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType::BackendType,
+      typedef ::Eigen::BiCGSTAB<  typename ContainerType::BackendType,
                                   ::Eigen::IncompleteLUT< double > > EigenSolverType;
-      EigenSolverType eigenSolver(matrix_->backend_->backend());
+      EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
       eigenSolver.preconditioner().setDroptol(1e-4);
       eigenSolver.preconditioner().setFillfactor(10);
-      range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
+      *(range.backend_) = eigenSolver.solve(*(source.backend_));
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
                          "see: http://eigen.tuxfamily.org/dox/group__enums.html#ga51bc1ac16f26ebe51eae1abb77bd037b !");
 #if HAVE_SUPERLU
   } else if (option_ == "superlu") {
-      typedef ::Eigen::SuperLU< typename ContainerType::BackendType::BackendType > EigenSolverType;
+      typedef ::Eigen::SuperLU< typename ContainerType::BackendType > EigenSolverType;
       EigenSolverType eigenSolver;
       eigenSolver.compute(matrix_->backend_->backend());
-      range.backend_->backend() = eigenSolver.solve(source.backend_->backend());
+      *(range.backend_) = eigenSolver.solve(*(source.backend_));
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -650,7 +650,7 @@ void EigenRowMajorSparse< S >::apply(const SourceType& source, RangeType& range,
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "the dim of range (" << range.dim() << ") does not match the dim_range of this ("
                      << dim_range() << ")!");
-  range.backend_->backend() = matrix_->backend_->backend() * source.backend_->backend();
+  *(range.backend_) = *(matrix_->backend_) * *(source.backend_);
 }
 
 template< class S >

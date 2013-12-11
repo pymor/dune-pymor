@@ -13,11 +13,11 @@
 #include <memory>
 
 #include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container.hh>
 
 #include <dune/pymor/common/exceptions.hh>
-#include <dune/pymor/la/container/interfaces.hh>
-#include <dune/pymor/la/container/dunedynamic.hh>
-#include <dune/pymor/la/container/eigen.hh>
+
 
 using namespace Dune;
 using namespace Dune::Pymor;
@@ -25,25 +25,25 @@ using namespace Dune::Pymor;
 static const size_t dim = 4;
 
 typedef testing::Types<
-                        Dune::Pymor::LA::DuneDynamicVector< double >
+//                        Dune::Pymor::LA::DuneDynamicVector< double >
 #if HAVE_EIGEN
-                      , Dune::Pymor::LA::EigenDenseVector< double >
+                        Dune::Stuff::LA::EigenDenseVector< double >
 #endif
                       > VectorTypes;
 
 typedef testing::Types<
-                        Dune::Pymor::LA::DuneDynamicMatrix< double >
+//                        Dune::Pymor::LA::DuneDynamicMatrix< double >
 #if HAVE_EIGEN
-                      , Dune::Pymor::LA::EigenRowMajorSparseMatrix< double >
+                        Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
 #endif
                       > MatrixTypes;
 
 typedef testing::Types<
-                        Dune::Pymor::LA::DuneDynamicVector< double >
-                      , Dune::Pymor::LA::DuneDynamicMatrix< double >
+//                        Dune::Pymor::LA::DuneDynamicVector< double >
+//                      , Dune::Pymor::LA::DuneDynamicMatrix< double >
 #if HAVE_EIGEN
-                      , Dune::Pymor::LA::EigenDenseVector< double >
-                      , Dune::Pymor::LA::EigenRowMajorSparseMatrix< double >
+                        Dune::Stuff::LA::EigenDenseVector< double >
+                      , Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
 #endif
                       > ContainerTypes;
 
@@ -63,13 +63,13 @@ struct ContainerTest
     // * of the container as itself (aka the derived type)
     typedef typename ContainerImp::ScalarType D_ScalarType;
     // * of the container as the interface
-    typedef typename LA::ContainerInterface< Traits > InterfaceType;
+    typedef typename Stuff::LA::ContainerInterface< Traits > InterfaceType;
     typedef typename InterfaceType::derived_type      I_derived_type;
     typedef typename InterfaceType::ScalarType        I_ScalarType;
     // dynamic tests
     // * of the container as itself (aka the derived type)
     ContainerImp DUNE_UNUSED(d_empty);
-    ContainerImp d_by_size = LA::createContainer(ContainerImp(), dim);
+    ContainerImp d_by_size = Stuff::LA::Container< ContainerImp >::create(dim);
     //ContainerImp d_copy_constructor(d_by_size); // <-- this is not allowed!
     //ContainerImp d_copy_assignment = d_by_size; // <-- this is not allowed!
     ContainerImp d_deep_copy = d_by_size.copy();
@@ -106,7 +106,7 @@ struct VectorTest
     // * of the vector as itself (aka the derived type)
     typedef typename VectorImp::ScalarType  D_ScalarType;
     // * of the vector as the interface
-    typedef typename LA::VectorInterface< Traits >  InterfaceType;
+    typedef typename Stuff::LA::VectorInterface< Traits >  InterfaceType;
     typedef typename InterfaceType::derived_type    I_derived_type;
     typedef typename InterfaceType::ScalarType      I_ScalarType;
     // dynamic tests
@@ -127,8 +127,8 @@ struct VectorTest
     D_ScalarType d_sup_norm = d_by_size.sup_norm();
     if (!Dune::FloatCmp::eq(d_sup_norm ,D_ScalarType(0))) DUNE_PYMOR_THROW(PymorException, d_sup_norm);
     VectorImp d_ones(dim, D_ScalarType(1));
-    std::vector< D_ScalarType > d_amax = d_ones.amax();
-    if (int(d_amax[0]) != 0 || !Dune::FloatCmp::eq(d_amax[1], D_ScalarType(1))) DUNE_PYMOR_THROW(PymorException, "");
+    std::pair< size_t, D_ScalarType > d_amax = d_ones.amax();
+    if (d_amax.first != 0 || !Dune::FloatCmp::eq(d_amax.second, D_ScalarType(1))) DUNE_PYMOR_THROW(PymorException, "");
     d_ones.add(d_by_size, d_by_size_and_value);
     if (!d_by_size_and_value.almost_equal(d_ones)) DUNE_PYMOR_THROW(PymorException, "");
     VectorImp d_added = d_ones.add(d_by_size);
@@ -142,16 +142,16 @@ struct VectorTest
     d_subtracted.isub(d_by_size);
     if (!d_subtracted.almost_equal(d_ones)) DUNE_PYMOR_THROW(PymorException, "");
     // * of the vector as the interface
-    VectorImp tmp1(dim);
-    VectorImp tmp2(dim, D_ScalarType(1));
-    InterfaceType& i_by_size = static_cast< InterfaceType& >(tmp1);
-    InterfaceType& i_by_size_and_value = static_cast< InterfaceType& >(tmp2);
+    VectorImp d_by_size_2(dim);
+    VectorImp d_by_size_and_value_2(dim, D_ScalarType(1));
+    InterfaceType& i_by_size = static_cast< InterfaceType& >(d_by_size_2);
+    InterfaceType& i_by_size_and_value = static_cast< InterfaceType& >(d_by_size_and_value_2);
     unsigned int DUNE_UNUSED(i_dim) = i_by_size.dim();
-    bool i_almost_equal = i_by_size.almost_equal(i_by_size);
+    bool i_almost_equal = i_by_size.almost_equal(d_by_size_2);
     if (!i_almost_equal) DUNE_PYMOR_THROW(PymorException, "");
     i_by_size_and_value.scal(I_ScalarType(0));
-    if (!i_by_size_and_value.almost_equal(i_by_size)) DUNE_PYMOR_THROW(PymorException, "");
-    I_ScalarType i_dot = i_by_size.dot(i_by_size_and_value);
+    if (!i_by_size_and_value.almost_equal(d_by_size_2)) DUNE_PYMOR_THROW(PymorException, "");
+    I_ScalarType i_dot = i_by_size.dot(d_by_size_and_value_2);
     if (!Dune::FloatCmp::eq(i_dot, I_ScalarType(0))) DUNE_PYMOR_THROW(PymorException, i_dot);
     I_ScalarType i_l1_norm = i_by_size.l1_norm();
     if (!Dune::FloatCmp::eq(i_l1_norm, I_ScalarType(0))) DUNE_PYMOR_THROW(PymorException, i_l1_norm);
@@ -160,19 +160,19 @@ struct VectorTest
     I_ScalarType i_sup_norm = i_by_size.sup_norm();
     if (!Dune::FloatCmp::eq(i_sup_norm ,I_ScalarType(0))) DUNE_PYMOR_THROW(PymorException, i_sup_norm);
     VectorImp i_ones(dim, I_ScalarType(1));
-    std::vector< I_ScalarType > i_amax = i_ones.amax();
-    if (int(i_amax[0]) != 0 || !Dune::FloatCmp::eq(i_amax[1], I_ScalarType(1))) DUNE_PYMOR_THROW(PymorException, "");
-    i_ones.add(i_by_size, i_by_size_and_value);
+    std::pair< size_t, I_ScalarType > i_amax = i_ones.amax();
+    if (i_amax.first != 0 || !Dune::FloatCmp::eq(i_amax.second, I_ScalarType(1))) DUNE_PYMOR_THROW(PymorException, "");
+    i_ones.add(d_by_size_2, d_by_size_and_value_2);
     if (!i_by_size_and_value.almost_equal(i_ones)) DUNE_PYMOR_THROW(PymorException, "");
-    VectorImp i_added = i_ones.add(i_by_size);
-    if (!i_added.almost_equal(i_by_size_and_value)) DUNE_PYMOR_THROW(PymorException, "");
-    i_added.iadd(i_by_size);
+    VectorImp i_added = i_ones.add(d_by_size_2);
+    if (!i_added.almost_equal(d_by_size_and_value_2)) DUNE_PYMOR_THROW(PymorException, "");
+    i_added.iadd(d_by_size_2);
     if (!i_added.almost_equal(i_ones)) DUNE_PYMOR_THROW(PymorException, "");
-    i_ones.sub(i_by_size, i_by_size_and_value);
+    i_ones.sub(d_by_size_2, d_by_size_and_value_2);
     if (!i_by_size_and_value.almost_equal(i_ones)) DUNE_PYMOR_THROW(PymorException, "");
-    VectorImp i_subtracted = i_ones.sub(i_by_size);
-    if (!i_subtracted.almost_equal(i_by_size_and_value)) DUNE_PYMOR_THROW(PymorException, "");
-    i_subtracted.isub(i_by_size);
+    VectorImp i_subtracted = i_ones.sub(d_by_size_2);
+    if (!i_subtracted.almost_equal(d_by_size_and_value_2)) DUNE_PYMOR_THROW(PymorException, "");
+    i_subtracted.isub(d_by_size_2);
     if (!i_subtracted.almost_equal(i_ones)) DUNE_PYMOR_THROW(PymorException, "");
   }
 }; // struct VectorTest

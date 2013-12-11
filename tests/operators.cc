@@ -16,15 +16,16 @@
 
 #include <dune/common/float_cmp.hh>
 
+#include <dune/stuff/la/container.hh>
+
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
-#include <dune/pymor/la/container.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/operators/affine.hh>
 #include <dune/pymor/operators/dunedynamic.hh>
 #if HAVE_EIGEN
-  #include <dune/pymor/operators/eigen.hh>
+# include <dune/pymor/operators/eigen.hh>
 #endif
 
 
@@ -34,10 +35,10 @@ using namespace Dune::Pymor;
 static const size_t dim = 4;
 
 typedef testing::Types<
-                        Dune::Pymor::Operators::DuneDynamic< double >
+//                        Dune::Pymor::Operators::DuneDynamic< double >
 #if HAVE_EIGEN
 //                      Dune::Pymor::Operators::EigenDense< double >
-                      , Dune::Pymor::Operators::EigenRowMajorSparse< double >
+                        Dune::Pymor::Operators::EigenRowMajorSparse< double >
 #endif // HAVE_EIGEN
                       > ContainerBasedOperatorTypes;
 
@@ -73,12 +74,12 @@ struct ContainerBasedOperatorTest
     typedef typename InterfaceType::ScalarType  I_ScalarType;
     typedef typename InterfaceType::InverseType I_InverseType;
     // * of the class as the container interface
-    static_assert(std::is_base_of< LA::ProvidesContainer< Traits >, OperatorType >::value,
+    static_assert(std::is_base_of< Stuff::LA::ProvidesContainer< Traits >, OperatorType >::value,
                   "OperatorType has to be derived from LA::ProvidesContainer!");
     // dynamic tests
     // * of the class itself (aka the derived type)
-    OperatorType d_from_ptr(new D_ContainerType(LA::createContainer(D_ContainerType(), dim)));
-    OperatorType d_from_shared_ptr(std::make_shared< D_ContainerType >(LA::createContainer(D_ContainerType(), dim)));
+    OperatorType d_from_ptr(new D_ContainerType(Stuff::LA::Container< D_ContainerType >::create(dim)));
+    OperatorType d_from_shared_ptr(std::make_shared< D_ContainerType >(Stuff::LA::Container< D_ContainerType >::create(dim)));
     d_from_shared_ptr = d_from_ptr;
     OperatorType DUNE_UNUSED(d_copy_constructor)(d_from_ptr); // <- at this point, all operators share the same matrix!
     const bool d_linear = d_from_ptr.linear();
@@ -88,7 +89,7 @@ struct ContainerBasedOperatorTest
     if (d_dim_source != dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
     const unsigned int d_dim_range = d_from_ptr.dim_range();
     if (d_dim_range != dim) DUNE_PYMOR_THROW(PymorException, d_dim_range);
-    D_SourceType source = LA::createContainer(D_SourceType(), dim);
+    D_SourceType source = Stuff::LA::Container< D_SourceType >::create(dim);
     D_SourceType range = d_from_ptr.apply(source);
     d_from_ptr.apply(source, range);
     D_ScalarType DUNE_UNUSED(d_apply2) = d_from_ptr.apply2(range, source);
@@ -144,10 +145,10 @@ struct LinearAffinelyDecomposedContainerBasedOperatorTest
     // * of the class itself (aka the derived type)
     typedef typename OperatorImp::ContainerType MatrixType;
     typedef LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
-    AffinelyDecomposedMatrixType affinelyDecomposedMatrix(new MatrixType(LA::createContainer(MatrixType(), dim)));
-    affinelyDecomposedMatrix.register_component(new MatrixType((LA::createContainer(MatrixType(), dim))),
+    AffinelyDecomposedMatrixType affinelyDecomposedMatrix(new MatrixType(Stuff::LA::Container< MatrixType >::create(dim)));
+    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
                                                 new ParameterFunctional("diffusion", 1, "diffusion[0]"));
-    affinelyDecomposedMatrix.register_component(new MatrixType((LA::createContainer(MatrixType(), dim))),
+    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
                                                 new ParameterFunctional("force", 2, "force[0]"));
     const Parameter mu = {{"diffusion", "force"},
                           {{1.0}, {1.0, 1.0}}};

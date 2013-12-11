@@ -11,9 +11,9 @@
 #endif
 
 #include <dune/common/typetraits.hh>
+#include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/parameters/functional.hh>
-#include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/la/container/affine.hh>
 
 #include "interfaces.hh"
@@ -38,7 +38,7 @@ public:
   typedef VectorBased< VectorImp >                          ComponentType;
   typedef VectorBased< VectorImp >                          FrozenType;
   typedef typename SourceType::ScalarType                   ScalarType;
-  static_assert(std::is_base_of< Dune::Pymor::LA::VectorInterface< typename VectorImp::Traits >, VectorType >::value,
+  static_assert(std::is_base_of< Dune::Stuff::LA::VectorInterface< typename VectorImp::Traits >, VectorType >::value,
                 "VectorType must be derived from Dune::Pymor::LA::VectorInterface!");
 };
 

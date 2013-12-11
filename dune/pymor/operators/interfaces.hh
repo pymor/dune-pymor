@@ -11,12 +11,12 @@
 #endif
 
 #include <dune/stuff/common/type_utils.hh>
+#include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
-#include <dune/pymor/la/container/interfaces.hh>
 
 namespace Dune {
 namespace Pymor {
@@ -40,10 +40,10 @@ public:
   typedef typename Traits::FrozenType   FrozenType;
   typedef typename Traits::InverseType  InverseType;
 
-  static_assert(std::is_base_of< LA::VectorInterface< typename SourceType::Traits >, SourceType >::value,
-                "SourceType has to be derived from LA::VectorInterface!");
-  static_assert(std::is_base_of< LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,
-                "RangeType has to be derived from LA::VectorInterface!");
+  static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename SourceType::Traits >, SourceType >::value,
+                "SourceType has to be derived from Stuff::LA::VectorInterface!");
+  static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,
+                "RangeType has to be derived from Stuff::LA::VectorInterface!");
 
   static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
   static std::string type_source() {  return Stuff::Common::Typename< SourceType >::value(); }
