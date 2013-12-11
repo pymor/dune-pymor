@@ -1,6 +1,4 @@
 AC_DEFUN([DUNE_PYMOR_CHECKS],[
-  AC_DEFINE([DUNE_PYMOR_SSIZE_T], [long int], [We need this for the python bindings (there is no unsigned in python).])
-
   PKG_CHECK_MODULES([EIGEN],
                     [eigen3],
                     [AC_DEFINE([HAVE_EIGEN],

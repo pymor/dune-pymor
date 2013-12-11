@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_PARAMETERS_BASE_HH
 #define DUNE_PYMOR_PARAMETERS_BASE_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <string>
 #include <map>
 #include <vector>
@@ -53,7 +57,7 @@ public:
 
   bool operator!=(const KeyValueBase< KeyType, ValueType >& other) const;
 
-  DUNE_PYMOR_SSIZE_T size() const;
+  DUNE_STUFF_SSIZE_T size() const;
 
   virtual std::string report() const = 0;
 
@@ -83,12 +87,12 @@ ParameterType type4 = {{"diffusion", "force"}, {1, 2}};
  * \see   Dune::Pymor::Parameter, Dune::Pymor::Parametric
  */
 class ParameterType
-  : public KeyValueBase< std::string, DUNE_PYMOR_SSIZE_T >
+  : public KeyValueBase< std::string, DUNE_STUFF_SSIZE_T >
 {
-  typedef KeyValueBase< std::string, DUNE_PYMOR_SSIZE_T > BaseType;
+  typedef KeyValueBase< std::string, DUNE_STUFF_SSIZE_T > BaseType;
 public:
   typedef std::string         KeyType;
-  typedef DUNE_PYMOR_SSIZE_T  ValueType;
+  typedef DUNE_STUFF_SSIZE_T  ValueType;
 
   /**
    * \brief Empty constructor to please pybindgen.
@@ -190,9 +194,9 @@ public:
 
   Parametric(const ParameterType& tt);
 
-  Parametric(const std::string& kk, const DUNE_PYMOR_SSIZE_T & vv);
+  Parametric(const std::string& kk, const DUNE_STUFF_SSIZE_T & vv);
 
-  Parametric(const std::vector< std::string >& kk, const std::vector< DUNE_PYMOR_SSIZE_T >& vv);
+  Parametric(const std::vector< std::string >& kk, const std::vector< DUNE_STUFF_SSIZE_T >& vv);
 
   Parametric(const Parametric& other);
 

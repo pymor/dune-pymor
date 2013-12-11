@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 #define DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/la/container/dunedynamic.hh>
@@ -58,9 +62,9 @@ public:
 
   bool linear() const;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const;
+  DUNE_STUFF_SSIZE_T dim_source() const;
 
-  DUNE_PYMOR_SSIZE_T dim_range() const;
+  DUNE_STUFF_SSIZE_T dim_range() const;
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 
@@ -117,9 +121,9 @@ public:
 
   bool linear() const;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const;
+  DUNE_STUFF_SSIZE_T dim_source() const;
 
-  DUNE_PYMOR_SSIZE_T dim_range() const;
+  DUNE_STUFF_SSIZE_T dim_range() const;
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 

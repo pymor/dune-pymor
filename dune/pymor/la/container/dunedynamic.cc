@@ -26,7 +26,7 @@ namespace LA {
 // ===== DuneDynamicVector =====
 // =============================
 template< class S >
-DuneDynamicVector< S >::DuneDynamicVector(const DUNE_PYMOR_SSIZE_T size, const ScalarType value)
+DuneDynamicVector< S >::DuneDynamicVector(const DUNE_STUFF_SSIZE_T size, const ScalarType value)
   : backend_(new BackendType(assert_is_not_negative(size), value))
 {}
 
@@ -76,7 +76,7 @@ void DuneDynamicVector< S >::axpy(const ScalarType& alpha, const ThisType& xx)
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicVector< S >::dim() const
+DUNE_STUFF_SSIZE_T DuneDynamicVector< S >::dim() const
 {
   return backend_->size();
 }
@@ -125,7 +125,7 @@ typename DuneDynamicVector< S >::ScalarType DuneDynamicVector< S >::sup_norm() c
 
 template< class S >
 std::vector< typename DuneDynamicVector< S >::ScalarType >
-DuneDynamicVector< S >::components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const
+DuneDynamicVector< S >::components(const std::vector< DUNE_STUFF_SSIZE_T >& component_indices) const
 {
   if (component_indices.size() > dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -166,7 +166,7 @@ void DuneDynamicVector< S >::add(const ThisType& other, ThisType& result) const
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
-  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim(); ++ii)
+  for (DUNE_STUFF_SSIZE_T ii = 0; ii < dim(); ++ii)
     result.backend_->operator[](ii) = backend_->operator[](ii) + other.backend_->operator[](ii);
 }
 
@@ -186,7 +186,7 @@ void DuneDynamicVector< S >::sub(const ThisType& other, ThisType& result) const
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
-  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim(); ++ii)
+  for (DUNE_STUFF_SSIZE_T ii = 0; ii < dim(); ++ii)
     result.backend_->operator[](ii) = backend_->operator[](ii) - other.backend_->operator[](ii);
 }
 
@@ -215,7 +215,7 @@ const typename DuneDynamicVector< S >::BackendType& DuneDynamicVector< S >::back
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicVector< S >::assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii)
+DUNE_STUFF_SSIZE_T DuneDynamicVector< S >::assert_is_not_negative(const DUNE_STUFF_SSIZE_T ii)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
@@ -237,8 +237,8 @@ template class AffinelyDecomposedContainer< DuneDynamicVector< double > >;
 // ===== DuneDynamicMatrix =====
 // =============================
 template< class S >
-DuneDynamicMatrix< S >::DuneDynamicMatrix(const DUNE_PYMOR_SSIZE_T rr,
-                                          const DUNE_PYMOR_SSIZE_T cc,
+DuneDynamicMatrix< S >::DuneDynamicMatrix(const DUNE_STUFF_SSIZE_T rr,
+                                          const DUNE_STUFF_SSIZE_T cc,
                                           const ScalarType value)
   : backend_(new BackendType(assert_is_not_negative(rr), assert_is_not_negative(cc), value))
 {}
@@ -272,13 +272,13 @@ typename DuneDynamicMatrix< S >::ThisType DuneDynamicMatrix< S >::copy() const
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicMatrix< S >::dim_source() const
+DUNE_STUFF_SSIZE_T DuneDynamicMatrix< S >::dim_source() const
 {
   return backend_->cols();
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicMatrix< S >::dim_range() const
+DUNE_STUFF_SSIZE_T DuneDynamicMatrix< S >::dim_range() const
 {
   return backend_->rows();
 }
@@ -326,7 +326,7 @@ const typename DuneDynamicMatrix< S >::BackendType& DuneDynamicMatrix< S >::back
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicMatrix< S >::assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii)
+DUNE_STUFF_SSIZE_T DuneDynamicMatrix< S >::assert_is_not_negative(const DUNE_STUFF_SSIZE_T ii)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;

@@ -8,6 +8,10 @@
 
 #if HAVE_EIGEN
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/pymor/la/container/eigen.hh>
 #include <dune/pymor/parameters/base.hh>
 
@@ -60,9 +64,9 @@ public:
 
   bool linear() const;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const;
+  DUNE_STUFF_SSIZE_T dim_source() const;
 
-  DUNE_PYMOR_SSIZE_T dim_range() const;
+  DUNE_STUFF_SSIZE_T dim_range() const;
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 
@@ -120,9 +124,9 @@ public:
 
   bool linear() const;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const;
+  DUNE_STUFF_SSIZE_T dim_source() const;
 
-  DUNE_PYMOR_SSIZE_T dim_range() const;
+  DUNE_STUFF_SSIZE_T dim_range() const;
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
 

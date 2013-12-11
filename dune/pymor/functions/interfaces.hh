@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 #define DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <memory>
 
 #include <dune/common/fmatrix.hh>
@@ -88,7 +92,7 @@ public:
     return nullptr;
   } // ... affine_part(...)
 
-  virtual DUNE_PYMOR_SSIZE_T num_components() const
+  virtual DUNE_STUFF_SSIZE_T num_components() const
   {
     if (!has_affine_part())
       return 0;
@@ -98,7 +102,7 @@ public:
     return false;
   } // ... num_components(...)
 
-  virtual std::shared_ptr< const NonparametricType > component(const DUNE_PYMOR_SSIZE_T qq) const
+  virtual std::shared_ptr< const NonparametricType > component(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (!parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
@@ -112,7 +116,7 @@ public:
     return nullptr;
   } // ... component(...)
 
-  virtual std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_PYMOR_SSIZE_T qq) const
+  virtual std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (!parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric,

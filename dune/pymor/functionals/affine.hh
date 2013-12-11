@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_FUNCTIONALS_AFFINE_HH
 #define DUNE_PYMOR_FUNCTIONALS_AFFINE_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/common/typetraits.hh>
 
 #include <dune/pymor/parameters/functional.hh>
@@ -65,27 +69,27 @@ public:
       dim_ = affinelyDecomposedVector_.component(0)->dim();
   }
 
-  DUNE_PYMOR_SSIZE_T num_components() const
+  DUNE_STUFF_SSIZE_T num_components() const
   {
     return affinelyDecomposedVector_.num_components();
   }
 
-  ComponentType component(const DUNE_PYMOR_SSIZE_T qq) const
+  ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
     return ComponentType(affinelyDecomposedVector_.component(qq));
   }
 
-  ComponentType* component_and_return_ptr(const DUNE_PYMOR_SSIZE_T qq)
+  ComponentType* component_and_return_ptr(const DUNE_STUFF_SSIZE_T qq)
   {
     return new ComponentType(component(qq));
   }
 
-  ParameterFunctional coefficient(const DUNE_PYMOR_SSIZE_T qq) const
+  ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     return ParameterFunctional(*(affinelyDecomposedVector_.coefficient(qq)));
   }
 
-  ParameterFunctional* coefficient_and_return_ptr(const DUNE_PYMOR_SSIZE_T qq) const
+  ParameterFunctional* coefficient_and_return_ptr(const DUNE_STUFF_SSIZE_T qq) const
   {
     return new ParameterFunctional(coefficient(qq));
   }
@@ -110,7 +114,7 @@ public:
     return true;
   }
 
-  DUNE_PYMOR_SSIZE_T dim_source() const
+  DUNE_STUFF_SSIZE_T dim_source() const
   {
     return dim_;
   }

@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_OPERATORS_INTERFACES_HH
 #define DUNE_PYMOR_OPERATORS_INTERFACES_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/stuff/common/type_utils.hh>
 
 #include <dune/pymor/common/exceptions.hh>
@@ -62,13 +66,13 @@ public:
     return CRTP::as_imp(*this).linear();
   }
 
-  DUNE_PYMOR_SSIZE_T dim_source() const
+  DUNE_STUFF_SSIZE_T dim_source() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
     return CRTP::as_imp(*this).dim_source();
   }
 
-  DUNE_PYMOR_SSIZE_T dim_range() const
+  DUNE_STUFF_SSIZE_T dim_range() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_range());
     return CRTP::as_imp(*this).dim_range();
@@ -193,7 +197,7 @@ public:
     : BaseType(other)
   {}
 
-  DUNE_PYMOR_SSIZE_T num_components() const
+  DUNE_STUFF_SSIZE_T num_components() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).num_components());
     return CRTP::as_imp(*this).num_components();
@@ -202,13 +206,13 @@ public:
   /**
    * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
    */
-  ComponentType component(const DUNE_PYMOR_SSIZE_T qq) const
+  ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).component(qq));
     return CRTP::as_imp(*this).component(qq);
   }
 
-  ComponentType* component_and_return_ptr(const DUNE_PYMOR_SSIZE_T qq) const
+  ComponentType* component_and_return_ptr(const DUNE_STUFF_SSIZE_T qq) const
   {
     return new ComponentType(component(qq));
   }
@@ -216,13 +220,13 @@ public:
   /**
    * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
    */
-  ParameterFunctional coefficient(const DUNE_PYMOR_SSIZE_T qq) const
+  ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
     return CRTP::as_imp(*this).coefficient(qq);
   }
 
-  ParameterFunctional* coefficient_and_return_ptr(const DUNE_PYMOR_SSIZE_T qq) const
+  ParameterFunctional* coefficient_and_return_ptr(const DUNE_STUFF_SSIZE_T qq) const
   {
     return new ParameterFunctional(coefficient(qq));
   }

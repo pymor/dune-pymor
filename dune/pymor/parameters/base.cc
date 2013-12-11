@@ -101,9 +101,9 @@ bool KeyValueBase< KeyType, ValueType >::operator!=(const KeyValueBase< KeyType,
 }
 
 template< class KeyType, class ValueType >
-DUNE_PYMOR_SSIZE_T KeyValueBase< KeyType, ValueType >::size() const
+DUNE_STUFF_SSIZE_T KeyValueBase< KeyType, ValueType >::size() const
 {
-  return (DUNE_PYMOR_SSIZE_T)(dict_.size());
+  return (DUNE_STUFF_SSIZE_T)(dict_.size());
 }
 
 template< class KeyType, class ValueType >
@@ -120,7 +120,7 @@ void KeyValueBase< KeyType, ValueType >::update()
   }
 } // void update()
 
-template class KeyValueBase< std::string, DUNE_PYMOR_SSIZE_T >;
+template class KeyValueBase< std::string, DUNE_STUFF_SSIZE_T >;
 template class KeyValueBase< std::string, std::vector< double > >;
 
 
@@ -269,7 +269,7 @@ Parameter::Parameter(const std::vector< KeyType >& kk,
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
   if (kk.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "kk and vv are empty!");
-  std::vector< DUNE_PYMOR_SSIZE_T > valueSizes(vv.size());
+  std::vector< DUNE_STUFF_SSIZE_T > valueSizes(vv.size());
   for (size_t ii = 0; ii < vv.size(); ++ii) {
     if (vv[ii].size() == 0)
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -426,11 +426,11 @@ Parametric::Parametric(const ParameterType& tt)
   : type_(tt)
 {}
 
-Parametric::Parametric(const std::string& kk, const DUNE_PYMOR_SSIZE_T & vv)
+Parametric::Parametric(const std::string& kk, const DUNE_STUFF_SSIZE_T & vv)
   : type_(kk, vv)
 {}
 
-Parametric::Parametric(const std::vector< std::string >& kk, const std::vector< DUNE_PYMOR_SSIZE_T >& vv)
+Parametric::Parametric(const std::vector< std::string >& kk, const std::vector< DUNE_STUFF_SSIZE_T >& vv)
   : type_(kk, vv)
 {}
 

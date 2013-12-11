@@ -14,7 +14,7 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCholesky>
 #if HAVE_SUPERLU
-  #include <Eigen/SuperLUSupport>
+# include <Eigen/SuperLUSupport>
 #endif
 
 #include "eigen.hh"
@@ -478,13 +478,13 @@ bool EigenRowMajorSparseInverse< S >::linear() const
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenRowMajorSparseInverse< S >::dim_source() const
+DUNE_STUFF_SSIZE_T EigenRowMajorSparseInverse< S >::dim_source() const
 {
   return matrix_->dim_range();
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenRowMajorSparseInverse< S >::dim_range() const
+DUNE_STUFF_SSIZE_T EigenRowMajorSparseInverse< S >::dim_range() const
 {
   return matrix_->dim_source();
 }
@@ -626,13 +626,13 @@ bool EigenRowMajorSparse< S >::linear() const
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenRowMajorSparse< S >::dim_source() const
+DUNE_STUFF_SSIZE_T EigenRowMajorSparse< S >::dim_source() const
 {
   return matrix_->dim_source();
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenRowMajorSparse< S >::dim_range() const
+DUNE_STUFF_SSIZE_T EigenRowMajorSparse< S >::dim_range() const
 {
   return matrix_->dim_range();
 }

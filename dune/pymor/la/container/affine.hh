@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_LA_CONTAINER_AFFINE_HH
 #define DUNE_PYMOR_LA_CONTAINER_AFFINE_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <memory>
 #include <vector>
 #include <type_traits>
@@ -103,7 +107,7 @@ public:
     return hasAffinePart_;
   }
 
-  DUNE_PYMOR_SSIZE_T num_components() const
+  DUNE_STUFF_SSIZE_T num_components() const
   {
     return num_components_;
   }
@@ -131,7 +135,7 @@ public:
   /**
    * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it manually)!
    */
-  DUNE_PYMOR_SSIZE_T register_component(const ContainerType* comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(const ContainerType* comp_ptr,
                                         const ParameterFunctional* coeff_ptr)
   {
     return register_component(std::shared_ptr< const ContainerType >(comp_ptr),
@@ -141,7 +145,7 @@ public:
   /**
    * \attention This class takes ownership of comp_ptr (in the sense, that you must not delete it manually)!
    */
-  DUNE_PYMOR_SSIZE_T register_component(const ContainerType* comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(const ContainerType* comp_ptr,
                                         const std::shared_ptr< const ParameterFunctional > coeff_ptr)
   {
     return register_component(std::shared_ptr< const ContainerType >(comp_ptr), coeff_ptr);
@@ -150,13 +154,13 @@ public:
   /**
    * \attention This class takes ownership of coeff_ptr (in the sense, that you must not delete it manually)!
    */
-  DUNE_PYMOR_SSIZE_T register_component(const std::shared_ptr< const ContainerType > comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(const std::shared_ptr< const ContainerType > comp_ptr,
                                         const ParameterFunctional* coeff_ptr)
   {
     return register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
-  DUNE_PYMOR_SSIZE_T register_component(const std::shared_ptr< const ContainerType > comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(const std::shared_ptr< const ContainerType > comp_ptr,
                                         const std::shared_ptr< const ParameterFunctional > coeff_ptr)
   {
     if (hasAffinePart_) {
@@ -182,7 +186,7 @@ public:
     return affinePart_;
   }
 
-  std::shared_ptr< const ContainerType > component(const DUNE_PYMOR_SSIZE_T qq) const
+  std::shared_ptr< const ContainerType > component(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (num_components_ == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -194,7 +198,7 @@ public:
     return components_[qq];
   }
 
-  std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_PYMOR_SSIZE_T qq) const
+  std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (num_components_ == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -220,7 +224,7 @@ public:
     if (hasAffinePart_) {
       ContainerType result = affinePart_->copy();
       if (num_components_ > 0)
-        for (DUNE_PYMOR_SSIZE_T ii = 0; ii < num_components_; ++ii) {
+        for (DUNE_STUFF_SSIZE_T ii = 0; ii < num_components_; ++ii) {
           const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
           result.axpy(coefficients_[ii]->evaluate(muCoefficient), *(components_[ii]));
         }
@@ -229,7 +233,7 @@ public:
       ContainerType result = components_[0]->copy();
       const Parameter muCoefficient0 = map_parameter(mu, "coefficient_0");
       result.scal(coefficients_[0]->evaluate(muCoefficient0));
-      for (DUNE_PYMOR_SSIZE_T ii = 1; ii < num_components_; ++ii) {
+      for (DUNE_STUFF_SSIZE_T ii = 1; ii < num_components_; ++ii) {
         const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
         result.axpy(coefficients_[ii]->evaluate(muCoefficient), *(components_[ii]));
       }
@@ -239,7 +243,7 @@ public:
 
 private:
   bool hasAffinePart_;
-  DUNE_PYMOR_SSIZE_T num_components_;
+  DUNE_STUFF_SSIZE_T num_components_;
   std::vector< std::shared_ptr< const ContainerType > > components_;
   std::vector< std::shared_ptr< const ParameterFunctional > > coefficients_;
   std::shared_ptr< const ContainerType > affinePart_;
@@ -322,7 +326,7 @@ public:
     BaseType::register_affine_part(affinePart_);
   }
 
-  DUNE_PYMOR_SSIZE_T register_component(ContainerType* comp_ptr, const ParameterFunctional* coeff_ptr)
+  DUNE_STUFF_SSIZE_T register_component(ContainerType* comp_ptr, const ParameterFunctional* coeff_ptr)
   {
     return register_component(std::shared_ptr< ContainerType >(comp_ptr),
                               std::shared_ptr< const ParameterFunctional >(coeff_ptr));
@@ -331,7 +335,7 @@ public:
   /**
    * \attention This class takes ownership of comp_ptr!
    */
-  DUNE_PYMOR_SSIZE_T register_component(ContainerType* comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(ContainerType* comp_ptr,
                                         const std::shared_ptr< const ParameterFunctional > coeff_ptr)
   {
     return register_component(std::shared_ptr< ContainerType >(comp_ptr), coeff_ptr);
@@ -340,13 +344,13 @@ public:
   /**
    * \attention This class takes ownership of coeff_ptr!
    */
-  DUNE_PYMOR_SSIZE_T register_component(std::shared_ptr< ContainerType > comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(std::shared_ptr< ContainerType > comp_ptr,
                                         const ParameterFunctional* coeff_ptr)
   {
     return register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
-  DUNE_PYMOR_SSIZE_T register_component(std::shared_ptr< ContainerType > comp_ptr,
+  DUNE_STUFF_SSIZE_T register_component(std::shared_ptr< ContainerType > comp_ptr,
                                         const std::shared_ptr< const ParameterFunctional > coeff_ptr)
   {
     components_.push_back(comp_ptr);
@@ -361,7 +365,7 @@ public:
     return affinePart_;
   }
 
-  std::shared_ptr< ContainerType > component(const DUNE_PYMOR_SSIZE_T qq)
+  std::shared_ptr< ContainerType > component(const DUNE_STUFF_SSIZE_T qq)
   {
     if (BaseType::num_components() == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,

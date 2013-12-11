@@ -3,11 +3,7 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include "config.h"
-#endif // HAVE_CMAKE_CONFIG
+#include "config.h"
 
 #if HAVE_EIGEN
 
@@ -25,7 +21,7 @@ namespace LA {
 // ===== EigenDenseVector =====
 // ============================
 template< class S >
-EigenDenseVector< S >::EigenDenseVector(const DUNE_PYMOR_SSIZE_T size, const ScalarType value)
+EigenDenseVector< S >::EigenDenseVector(const DUNE_STUFF_SSIZE_T size, const ScalarType value)
   : backend_(new BackendType(assert_is_not_negative(size), value))
 {}
 
@@ -74,7 +70,7 @@ void EigenDenseVector< S >::axpy(const ScalarType& alpha, const ThisType& xx)
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenDenseVector< S >::dim() const
+DUNE_STUFF_SSIZE_T EigenDenseVector< S >::dim() const
 {
   return backend_->size();
 }
@@ -124,7 +120,7 @@ typename EigenDenseVector< S >::ScalarType EigenDenseVector< S >::sup_norm() con
 
 template< class S >
 std::vector< typename EigenDenseVector< S >::ScalarType >
-EigenDenseVector< S >::components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const
+EigenDenseVector< S >::components(const std::vector< DUNE_STUFF_SSIZE_T >& component_indices) const
 {
   if (component_indices.size() > dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
@@ -187,7 +183,7 @@ void EigenDenseVector< S >::sub(const ThisType& other, ThisType& result) const
   if (dim() != other.dim())
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "dim of other (" << other.dim() << ") does not match the dim of this (" << dim() << ")!");
-  for (DUNE_PYMOR_SSIZE_T ii = 0; ii < dim(); ++ii)
+  for (DUNE_STUFF_SSIZE_T ii = 0; ii < dim(); ++ii)
     result.backend_->backend() = backend_->backend() - other.backend_->backend();
 }
 
@@ -216,7 +212,7 @@ const typename EigenDenseVector< S >::BackendType& EigenDenseVector< S >::backen
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenDenseVector< S >::assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii)
+DUNE_STUFF_SSIZE_T EigenDenseVector< S >::assert_is_not_negative(const DUNE_STUFF_SSIZE_T ii)
 {
   if (ii < 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "ii has to be positive (is " << ii << ")!");
   return ii;
@@ -271,13 +267,13 @@ typename EigenRowMajorSparseMatrix< S >::ThisType EigenRowMajorSparseMatrix< S >
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenRowMajorSparseMatrix< S >::dim_source() const
+DUNE_STUFF_SSIZE_T EigenRowMajorSparseMatrix< S >::dim_source() const
 {
   return backend_->cols();
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T EigenRowMajorSparseMatrix< S >::dim_range() const
+DUNE_STUFF_SSIZE_T EigenRowMajorSparseMatrix< S >::dim_range() const
 {
   return backend_->rows();
 }

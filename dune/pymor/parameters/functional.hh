@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_PARAMETERS_FUNCTIONAL_HH
 #define DUNE_PYMOR_PARAMETERS_FUNCTIONAL_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <vector>
 #include <memory>
 
@@ -27,10 +31,10 @@ class ParameterFunctional
 public:
   ParameterFunctional(const ParameterType& tt, const std::string& exp);
 
-  ParameterFunctional(const std::string& kk, const DUNE_PYMOR_SSIZE_T & vv, const std::string& exp);
+  ParameterFunctional(const std::string& kk, const DUNE_STUFF_SSIZE_T & vv, const std::string& exp);
 
   ParameterFunctional(const std::vector< std::string >& kk,
-                      const std::vector< DUNE_PYMOR_SSIZE_T >& vv,
+                      const std::vector< DUNE_STUFF_SSIZE_T >& vv,
                       const std::string& exp);
 
   ParameterFunctional(const ParameterFunctional& other);

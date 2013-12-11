@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 #define DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/stuff/functions/constant.hh>
 #include <dune/stuff/grid/fakeentity.hh>
 
@@ -32,11 +36,11 @@ public:
   typedef Dune::Pymor::Function::AffinelyDecomposableDefault< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
     FunctionType;
 
-  AnalyticalProblem(const DUNE_PYMOR_SSIZE_T dd = 4);
+  AnalyticalProblem(const DUNE_STUFF_SSIZE_T dd = 4);
 
   ~AnalyticalProblem();
 
-  DUNE_PYMOR_SSIZE_T dim() const;
+  DUNE_STUFF_SSIZE_T dim() const;
 
   const FunctionType* diffusion() const;
 
@@ -47,7 +51,7 @@ public:
   const FunctionType* neumann() const;
 
 private:
-  DUNE_PYMOR_SSIZE_T dim_;
+  DUNE_STUFF_SSIZE_T dim_;
   FunctionType* diffusion_;
   FunctionType* force_;
   FunctionType* dirichlet_;
@@ -102,7 +106,7 @@ public:
 
 private:
   const AnalyticalProblem* problem_;
-  DUNE_PYMOR_SSIZE_T dim_;
+  DUNE_STUFF_SSIZE_T dim_;
   OperatorType* op_;
   FunctionalType* func_;
 }; // class SimpleDiscretization

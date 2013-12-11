@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_FUNCTIONALS_DEFAULT_HH
 #define DUNE_PYMOR_FUNCTIONALS_DEFAULT_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/common/typetraits.hh>
 
 #include <dune/pymor/parameters/functional.hh>
@@ -64,7 +68,7 @@ public:
     return true;
   }
 
-  DUNE_PYMOR_SSIZE_T dim_source() const
+  DUNE_STUFF_SSIZE_T dim_source() const
   {
     return vector_->dim();
   }

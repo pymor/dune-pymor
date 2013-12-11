@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 #define DUNE_PYMOR_FUNCTIONS_DEFAULT_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <memory>
 
 #include <dune/stuff/functions/interfaces.hh>
@@ -72,7 +76,7 @@ public:
     return nonparametric_;
   }
 
-  virtual DUNE_PYMOR_SSIZE_T num_components() const DS_OVERRIDE
+  virtual DUNE_STUFF_SSIZE_T num_components() const DS_OVERRIDE
   {
     return 0;
   }
@@ -275,12 +279,12 @@ public:
     return affinePart_;
   }
 
-  virtual DUNE_PYMOR_SSIZE_T num_components() const DS_OVERRIDE
+  virtual DUNE_STUFF_SSIZE_T num_components() const DS_OVERRIDE
   {
     return num_components_;
   }
 
-  virtual std::shared_ptr< const NonparametricType > component(const DUNE_PYMOR_SSIZE_T qq) const DS_OVERRIDE
+  virtual std::shared_ptr< const NonparametricType > component(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
   {
     if (num_components_ == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
@@ -292,7 +296,7 @@ public:
     return components_[qq];
   }
 
-  virtual std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_PYMOR_SSIZE_T qq) const DS_OVERRIDE
+  virtual std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
   {
     if (num_components_ == 0)
       DUNE_PYMOR_THROW(Exception::requirements_not_met,

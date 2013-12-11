@@ -41,13 +41,13 @@ bool DuneDynamicInverse< S >::linear() const
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicInverse< S >::dim_source() const
+DUNE_STUFF_SSIZE_T DuneDynamicInverse< S >::dim_source() const
 {
   return matrix_->dim_range();
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamicInverse< S >::dim_range() const
+DUNE_STUFF_SSIZE_T DuneDynamicInverse< S >::dim_range() const
 {
   return matrix_->dim_source();
 }
@@ -118,13 +118,13 @@ bool DuneDynamic< S >::linear() const
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamic< S >::dim_source() const
+DUNE_STUFF_SSIZE_T DuneDynamic< S >::dim_source() const
 {
   return matrix_->dim_source();
 }
 
 template< class S >
-DUNE_PYMOR_SSIZE_T DuneDynamic< S >::dim_range() const
+DUNE_STUFF_SSIZE_T DuneDynamic< S >::dim_range() const
 {
   return matrix_->dim_range();
 }

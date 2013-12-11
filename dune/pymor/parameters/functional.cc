@@ -24,7 +24,7 @@ ParameterFunctional::ParameterFunctional(const ParameterType& tt, const std::str
 }
 
 ParameterFunctional::ParameterFunctional(const std::string& kk,
-                                         const DUNE_PYMOR_SSIZE_T & vv,
+                                         const DUNE_STUFF_SSIZE_T & vv,
                                          const std::string& exp)
   : Parametric(ParameterType(kk, vv))
   , expression_(exp)
@@ -33,7 +33,7 @@ ParameterFunctional::ParameterFunctional(const std::string& kk,
 }
 
 ParameterFunctional::ParameterFunctional(const std::vector< std::string >& kk,
-                                         const std::vector< DUNE_PYMOR_SSIZE_T >& vv,
+                                         const std::vector< DUNE_STUFF_SSIZE_T >& vv,
                                          const std::string& exp)
   : Parametric(ParameterType(kk, vv))
   , expression_(exp)

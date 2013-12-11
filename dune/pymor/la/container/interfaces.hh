@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_LA_CONTAINER_INTERFACES_HH
 #define DUNE_PYMOR_LA_CONTAINER_INTERFACES_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <utility>
 #include <vector>
 #include <string>
@@ -147,7 +151,7 @@ public:
    * \brief   The dimension of the vector.
    * \return  The dimension of the vector.
    */
-  DUNE_PYMOR_SSIZE_T dim() const
+  DUNE_STUFF_SSIZE_T dim() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim());
     return CRTP::as_imp(*this).dim();
@@ -227,7 +231,7 @@ public:
    * \return                  A std::vector< ScalarType > `result` such that `result[i]` is the `component_indices[i]`-th
                               component of the vector.
    */
-  std::vector< ScalarType > components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const
+  std::vector< ScalarType > components(const std::vector< DUNE_STUFF_SSIZE_T >& component_indices) const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).components(component_indices));
     return CRTP::as_imp(*this).components(component_indices);
@@ -376,13 +380,13 @@ public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::ScalarType   ScalarType;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const
+  DUNE_STUFF_SSIZE_T dim_source() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
     return CRTP::as_imp(*this).dim_source();
   }
 
-  DUNE_PYMOR_SSIZE_T dim_range() const
+  DUNE_STUFF_SSIZE_T dim_range() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_range());
     return CRTP::as_imp(*this).dim_range();

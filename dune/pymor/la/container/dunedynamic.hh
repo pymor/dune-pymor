@@ -6,11 +6,15 @@
 #ifndef DUNE_PYMOR_LA_CONTAINER_DYNAMICVECTOR_HH
 #define DUNE_PYMOR_LA_CONTAINER_DYNAMICVECTOR_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <memory>
 
 #include <dune/common/dynvector.hh>
 #include <dune/stuff/common/disable_warnings.hh>
-  #include <dune/common/dynmatrix.hh>
+# include <dune/common/dynmatrix.hh>
 #include <dune/stuff/common/reenable_warnings.hh>
 #include <dune/common/float_cmp.hh>
 
@@ -63,7 +67,7 @@ public:
   typedef typename Traits::ScalarType           ScalarType;
   typedef typename Traits::BackendType          BackendType;
 
-  DuneDynamicVector(const DUNE_PYMOR_SSIZE_T size = 0, const ScalarType value = ScalarType(0));
+  DuneDynamicVector(const DUNE_STUFF_SSIZE_T size = 0, const ScalarType value = ScalarType(0));
 
   /**
    * \attention This class takes ownership of backend_ptr in the sense, that you must not remove it manually!
@@ -78,7 +82,7 @@ public:
 
   ThisType copy() const;
 
-  DUNE_PYMOR_SSIZE_T dim() const;
+  DUNE_STUFF_SSIZE_T dim() const;
 
   bool has_equal_shape(const ThisType& other) const;
 
@@ -103,7 +107,7 @@ public:
 
   ScalarType sup_norm() const;
 
-  std::vector< ScalarType > components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const;
+  std::vector< ScalarType > components(const std::vector< DUNE_STUFF_SSIZE_T >& component_indices) const;
 
   std::vector< ScalarType > amax() const;
 
@@ -128,7 +132,7 @@ public:
   const BackendType& backend() const;
 
 private:
-  static DUNE_PYMOR_SSIZE_T assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii);
+  static DUNE_STUFF_SSIZE_T assert_is_not_negative(const DUNE_STUFF_SSIZE_T ii);
   void ensure_uniqueness();
 
   friend class Operators::DuneDynamic< ScalarType >;
@@ -163,8 +167,8 @@ public:
   typedef typename Traits::BackendType          BackendType;
 
 public:
-  DuneDynamicMatrix(const DUNE_PYMOR_SSIZE_T rr = 0,
-                    const DUNE_PYMOR_SSIZE_T cc = 0,
+  DuneDynamicMatrix(const DUNE_STUFF_SSIZE_T rr = 0,
+                    const DUNE_STUFF_SSIZE_T cc = 0,
                     const ScalarType value = ScalarType(0));
 
   /**
@@ -180,9 +184,9 @@ public:
 
   ThisType copy() const;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const;
+  DUNE_STUFF_SSIZE_T dim_source() const;
 
-  DUNE_PYMOR_SSIZE_T dim_range() const;
+  DUNE_STUFF_SSIZE_T dim_range() const;
 
   bool has_equal_shape(const ThisType& other) const;
 
@@ -195,7 +199,7 @@ public:
   const BackendType& backend() const;
 
 private:
-  static DUNE_PYMOR_SSIZE_T assert_is_not_negative(DUNE_PYMOR_SSIZE_T ii);
+  static DUNE_STUFF_SSIZE_T assert_is_not_negative(DUNE_STUFF_SSIZE_T ii);
   void ensure_uniqueness();
 
   friend class Operators::DuneDynamic< ScalarType >;
@@ -206,14 +210,14 @@ private:
 
 
 template< class S >
-static DuneDynamicVector< S > createContainer(const DuneDynamicVector< S >&, const DUNE_PYMOR_SSIZE_T size)
+static DuneDynamicVector< S > createContainer(const DuneDynamicVector< S >&, const DUNE_STUFF_SSIZE_T size)
 {
   return DuneDynamicVector< S >(size, S(1));
 }
 
 
 template< class S >
-static DuneDynamicMatrix< S > createContainer(const DuneDynamicMatrix< S >&, const DUNE_PYMOR_SSIZE_T size)
+static DuneDynamicMatrix< S > createContainer(const DuneDynamicMatrix< S >&, const DUNE_STUFF_SSIZE_T size)
 {
   typedef Dune::DynamicMatrix< S > BackendType;
   BackendType* matrix = new BackendType(size, size, S(0));

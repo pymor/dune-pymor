@@ -6,6 +6,10 @@
 #ifndef DUNE_PYMOR_OPERATORS_AFFINE_HH
 #define DUNE_PYMOR_OPERATORS_AFFINE_HH
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <type_traits>
 
 #include <dune/pymor/la/container/interfaces.hh>
@@ -72,17 +76,17 @@ public:
     }
   }
 
-  DUNE_PYMOR_SSIZE_T num_components() const
+  DUNE_STUFF_SSIZE_T num_components() const
   {
     return affinelyDecomposedContainer_.num_components();
   }
 
-  ComponentType component(const DUNE_PYMOR_SSIZE_T qq) const
+  ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
     return ComponentType(affinelyDecomposedContainer_.component(qq));
   }
 
-  ParameterFunctional coefficient(const DUNE_PYMOR_SSIZE_T qq) const
+  ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     return ParameterFunctional(*(affinelyDecomposedContainer_.coefficient(qq)));
   }
@@ -102,12 +106,12 @@ public:
     return true;
   }
 
-  DUNE_PYMOR_SSIZE_T dim_source() const
+  DUNE_STUFF_SSIZE_T dim_source() const
   {
     return dim_source_;
   }
 
-  DUNE_PYMOR_SSIZE_T dim_range() const
+  DUNE_STUFF_SSIZE_T dim_range() const
   {
     return dim_range_;
   }
@@ -148,8 +152,8 @@ public:
 
 private:
   AffinelyDecomposedContainerType affinelyDecomposedContainer_;
-  DUNE_PYMOR_SSIZE_T dim_source_;
-  DUNE_PYMOR_SSIZE_T dim_range_;
+  DUNE_STUFF_SSIZE_T dim_source_;
+  DUNE_STUFF_SSIZE_T dim_range_;
 }; // class LinearAffinelyDecomposedContainerBased
 
 

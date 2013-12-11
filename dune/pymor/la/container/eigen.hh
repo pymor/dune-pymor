@@ -8,6 +8,10 @@
 
 #if HAVE_EIGEN
 
+#ifndef DUNE_STUFF_SSIZE_T
+# define DUNE_STUFF_SSIZE_T long int
+#endif
+
 #include <dune/common/float_cmp.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
@@ -60,7 +64,7 @@ public:
   typedef typename Traits::ScalarType         ScalarType;
   typedef typename Traits::BackendType        BackendType;
 
-  EigenDenseVector(const DUNE_PYMOR_SSIZE_T size = 0, const ScalarType value = ScalarType(0));
+  EigenDenseVector(const DUNE_STUFF_SSIZE_T size = 0, const ScalarType value = ScalarType(0));
 
   /**
    * \attention This class takes ownership of backend_ptr!
@@ -75,7 +79,7 @@ public:
 
   ThisType copy() const;
 
-  DUNE_PYMOR_SSIZE_T dim() const;
+  DUNE_STUFF_SSIZE_T dim() const;
 
   bool has_equal_shape(const ThisType& other) const;
 
@@ -100,7 +104,7 @@ public:
 
   ScalarType sup_norm() const;
 
-  std::vector< ScalarType > components(const std::vector< DUNE_PYMOR_SSIZE_T >& component_indices) const;
+  std::vector< ScalarType > components(const std::vector< DUNE_STUFF_SSIZE_T >& component_indices) const;
 
   std::vector< ScalarType > amax() const;
 
@@ -125,7 +129,7 @@ public:
   const BackendType& backend() const;
 
 private:
-  static DUNE_PYMOR_SSIZE_T assert_is_not_negative(const DUNE_PYMOR_SSIZE_T ii);
+  static DUNE_STUFF_SSIZE_T assert_is_not_negative(const DUNE_STUFF_SSIZE_T ii);
   void ensure_uniqueness();
 
   friend class Operators::EigenRowMajorSparse< ScalarType >;
@@ -176,9 +180,9 @@ public:
 
   ThisType copy() const;
 
-  DUNE_PYMOR_SSIZE_T dim_source() const;
+  DUNE_STUFF_SSIZE_T dim_source() const;
 
-  DUNE_PYMOR_SSIZE_T dim_range() const;
+  DUNE_STUFF_SSIZE_T dim_range() const;
 
   bool has_equal_shape(const ThisType& other) const;
 
