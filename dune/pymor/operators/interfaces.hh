@@ -12,9 +12,9 @@
 
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/common/crtp.hh>
 
 #include <dune/pymor/common/exceptions.hh>
-#include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 
@@ -29,7 +29,7 @@ template< class Traits >
 class OperatorInterface
   : public Parametric
   , public OperatorInterfaceDynamic
-  , protected CRTPInterface< OperatorInterface< Traits >, Traits >
+  , protected Stuff::CRTPInterface< OperatorInterface< Traits >, Traits >
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -176,11 +176,9 @@ class AffinelyDecomposedOperatorInterfaceDynamic {};
 
 template< class Traits >
 class AffinelyDecomposedOperatorInterface
-  : CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits >
-  , public OperatorInterface< Traits >
+  : public OperatorInterface< Traits >
   , public AffinelyDecomposedOperatorInterfaceDynamic
 {
-  typedef CRTPInterface< AffinelyDecomposedOperatorInterface< Traits >, Traits > CRTP;
   typedef OperatorInterface< Traits > BaseType;
 public:
   typedef typename Traits::derived_type   derived_type;
