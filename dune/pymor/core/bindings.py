@@ -104,19 +104,19 @@ def inject_lib_dune_pymor(module):
     #     Traits={'ThisType': 'Dune::Pymor::LA::DuneDynamicMatrix< double >',
     #             'ScalarType': 'double'},
     #     template_parameters='double')
-    # if CONFIG_H['HAVE_EIGEN']:
-    #     module, _ = dune.pymor.la.container.inject_MatrixImplementation(
-    #         module, exceptions, interfaces, CONFIG_H,
-    #         name='Dune::Pymor::LA::EigenRowMajorSparseMatrix',
-    #         Traits={'ThisType' : 'Dune::Pymor::LA::EigenRowMajorSparseMatrix< double >',
-    #                 'ScalarType' : 'double'},
-    #         template_parameters='double')
-    # # next we add what we need of the functionals
-    # (module, interfaces['Dune::Pymor::FunctionalInterfaceDynamic']
-    #  ) = inject_Class(module, 'Dune::Pymor::FunctionalInterfaceDynamic')
-    # (module, interfaces['Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic']
-    #  ) = inject_Class(module, 'Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic',
-    #                   parent=interfaces['Dune::Pymor::FunctionalInterfaceDynamic'])
+    if CONFIG_H['HAVE_EIGEN']:
+        module, _ = dune.pymor.la.container.inject_MatrixImplementation(
+            module, exceptions, interfaces, CONFIG_H,
+            name='Dune::Stuff::LA::EigenRowMajorSparseMatrix',
+            Traits={'ThisType' : 'Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >',
+                    'ScalarType' : 'double'},
+            template_parameters='double')
+    # next we add what we need of the functionals
+    (module, interfaces['Dune::Pymor::FunctionalInterfaceDynamic']
+     ) = inject_Class(module, 'Dune::Pymor::FunctionalInterfaceDynamic')
+    (module, interfaces['Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic']
+     ) = inject_Class(module, 'Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic',
+                      parent=interfaces['Dune::Pymor::FunctionalInterfaceDynamic'])
     # #   for the Dune::DynamicVector backend
     # _ = dune.pymor.functionals.inject_VectorBasedImplementation(
     #     module, exceptions, interfaces, CONFIG_H,
@@ -132,26 +132,26 @@ def inject_lib_dune_pymor(module):
     #             'ScalarType' : 'double'},
     #     template_parameters='Dune::Pymor::LA::DuneDynamicVector< double >')
     # #   and the Eigen backend
-    # if CONFIG_H['HAVE_EIGEN']:
-    #     _ = dune.pymor.functionals.inject_VectorBasedImplementation(
-    #         module, exceptions, interfaces, CONFIG_H,
-    #         Traits={'SourceType' : 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                 'ScalarType' : 'double',
-    #                 'ContainerType' : 'Dune::Pymor::LA::EigenDenseVector< double >'},
-    #         template_parameters='Dune::Pymor::LA::EigenDenseVector< double >')
-    #     _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
-    #         module, exceptions, interfaces, CONFIG_H,
-    #         Traits={'SourceType' : 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                 'ComponentType': 'Dune::Pymor::Functionals::VectorBased< Dune::Pymor::LA::EigenDenseVector< double > >',
-    #                 'FrozenType': 'Dune::Pymor::Functionals::VectorBased< Dune::Pymor::LA::EigenDenseVector< double > >',
-    #                 'ScalarType' : 'double'},
-    #         template_parameters='Dune::Pymor::LA::EigenDenseVector< double >')
-    # # next we add what we need of the operators
-    # (_, interfaces['Dune::Pymor::OperatorInterfaceDynamic']
-    #  ) = inject_Class(module, 'Dune::Pymor::OperatorInterfaceDynamic')
-    # (_, interfaces['Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic']
-    #  ) = inject_Class(module, 'Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic',
-    #                   parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'])
+    if CONFIG_H['HAVE_EIGEN']:
+        _ = dune.pymor.functionals.inject_VectorBasedImplementation(
+            module, exceptions, interfaces, CONFIG_H,
+            Traits={'SourceType' : 'Dune::Stuff::LA::EigenDenseVector< double >',
+                    'ScalarType' : 'double',
+                    'ContainerType' : 'Dune::Stuff::LA::EigenDenseVector< double >'},
+            template_parameters='Dune::Stuff::LA::EigenDenseVector< double >')
+        _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
+            module, exceptions, interfaces, CONFIG_H,
+            Traits={'SourceType' : 'Dune::Stuff::LA::EigenDenseVector< double >',
+                    'ComponentType': 'Dune::Pymor::Functionals::VectorBased< Dune::Stuff::LA::EigenDenseVector< double > >',
+                    'FrozenType': 'Dune::Pymor::Functionals::VectorBased< Dune::Stuff::LA::EigenDenseVector< double > >',
+                    'ScalarType' : 'double'},
+            template_parameters='Dune::Stuff::LA::EigenDenseVector< double >')
+    # next we add what we need of the operators
+    (_, interfaces['Dune::Pymor::OperatorInterfaceDynamic']
+     ) = inject_Class(module, 'Dune::Pymor::OperatorInterfaceDynamic')
+    (_, interfaces['Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic']
+     ) = inject_Class(module, 'Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic',
+                      parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'])
     # #   the Dune::DynamicMatrix backend
     # _, _ = dune.pymor.operators.inject_OperatorAndInverseImplementation(
     #     module, exceptions, interfaces, CONFIG_H,
@@ -178,33 +178,33 @@ def inject_lib_dune_pymor(module):
     #             'ComponentType': 'Dune::Pymor::Operators::DuneDynamic< double >',
     #             'InverseType': 'Dune::Pymor::Operators::DuneDynamicInverse< double >'},
     #     template_parameters='Dune::Pymor::Operators::DuneDynamic< double >')
-    # #   and the Eigen backend
-    # if CONFIG_H['HAVE_EIGEN']:
-    #     _, _ = dune.pymor.operators.inject_OperatorAndInverseImplementation(
-    #         module, exceptions, interfaces, CONFIG_H,
-    #         operator_name='Dune::Pymor::Operators::EigenRowMajorSparse',
-    #         operator_Traits={'SourceType': 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                          'RangeType': 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                          'ScalarType': 'double',
-    #                          'FrozenType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >',
-    #                          'InverseType': 'Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >'},
-    #         inverse_name='Dune::Pymor::Operators::EigenRowMajorSparseInverse',
-    #         inverse_Traits={'SourceType': 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                         'RangeType': 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                         'ScalarType': 'double',
-    #                         'FrozenType': 'Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >',
-    #                         'InverseType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >'},
-    #         operator_template_parameters='double',
-    #         inverse_template_parameters='double')
-    #     _ = dune.pymor.operators.inject_LinearAffinelyDecomposedContainerBasedImplementation(
-    #         module, exceptions, interfaces, CONFIG_H,
-    #         Traits={'SourceType': 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                 'RangeType': 'Dune::Pymor::LA::EigenDenseVector< double >',
-    #                 'ScalarType': 'double',
-    #                 'FrozenType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >',
-    #                 'ComponentType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >',
-    #                 'InverseType': 'Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >'},
-    #         template_parameters='Dune::Pymor::Operators::EigenRowMajorSparse< double >')
+    #   and the Eigen backend
+    if CONFIG_H['HAVE_EIGEN']:
+        _, _ = dune.pymor.operators.inject_OperatorAndInverseImplementation(
+            module, exceptions, interfaces, CONFIG_H,
+            operator_name='Dune::Pymor::Operators::EigenRowMajorSparse',
+            operator_Traits={'SourceType': 'Dune::Stuff::LA::EigenDenseVector< double >',
+                             'RangeType': 'Dune::Stuff::LA::EigenDenseVector< double >',
+                             'ScalarType': 'double',
+                             'FrozenType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >',
+                             'InverseType': 'Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >'},
+            inverse_name='Dune::Pymor::Operators::EigenRowMajorSparseInverse',
+            inverse_Traits={'SourceType': 'Dune::Stuff::LA::EigenDenseVector< double >',
+                            'RangeType': 'Dune::Stuff::LA::EigenDenseVector< double >',
+                            'ScalarType': 'double',
+                            'FrozenType': 'Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >',
+                            'InverseType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >'},
+            operator_template_parameters='double',
+            inverse_template_parameters='double')
+        _ = dune.pymor.operators.inject_LinearAffinelyDecomposedContainerBasedImplementation(
+            module, exceptions, interfaces, CONFIG_H,
+            Traits={'SourceType': 'Dune::Stuff::LA::EigenDenseVector< double >',
+                    'RangeType': 'Dune::Stuff::LA::EigenDenseVector< double >',
+                    'ScalarType': 'double',
+                    'FrozenType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >',
+                    'ComponentType': 'Dune::Pymor::Operators::EigenRowMajorSparse< double >',
+                    'InverseType': 'Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >'},
+            template_parameters='Dune::Pymor::Operators::EigenRowMajorSparse< double >')
 
     return module, exceptions, interfaces, CONFIG_H
 
