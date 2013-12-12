@@ -31,7 +31,7 @@ class LinearAffinelyDecomposedContainerBasedTraits
 {
 public:
   typedef LinearAffinelyDecomposedContainerBased< OperatorType >  derived_type;
-  static_assert(std::is_base_of< Stuff::LA::ProvidesContainer< typename OperatorType::Traits >, OperatorType > ::value,
+  static_assert(std::is_base_of< Stuff::LA::ProvidesConstContainer< typename OperatorType::Traits >, OperatorType > ::value,
                 "OperatorType has to be derived from Stuff::LA::ProvidesContainer!");
   typedef typename OperatorType::ContainerType                    ContainerType;
   static_assert(std::is_base_of< OperatorInterface< typename OperatorType::Traits >, OperatorType > ::value,

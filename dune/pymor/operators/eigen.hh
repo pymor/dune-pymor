@@ -103,7 +103,7 @@ public:
 template< class ScalarImp >
 class EigenRowMajorSparse
   : public OperatorInterface< EigenRowMajorSparseTraits< ScalarImp > >
-  , public Stuff::LA::ProvidesContainer< EigenRowMajorSparseTraits< ScalarImp > >
+  , public Stuff::LA::ProvidesConstContainer< EigenRowMajorSparseTraits< ScalarImp > >
 {
   typedef OperatorInterface< EigenRowMajorSparseTraits< ScalarImp > > BaseType;
 public:
