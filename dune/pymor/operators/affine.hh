@@ -69,11 +69,11 @@ public:
     if (!affinelyDecomposedContainer_.has_affine_part() && affinelyDecomposedContainer_.num_components() == 0)
       DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "affinelyDecomposedContainer must not be empty!");
     if (affinelyDecomposedContainer_.has_affine_part()) {
-      dim_source_ = affinelyDecomposedContainer_.affine_part()->dim_source();
-      dim_range_ = affinelyDecomposedContainer_.affine_part()->dim_range();
+      dim_source_ = affinelyDecomposedContainer_.affine_part()->cols();
+      dim_range_ = affinelyDecomposedContainer_.affine_part()->rows();
     } else {
-      dim_source_ = affinelyDecomposedContainer_.component(0)->dim_source();
-      dim_range_ = affinelyDecomposedContainer_.component(0)->dim_range();
+      dim_source_ = affinelyDecomposedContainer_.component(0)->cols();
+      dim_range_ = affinelyDecomposedContainer_.component(0)->rows();
     }
   }
 

@@ -480,13 +480,13 @@ bool EigenRowMajorSparseInverse< S >::linear() const
 template< class S >
 DUNE_STUFF_SSIZE_T EigenRowMajorSparseInverse< S >::dim_source() const
 {
-  return matrix_->dim_range();
+  return matrix_->rows();
 }
 
 template< class S >
 DUNE_STUFF_SSIZE_T EigenRowMajorSparseInverse< S >::dim_range() const
 {
-  return matrix_->dim_source();
+  return matrix_->cols();
 }
 
 template< class S >
@@ -628,13 +628,13 @@ bool EigenRowMajorSparse< S >::linear() const
 template< class S >
 DUNE_STUFF_SSIZE_T EigenRowMajorSparse< S >::dim_source() const
 {
-  return matrix_->dim_source();
+  return matrix_->rows();
 }
 
 template< class S >
 DUNE_STUFF_SSIZE_T EigenRowMajorSparse< S >::dim_range() const
 {
-  return matrix_->dim_range();
+  return matrix_->cols();
 }
 
 template< class S >
