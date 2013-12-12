@@ -6,6 +6,8 @@
 #ifndef DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 #define DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 
+#include "config.h"
+
 #ifndef DUNE_STUFF_SSIZE_T
 # define DUNE_STUFF_SSIZE_T long int
 #endif
