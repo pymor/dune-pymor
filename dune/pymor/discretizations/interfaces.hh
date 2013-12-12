@@ -9,9 +9,10 @@
 #include <vector>
 #include <string>
 
+#include <dune/stuff/la/container/interfaces.hh>
+
 #include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
-#include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/functionals/interfaces.hh>
 

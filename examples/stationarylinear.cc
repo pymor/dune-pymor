@@ -100,7 +100,6 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   , dim_(prob->dim())
 {
   typedef typename OperatorType::ContainerType MatrixType;
-  typedef typename MatrixType::BackendType MatrixBackendType;
   typedef Dune::Pymor::LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
   AffinelyDecomposedMatrixType diffusionMatrix;
   // left hand side
@@ -108,16 +107,16 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   const auto& diffusion = *(problem_->diffusion());
   assert(diffusion.num_components() == dim_);
   for (DUNE_STUFF_SSIZE_T ii = 0; ii < dim_; ++ii) {
-    MatrixBackendType* compMatrix = new MatrixBackendType(dim_, dim_);
-    compMatrix->operator[](ii)[ii] = 1.0;
-    diffusionMatrix.register_component(new MatrixType(compMatrix),
+    MatrixType* compMatrix = new MatrixType(dim_, dim_);
+    compMatrix->set_entry(ii, ii, 1.0);
+    diffusionMatrix.register_component(compMatrix,
                                        new Dune::Pymor::ParameterFunctional(*(diffusion.coefficient(ii))));
   }
   if (diffusion.has_affine_part()) {
-    MatrixBackendType* affMatrix = new MatrixBackendType(dim_, dim_);
+    MatrixType* affMatrix = new MatrixType(dim_, dim_);
     for (DUNE_STUFF_SSIZE_T ii = 0; ii < dim_; ++ii)
-      affMatrix->operator[](ii)[ii] = 1.0;
-    diffusionMatrix.register_affine_part(new MatrixType(affMatrix));
+      affMatrix->set_entry(ii, ii, 1.0);
+    diffusionMatrix.register_affine_part(affMatrix);
   }
   op_ = new OperatorType(diffusionMatrix);
   inherit_parameter_type(op_->parameter_type(), "lhs");
@@ -279,9 +278,9 @@ void SimpleDiscretization::visualize(const VectorType& vector,
   if (!file.is_open())
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::io_error, "could not open '" << filename << "' for writing!");
   file << name << " = [";
-  for (DUNE_STUFF_SSIZE_T ii = 0; ii < vector.dim() - 1; ++ii)
-    file << vector.components({ii})[0] << ", ";
-  file << vector.components({vector.dim() - 1})[0] << "]" << std::endl;
+  for (size_t ii = 0; ii < vector.dim() - 1; ++ii)
+    file << vector.get_entry(ii) << ", ";
+  file << vector.get_entry(vector.dim() - 1) << "]" << std::endl;
 }
 
 

@@ -12,11 +12,11 @@
 
 #include <dune/stuff/functions/constant.hh>
 #include <dune/stuff/grid/fakeentity.hh>
+#include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/discretizations/interfaces.hh>
-#include <dune/pymor/la/container/dunedynamic.hh>
-#include <dune/pymor/operators/dunedynamic.hh>
+#include <dune/pymor/operators/eigen.hh>
 #include <dune/pymor/operators/affine.hh>
 #include <dune/pymor/functions/default.hh>
 #include <dune/pymor/functionals/default.hh>
@@ -65,8 +65,8 @@ class SimpleDiscretizationTraits
 {
 public:
   typedef SimpleDiscretization derived_type;
-  typedef Dune::Pymor::LA::DuneDynamicVector< double > VectorType;
-  typedef Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< typename Dune::Pymor::Operators::DuneDynamic< double > > OperatorType;
+  typedef Dune::Stuff::LA::EigenDenseVector< double > VectorType;
+  typedef Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< typename Dune::Pymor::Operators::EigenRowMajorSparse< double > > OperatorType;
   typedef Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< VectorType > FunctionalType;
   typedef OperatorType ProductType;
 };

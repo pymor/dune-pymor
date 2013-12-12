@@ -6,15 +6,17 @@
 #ifndef DUNE_PYMOR_PYTHON_BINDINGS_HH
 #define DUNE_PYMOR_PYTHON_BINDINGS_HH
 
+#include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container/eigen.hh>
+#include <dune/stuff/la/container.hh>
+
+//#include <dune/pymor/la/container/dunedynamic.hh>
+
 #include <dune/pymor/discretizations/interfaces.hh>
 #include <dune/pymor/functionals/affine.hh>
 #include <dune/pymor/functionals/default.hh>
 #include <dune/pymor/functionals/interfaces.hh>
-#include <dune/pymor/la/container.hh>
 #include <dune/pymor/la/container/affine.hh>
-#include <dune/pymor/la/container/dunedynamic.hh>
-#include <dune/pymor/la/container/eigen.hh>
-#include <dune/pymor/la/container/interfaces.hh>
 #include <dune/pymor/operators/affine.hh>
 #include <dune/pymor/operators/dunedynamic.hh>
 #include <dune/pymor/operators/eigen.hh>
