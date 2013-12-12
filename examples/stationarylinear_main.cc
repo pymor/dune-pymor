@@ -10,6 +10,7 @@
 #include <dune/pymor/common/exceptions.hh>
 
 #include "stationarylinear.hh"
+#include <dune/stuff/common/enable_warnings.hh>
 
 using namespace Dune;
 using namespace Dune::Pymor;

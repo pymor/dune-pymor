@@ -117,3 +117,5 @@ private:
 } // namespace Example
 
 #endif // DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
+
+#include <dune/stuff/common/disable_warnings.hh>
