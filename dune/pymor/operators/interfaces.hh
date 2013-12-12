@@ -29,9 +29,8 @@ template< class Traits >
 class OperatorInterface
   : public Parametric
   , public OperatorInterfaceDynamic
-  , CRTPInterface< OperatorInterface< Traits >, Traits >
+  , protected CRTPInterface< OperatorInterface< Traits >, Traits >
 {
-  typedef CRTPInterface< OperatorInterface< Traits >, Traits > CRTP;
 public:
   typedef typename Traits::derived_type derived_type;
   typedef typename Traits::SourceType   SourceType;
@@ -62,20 +61,20 @@ public:
 
   bool linear() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).linear());
-    return CRTP::as_imp(*this).linear();
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).linear());
+    return this->as_imp(*this).linear();
   }
 
   DUNE_STUFF_SSIZE_T dim_source() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
-    return CRTP::as_imp(*this).dim_source();
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).dim_source());
+    return this->as_imp(*this).dim_source();
   }
 
   DUNE_STUFF_SSIZE_T dim_range() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_range());
-    return CRTP::as_imp(*this).dim_range();
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).dim_range());
+    return this->as_imp(*this).dim_range();
   }
 
   /**
@@ -84,7 +83,7 @@ public:
    */
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
-    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).apply(source, range, mu));
+    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(this->as_imp(*this).apply(source, range, mu));
   }
 
   /**
@@ -123,8 +122,8 @@ public:
 
   InverseType invert(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).invert(option, mu));
-    return CRTP::as_imp(*this).invert(option, mu);
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).invert(option, mu));
+    return this->as_imp(*this).invert(option, mu);
   }
 
   InverseType* invert_and_return_ptr(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
@@ -161,8 +160,8 @@ public:
    */
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).freeze_parameter(mu));
-    return CRTP::as_imp(*this).freeze_parameter(mu);
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).freeze_parameter(mu));
+    return this->as_imp(*this).freeze_parameter(mu);
   }
 
   FrozenType* freeze_parameter_and_return_ptr(const Parameter mu = Parameter()) const
@@ -199,8 +198,8 @@ public:
 
   DUNE_STUFF_SSIZE_T num_components() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).num_components());
-    return CRTP::as_imp(*this).num_components();
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).num_components());
+    return this->as_imp(*this).num_components();
   }
 
   /**
@@ -208,8 +207,8 @@ public:
    */
   ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).component(qq));
-    return CRTP::as_imp(*this).component(qq);
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).component(qq));
+    return this->as_imp(*this).component(qq);
   }
 
   ComponentType* component_and_return_ptr(const DUNE_STUFF_SSIZE_T qq) const
@@ -222,8 +221,8 @@ public:
    */
   ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).coefficient(qq));
-    return CRTP::as_imp(*this).coefficient(qq);
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).coefficient(qq));
+    return this->as_imp(*this).coefficient(qq);
   }
 
   ParameterFunctional* coefficient_and_return_ptr(const DUNE_STUFF_SSIZE_T qq) const
@@ -233,8 +232,8 @@ public:
 
   bool has_affine_part() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).has_affine_part());
-    return CRTP::as_imp(*this).has_affine_part();
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).has_affine_part());
+    return this->as_imp(*this).has_affine_part();
   }
 
   /**
@@ -242,8 +241,8 @@ public:
    */
   ComponentType affine_part() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).affine_part());
-    return CRTP::as_imp(*this).affine_part();
+    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).affine_part());
+    return this->as_imp(*this).affine_part();
   }
 
   ComponentType* affine_part_and_return_ptr() const
