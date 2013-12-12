@@ -51,8 +51,8 @@ def inject_lib_dune_pymor(module):
     # first of all, add all the stl containers
     module.add_container('std::vector< std::string >', 'std::string', 'list')
     module.add_container('std::vector< double >', 'double', 'list')
-    module.add_container('std::vector< ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'] + ' >',
-                         CONFIG_H['DUNE_PYMOR_SSIZE_T'],
+    module.add_container('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >',
+                         CONFIG_H['DUNE_STUFF_SSIZE_T'],
                          'list')
     module.add_container('std::vector< std::vector< double > >', 'std::vector< double >', 'list')
     # then of dune-pymor we need the eceptions first

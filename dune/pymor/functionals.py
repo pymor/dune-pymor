@@ -52,7 +52,7 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
     Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['PymorException'], exceptions['DuneException']])
     Class.add_method('linear', retval('bool'), [], is_const=True)
-    Class.add_method('dim_source', retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']), [], is_const=True)
+    Class.add_method('dim_source', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
     Class.add_method('apply',
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source')],
@@ -186,17 +186,17 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
     Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['PymorException'], exceptions['DuneException']])
     Class.add_method('num_components',
-                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                     retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                      [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('component_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),
-                     [param('const ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'qq')],
+                     [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'qq')],
                      is_const=True,
                      throw=[exceptions['PymorException']],
                      custom_name='component')
     Class.add_method('coefficient_and_return_ptr',
                      retval('Dune::Pymor::ParameterFunctional *', caller_owns_return=True),
-                     [param('const ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'qq')],
+                     [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'qq')],
                      is_const=True,
                      throw=[exceptions['PymorException']],
                      custom_name='coefficient')
@@ -209,7 +209,7 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                      custom_name='affine_part')
     Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('dim_source',
-                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']), [], is_const=True, throw=[exceptions['PymorException']])
+                     retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('apply',
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source')],

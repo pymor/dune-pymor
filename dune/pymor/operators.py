@@ -107,10 +107,10 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                         throw=[exceptions['PymorException'], exceptions['DuneException']])
     Operator.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
     Operator.add_method('dim_source',
-                        retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                        retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                         [], is_const=True, throw=[exceptions['PymorException']])
     Operator.add_method('dim_range',
-                        retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                        retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                         [], is_const=True, throw=[exceptions['PymorException']])
     Operator.add_method('apply', None,
                         [param('const ' + operator_SourceType + ' &', 'source'),
@@ -203,10 +203,10 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                        throw=[exceptions['PymorException'], exceptions['DuneException']])
     Inverse.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
     Inverse.add_method('dim_source',
-                       retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                       retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                        [], is_const=True, throw=[exceptions['PymorException']])
     Inverse.add_method('dim_range',
-                       retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                       retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                        [], is_const=True, throw=[exceptions['PymorException']])
     Inverse.add_method('apply', None,
                        [param('const ' + inverse_SourceType + ' &', 'source'),
@@ -417,7 +417,7 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
     Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['PymorException'], exceptions['DuneException']])
     Class.add_method('num_components',
-                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                     retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                      [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('component_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),
@@ -440,10 +440,10 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
                      custom_name='affine_part')
     Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('dim_source',
-                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                     retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                      [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('dim_range',
-                     retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                     retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                      [], is_const=True, throw=[exceptions['PymorException']])
     Class.add_method('apply', None,
                      [param('const ' + SourceType + ' &', 'source'),

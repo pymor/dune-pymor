@@ -252,7 +252,7 @@ void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Paramete
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_parameter_type,
                      "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                      << parameter_type() << ")!");
-  if (vector.dim() != dim_)
+  if ((DUNE_STUFF_SSIZE_T)(vector.dim()) != dim_)
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
                      "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   // freeze lhs and rhs
@@ -269,7 +269,7 @@ void SimpleDiscretization::visualize(const VectorType& vector,
                                      const std::string filename,
                                      const std::string name) const
 {
-  if (vector.dim() != dim_)
+  if ((DUNE_STUFF_SSIZE_T)(vector.dim()) != dim_)
     DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
                      "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   if (filename.empty())

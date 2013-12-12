@@ -85,9 +85,9 @@ struct ContainerBasedOperatorTest
     const bool d_linear = d_from_ptr.linear();
     if (!d_linear) DUNE_PYMOR_THROW(PymorException, "");
     if (d_from_ptr.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    const unsigned int d_dim_source = d_from_ptr.dim_source();
+    const DUNE_STUFF_SSIZE_T d_dim_source = d_from_ptr.dim_source();
     if (d_dim_source != dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
-    const unsigned int d_dim_range = d_from_ptr.dim_range();
+    const DUNE_STUFF_SSIZE_T d_dim_range = d_from_ptr.dim_range();
     if (d_dim_range != dim) DUNE_PYMOR_THROW(PymorException, d_dim_range);
     D_SourceType source = Stuff::LA::Container< D_SourceType >::create(dim);
     D_SourceType range = d_from_ptr.apply(source);
@@ -163,7 +163,7 @@ struct LinearAffinelyDecomposedContainerBasedOperatorTest
       DUNE_PYMOR_THROW(PymorException,
                        "\nmu.type()                   = " << mu.type()
                        << "\nd_operator.parameter_type() = " << d_operator.parameter_type());
-    const unsigned int d_num_components = d_operator.num_components();
+    const DUNE_STUFF_SSIZE_T d_num_components = d_operator.num_components();
     if (d_num_components != 2) DUNE_PYMOR_THROW(PymorException, d_num_components);
     for (unsigned int qq = 0; qq < d_num_components; ++qq) {
       D_ComponentType component = d_operator.component(qq);
@@ -192,9 +192,9 @@ struct LinearAffinelyDecomposedContainerBasedOperatorTest
       DUNE_PYMOR_THROW(PymorException,
                        "\nmu.type()                   = " << mu.type()
                        << "\ni_operator.parameter_type() = " << i_operator.parameter_type());
-    const unsigned int i_num_components = i_operator.num_components();
+    const DUNE_STUFF_SSIZE_T i_num_components = i_operator.num_components();
     if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
-    for (unsigned int qq = 0; qq < i_num_components; ++qq) {
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < i_num_components; ++qq) {
       I_ComponentType component = i_operator.component(qq);
       if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
       ParameterFunctional DUNE_UNUSED(coefficient) = i_operator.coefficient(qq);

@@ -16,11 +16,11 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
     ParameterType = namespace.add_class('ParameterType')
     ParameterType.add_constructor([])
     ParameterType.add_constructor([param('std::string', 'kk'),
-                                   param(CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'vv')],
+                                   param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'vv')],
                                   throw=[exceptions['key_is_not_valid'],
                                          exceptions['index_out_of_range']])
     ParameterType.add_constructor([param('std::vector< std::string >', 'kk'),
-                                   param('std::vector< ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'] + ' >', 'vv')],
+                                   param('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >', 'vv')],
                                   throw=[exceptions['key_is_not_valid'],
                                          exceptions['index_out_of_range'],
                                          exceptions['sizes_do_not_match']])
@@ -30,7 +30,7 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
                              [],
                              is_const=True)
     ParameterType.add_method('values',
-                             retval('std::vector< ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'] + ' >'),
+                             retval('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >'),
                              [],
                              is_const=True)
     ParameterType.add_method('hasKey',
@@ -40,18 +40,18 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
     ParameterType.add_method('set',
                              None,
                              [param('std::string', 'key'),
-                              param(CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'value')],
+                              param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'value')],
                              throw=[exceptions['key_is_not_valid'],
                                     exceptions['index_out_of_range'],
                                     exceptions['sizes_do_not_match']])
     ParameterType.add_method('get',
-                             retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']),
+                             retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                              [param('std::string', 'key')],
                              is_const=True,
                              throw=[exceptions['key_is_not_valid']])
     ParameterType.add_binary_comparison_operator('==')
     ParameterType.add_binary_comparison_operator('!=')
-    ParameterType.add_method('size', retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']), [], is_const=True)
+    ParameterType.add_method('size', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
     ParameterType.add_method('report', retval('std::string'), [], is_const=True)
     ParameterType.allow_subclassing = True
     return module, ParameterType
@@ -112,7 +112,7 @@ def inject_Parameter(module, exceptions, CONFIG_H):
                          throw=[exceptions['key_is_not_valid']])
     Parameter.add_binary_comparison_operator('==')
     Parameter.add_binary_comparison_operator('!=')
-    Parameter.add_method('size', retval(CONFIG_H['DUNE_PYMOR_SSIZE_T']), [], is_const=True)
+    Parameter.add_method('size', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
     Parameter.add_method('report', retval('std::string'), [], is_const=True)
     Parameter.allow_subclassing = True
     return module, Parameter
@@ -134,9 +134,9 @@ def inject_Parametric(module, exceptions, CONFIG_H):
     # Parametric.add_constructor([])
     # Parametric.add_constructor([param('Dune::Pymor::ParameterType', 'tt')])
     # Parametric.add_constructor([param('std::string', 'kk'),
-    #                             param(CONFIG_H['DUNE_PYMOR_SSIZE_T'], 'vv')])
+    #                             param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'vv')])
     # Parametric.add_constructor([param('std::vector< std::string >', 'kk'),
-    #                             param('std::vector< ' + CONFIG_H['DUNE_PYMOR_SSIZE_T'] + ' >', 'vv')])
+    #                             param('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >', 'vv')])
     # Parametric.add_copy_constructor()
 
     ###################################################################

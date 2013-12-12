@@ -77,7 +77,7 @@ struct VectorBasedTest
     FunctionalType DUNE_UNUSED(d_copy_constructor)(d_from_ptr); // <- at this point, all functionals share the same vector!
     const bool d_linear = d_from_ptr.linear();
     if (!d_linear) DUNE_PYMOR_THROW(PymorException, "");
-    const unsigned int d_dim_source = d_from_ptr.dim_source();
+    const DUNE_STUFF_SSIZE_T d_dim_source = d_from_ptr.dim_source();
     if (d_dim_source != dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
     const VectorType source(dim, D_ScalarType(1));
     const D_ScalarType d_apply = d_from_ptr.apply(source);
@@ -86,7 +86,7 @@ struct VectorBasedTest
     const InterfaceType& i_from_ptr = static_cast< const InterfaceType& >(d_from_ptr);
     const bool i_linear = i_from_ptr.linear();
     if (!i_linear) DUNE_PYMOR_THROW(PymorException, "");
-    const unsigned int i_dim_source = i_from_ptr.dim_source();
+    const DUNE_STUFF_SSIZE_T i_dim_source = i_from_ptr.dim_source();
     if (i_dim_source != dim) DUNE_PYMOR_THROW(PymorException, i_dim_source);
     const I_ScalarType i_apply = i_from_ptr.apply(source);
     if (i_apply != dim) DUNE_PYMOR_THROW(PymorException, i_apply);
@@ -147,9 +147,9 @@ struct LinearAffinelyDecomposedVectorBasedTest
       DUNE_PYMOR_THROW(PymorException,
                        "\nmu.type()         = " << mu.type()
                        << "\n.parameter_type() = " << d_functional.parameter_type());
-    const unsigned int d_num_components = d_functional.num_components();
+    const DUNE_STUFF_SSIZE_T d_num_components = d_functional.num_components();
     if (d_num_components != 2) DUNE_PYMOR_THROW(PymorException, d_num_components);
-    for (unsigned int qq = 0; qq < d_num_components; ++qq) {
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < d_num_components; ++qq) {
       D_ComponentType component = d_functional.component(qq);
       if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
       ParameterFunctional DUNE_UNUSED(coefficient) = d_functional.coefficient(qq);
@@ -171,9 +171,9 @@ struct LinearAffinelyDecomposedVectorBasedTest
       DUNE_PYMOR_THROW(PymorException,
                        "\nmu.type()         = " << mu.type()
                        << "\n.parameter_type() = " << i_functional.parameter_type());
-    const unsigned int i_num_components = i_functional.num_components();
+    const DUNE_STUFF_SSIZE_T i_num_components = i_functional.num_components();
     if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
-    for (unsigned int qq = 0; qq < i_num_components; ++qq) {
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < i_num_components; ++qq) {
       I_ComponentType component = i_functional.component(qq);
       if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
       ParameterFunctional DUNE_UNUSED(coefficient) = i_functional.coefficient(qq);
