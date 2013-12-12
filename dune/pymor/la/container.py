@@ -75,11 +75,6 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_method('l1_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['DuneException']])
     Class.add_method('l2_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['DuneException']])
     Class.add_method('sup_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['DuneException']])
-#    Class.add_method('amax',
-#                     retval('std::vector< ' + ScalarType + ' >'),
-#                     [],
-#                     is_const=True,
-#                     throw=[exceptions['DuneException']])
     Class.add_method('add',
                      None,
                      [param('const ' + ThisType + ' &', 'other'),
@@ -140,6 +135,11 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      is_const=True,
                      throw=[exceptions['DuneException']],
                      custom_name='amax')
+    Class.add_method('components',
+                     retval('std::vector< ' + ScalarType + ' >'),
+                     [param('const std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + '> &', 'component_indices')],
+                     is_const=True,
+                     throw=[exceptions['DuneException']])
 
 
     return module, Class
@@ -177,18 +177,17 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
         for nspace in namespaces:
             namespace = namespace.add_cpp_namespace(nspace)
     Class = namespace.add_class(name,
-                                parent=interfaces['Dune::Pymor::LA::MatrixInterfaceDynamic'],
+                                parent=interfaces['Dune::Stuff::LA::MatrixInterfaceDynamic'],
                                 template_parameters=template_parameters)
     Class.add_constructor([])
     # what we want from ContainerInterface
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['DuneException'], exceptions['DuneException']])
-    Class.add_method('copy_and_return_ptr',
-                     retval(ThisType + ' *', caller_owns_return=True),
+    Class.add_method('copy',
+                     retval(ThisType),
                      [],
                      is_const=True,
-                     throw=[exceptions['DuneException']],
-                     custom_name='copy')
+                     throw=[exceptions['DuneException']])
     Class.add_method('scal',
                      None,
                      [param('const ' + ScalarType + ' &', 'alpha')],
@@ -198,14 +197,55 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      [param('const ' + ScalarType + ' &', 'alpha'),
                       param('const ' + ThisType + ' &', 'xx')],
                      throw=[exceptions['DuneException']])
+    Class.add_method('has_equal_shape',
+                     retval('bool'),
+                     [param('const ' + ThisType + ' &', 'other')],
+                     is_const=True,
+                     throw=[exceptions['DuneException']])
     # what we want from MatrixInterface
-    Class.add_method('dim_source',
+    Class.add_method('pb_rows',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['DuneException']])
-    Class.add_method('dim_range',
+                     [], is_const=True, throw=[exceptions['DuneException']],
+                     custom_name='rows')
+    Class.add_method('pb_cols',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['DuneException']])
+                     [], is_const=True, throw=[exceptions['DuneException']],
+                     custom_name='cols')
+    Class.add_method('pb_add_to_entry',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
+                            param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj'),
+                            param(ScalarType, 'value')],
+                     throw=[exceptions['DuneException']],
+                     custom_name='add_to_entry')
+    Class.add_method('pb_set_entry',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
+                            param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj'),
+                            param(ScalarType, 'value')],
+                     throw=[exceptions['DuneException']],
+                     custom_name='set_entry')
+    Class.add_method('pb_get_entry',
+                     retval(ScalarType),
+                     [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
+                      param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
+                     is_const=True, throw=[exceptions['DuneException']],
+                     custom_name='set_entry')
     return module, Class
+    Class.add_method('pb_clear_row',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
+                     throw=[exceptions['DuneException']],
+                     custom_name='clear_row')
+    Class.add_method('pb_unit_col',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
+                     throw=[exceptions['DuneException']],
+                     custom_name='unit_col')
+    Class.add_method('pb_clear_row',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
+                     throw=[exceptions['DuneException']],
+                     custom_name='clear_row')
+    Class.add_method('pb_unit_col',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
+                     throw=[exceptions['DuneException']],
+                     custom_name='unit_col')
 
 
 def wrap_vector(cls):
