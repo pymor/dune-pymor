@@ -24,7 +24,7 @@ def wrap_module(mod):
     AffinelyDecomposedFunctionalInterface = mod.Dune.Pymor.AffinelyDecomposedFunctionalInterfaceDynamic
     AffinelyDecomposedOperatorInterface = mod.Dune.Pymor.AffinelyDecomposedOperatorInterfaceDynamic
     FunctionalInterface = mod.Dune.Pymor.FunctionalInterfaceDynamic
-    VectorInterface = mod.Dune.Pymor.LA.VectorInterfaceDynamic
+    VectorInterface = mod.Dune.Stuff.LA.VectorInterfaceDynamic
     OperatorInterface = mod.Dune.Pymor.OperatorInterfaceDynamic
     Parameter = mod.Dune.Pymor.Parameter
     ParameterFunctional = mod.Dune.Pymor.ParameterFunctional
