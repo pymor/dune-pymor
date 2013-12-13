@@ -67,6 +67,15 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      [param('const ' + ThisType + ' &', 'other')],
                      throw=[exceptions['DuneException']])
     # what we want from VectorInterface
+    Class.add_method('almost_equal',
+                     retval('bool'),
+                     [param('const ' + ThisType + ' &', 'other'),
+                      param('const ' + ScalarType, 'epsilon')],
+                     is_const=True, throw=[exceptions['DuneException']])
+    Class.add_method('almost_equal',
+                     retval('bool'),
+                     [param('const ' + ThisType + ' &', 'other')],
+                     is_const=True, throw=[exceptions['DuneException']])
     Class.add_method('dot',
                      retval(ScalarType),
                      [param('const ' + ThisType + ' &', 'other')],
