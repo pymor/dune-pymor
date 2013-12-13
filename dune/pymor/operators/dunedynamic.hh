@@ -3,17 +3,14 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#if 0
 #ifndef DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 #define DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-# define DUNE_STUFF_SSIZE_T long int
-#endif
+#include <dune/stuff/la/container/dunedynamic.hh>
 
-#include <dune/pymor/common/exceptions.hh>
+#include <dune//common/exceptions.hh>
 #include <dune/pymor/common/crtp.hh>
-#include <dune/pymor/la/container/dunedynamic.hh>
+
 #include "interfaces.hh"
 
 namespace Dune {
@@ -34,9 +31,9 @@ class DuneDynamicInverseTraits
 public:
   typedef ScalarImp                           ScalarType;
   typedef DuneDynamicInverse< ScalarType >    derived_type;
-  typedef LA::DuneDynamicMatrix< ScalarType > ContainerType;
-  typedef LA::DuneDynamicVector< ScalarType > SourceType;
-  typedef LA::DuneDynamicVector< ScalarType > RangeType;
+  typedef Stuff::LA::DuneDynamicMatrix< ScalarType > ContainerType;
+  typedef Stuff::LA::DuneDynamicVector< ScalarType > SourceType;
+  typedef Stuff::LA::DuneDynamicVector< ScalarType > RangeType;
   typedef derived_type                        FrozenType;
   typedef DuneDynamic< ScalarType >           InverseType;
 };
@@ -89,9 +86,9 @@ class DuneDynamicTraits
 public:
   typedef ScalarImp                           ScalarType;
   typedef DuneDynamic< ScalarType >           derived_type;
-  typedef LA::DuneDynamicMatrix< ScalarType > ContainerType;
-  typedef LA::DuneDynamicVector< ScalarType > SourceType;
-  typedef LA::DuneDynamicVector< ScalarType > RangeType;
+  typedef Stuff::LA::DuneDynamicMatrix< ScalarType > ContainerType;
+  typedef Stuff::LA::DuneDynamicVector< ScalarType > SourceType;
+  typedef Stuff::LA::DuneDynamicVector< ScalarType > RangeType;
   typedef derived_type                        FrozenType;
   typedef DuneDynamicInverse< ScalarType >    InverseType;
 };
@@ -100,7 +97,7 @@ public:
 template< class ScalarImp >
 class DuneDynamic
   : public OperatorInterface< DuneDynamicTraits< ScalarImp > >
-  , public LA::ProvidesContainer< DuneDynamicTraits< ScalarImp > >
+  , public Stuff::LA::ProvidesContainer< DuneDynamicTraits< ScalarImp > >
 {
   typedef OperatorInterface< DuneDynamicTraits< ScalarImp > > BaseType;
 public:
@@ -149,4 +146,3 @@ private:
 } // namespace Dune
 
 #endif // DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
-#endif
