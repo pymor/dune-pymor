@@ -14,6 +14,8 @@
 
 #include <dune/stuff/test/test_common.hh>
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container/dunedynamic.hh>
+#include <dune/stuff/la/container/eigen.hh>
 #include <dune/stuff/la/container.hh>
 
 #include <dune/pymor/common/exceptions.hh>
@@ -25,24 +27,24 @@ using namespace Dune::Pymor;
 static const size_t dim = 4;
 
 typedef testing::Types<
-//                        Dune::Pymor::LA::DuneDynamicVector< double >
+                        Dune::Stuff::LA::DuneDynamicVector< double >
 #if HAVE_EIGEN
-                        Dune::Stuff::LA::EigenDenseVector< double >
+                      , Dune::Stuff::LA::EigenDenseVector< double >
 #endif
                       > VectorTypes;
 
 typedef testing::Types<
-//                        Dune::Pymor::LA::DuneDynamicMatrix< double >
+                        Dune::Stuff::LA::DuneDynamicMatrix< double >
 #if HAVE_EIGEN
-                        Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
+                      , Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
 #endif
                       > MatrixTypes;
 
 typedef testing::Types<
-//                        Dune::Pymor::LA::DuneDynamicVector< double >
-//                      , Dune::Pymor::LA::DuneDynamicMatrix< double >
+                        Dune::Stuff::LA::DuneDynamicVector< double >
+                      , Dune::Stuff::LA::DuneDynamicMatrix< double >
 #if HAVE_EIGEN
-                        Dune::Stuff::LA::EigenDenseVector< double >
+                      , Dune::Stuff::LA::EigenDenseVector< double >
                       , Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
 #endif
                       > ContainerTypes;
@@ -113,7 +115,7 @@ struct VectorTest
     // * of the vector as itself (aka the derived type)
     VectorImp d_by_size(dim);
     VectorImp d_by_size_and_value(dim, D_ScalarType(1));
-    unsigned int DUNE_UNUSED(d_dim) = d_by_size.dim();
+    DUNE_STUFF_SSIZE_T DUNE_UNUSED(d_dim) = d_by_size.dim();
     bool d_almost_equal = d_by_size.almost_equal(d_by_size);
     if (!d_almost_equal) DUNE_PYMOR_THROW(PymorException, "");
     d_by_size_and_value.scal(D_ScalarType(0));
@@ -146,7 +148,7 @@ struct VectorTest
     VectorImp d_by_size_and_value_2(dim, D_ScalarType(1));
     InterfaceType& i_by_size = static_cast< InterfaceType& >(d_by_size_2);
     InterfaceType& i_by_size_and_value = static_cast< InterfaceType& >(d_by_size_and_value_2);
-    unsigned int DUNE_UNUSED(i_dim) = i_by_size.dim();
+    DUNE_STUFF_SSIZE_T DUNE_UNUSED(i_dim) = i_by_size.dim();
     bool i_almost_equal = i_by_size.almost_equal(d_by_size_2);
     if (!i_almost_equal) DUNE_PYMOR_THROW(PymorException, "");
     i_by_size_and_value.scal(I_ScalarType(0));

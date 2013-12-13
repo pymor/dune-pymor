@@ -16,12 +16,12 @@
 #include <dune/common/float_cmp.hh>
 #include <dune/common/typetraits.hh>
 
+#include <dune/stuff/la/container/dunedynamic.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
-//#include <dune/pymor/la/container/dunedynamic.hh>
 #include <dune/pymor/functionals/interfaces.hh>
 #include <dune/pymor/functionals/default.hh>
 #include <dune/pymor/functionals/affine.hh>
@@ -31,9 +31,9 @@ using namespace Dune;
 using namespace Dune::Pymor;
 
 typedef testing::Types<
-//                        LA::DuneDynamicVector< double >
+                        Stuff::LA::DuneDynamicVector< double >
 #if HAVE_EIGEN
-                        Stuff::LA::EigenDenseVector< double >
+                      , Stuff::LA::EigenDenseVector< double >
 #endif
                       > VectorTypes;
 
@@ -173,7 +173,7 @@ struct LinearAffinelyDecomposedVectorBasedTest
                        << "\n.parameter_type() = " << i_functional.parameter_type());
     const DUNE_STUFF_SSIZE_T i_num_components = i_functional.num_components();
     if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
-    for (DUNE_STUFF_SSIZE_T qq = 0; qq < i_num_components; ++qq) {
+    for (int qq = 0; qq < i_num_components; ++qq) {
       I_ComponentType component = i_functional.component(qq);
       if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
       ParameterFunctional DUNE_UNUSED(coefficient) = i_functional.coefficient(qq);

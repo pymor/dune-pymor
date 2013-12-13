@@ -35,10 +35,10 @@ using namespace Dune::Pymor;
 static const size_t dim = 4;
 
 typedef testing::Types<
-//                        Dune::Pymor::Operators::DuneDynamic< double >
+                        Dune::Pymor::Operators::DuneDynamic< double >
 #if HAVE_EIGEN
-//                      Dune::Pymor::Operators::EigenDense< double >
-                        Dune::Pymor::Operators::EigenRowMajorSparse< double >
+//                      , Dune::Pymor::Operators::EigenDense< double >
+                      , Dune::Pymor::Operators::EigenRowMajorSparse< double >
 #endif // HAVE_EIGEN
                       > ContainerBasedOperatorTypes;
 
@@ -73,9 +73,9 @@ struct ContainerBasedOperatorTest
     typedef typename InterfaceType::RangeType   I_RangeType;
     typedef typename InterfaceType::ScalarType  I_ScalarType;
     typedef typename InterfaceType::InverseType I_InverseType;
-    // * of the class as the container interface
-    static_assert(std::is_base_of< Stuff::LA::ProvidesContainer< Traits >, OperatorType >::value,
-                  "OperatorType has to be derived from LA::ProvidesContainer!");
+    // * of the class as provides the container interface
+    static_assert(std::is_base_of< Stuff::LA::ProvidesConstContainer< Traits >, OperatorType >::value,
+                  "OperatorType has to be derived from Stuff::LA::ProvidesConstContainer!");
     // dynamic tests
     // * of the class itself (aka the derived type)
     OperatorType d_from_ptr(new D_ContainerType(Stuff::LA::Container< D_ContainerType >::create(dim)));
