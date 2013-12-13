@@ -61,19 +61,19 @@ public:
 
   bool linear() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).linear());
+    CHECK_CRTP(this->as_imp(*this).linear());
     return this->as_imp(*this).linear();
   }
 
   DUNE_STUFF_SSIZE_T dim_source() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).dim_source());
+    CHECK_CRTP(this->as_imp(*this).dim_source());
     return this->as_imp(*this).dim_source();
   }
 
   DUNE_STUFF_SSIZE_T dim_range() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).dim_range());
+    CHECK_CRTP(this->as_imp(*this).dim_range());
     return this->as_imp(*this).dim_range();
   }
 
@@ -83,7 +83,7 @@ public:
    */
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
-    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(this->as_imp(*this).apply(source, range, mu));
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).apply(source, range, mu));
   }
 
   /**
@@ -122,7 +122,7 @@ public:
 
   InverseType invert(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).invert(option, mu));
+    CHECK_CRTP(this->as_imp(*this).invert(option, mu));
     return this->as_imp(*this).invert(option, mu);
   }
 
@@ -160,7 +160,7 @@ public:
    */
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).freeze_parameter(mu));
+    CHECK_CRTP(this->as_imp(*this).freeze_parameter(mu));
     return this->as_imp(*this).freeze_parameter(mu);
   }
 
@@ -196,7 +196,7 @@ public:
 
   DUNE_STUFF_SSIZE_T num_components() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).num_components());
+    CHECK_CRTP(this->as_imp(*this).num_components());
     return this->as_imp(*this).num_components();
   }
 
@@ -205,7 +205,7 @@ public:
    */
   ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).component(qq));
+    CHECK_CRTP(this->as_imp(*this).component(qq));
     return this->as_imp(*this).component(qq);
   }
 
@@ -219,7 +219,7 @@ public:
    */
   ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).coefficient(qq));
+    CHECK_CRTP(this->as_imp(*this).coefficient(qq));
     return this->as_imp(*this).coefficient(qq);
   }
 
@@ -230,7 +230,7 @@ public:
 
   bool has_affine_part() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).has_affine_part());
+    CHECK_CRTP(this->as_imp(*this).has_affine_part());
     return this->as_imp(*this).has_affine_part();
   }
 
@@ -239,7 +239,7 @@ public:
    */
   ComponentType affine_part() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(this->as_imp(*this).affine_part());
+    CHECK_CRTP(this->as_imp(*this).affine_part());
     return this->as_imp(*this).affine_part();
   }
 
