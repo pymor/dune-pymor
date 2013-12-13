@@ -11,7 +11,24 @@ import numpy as np
 from pymor import defaults
 from pymor.la.listvectorarray import VectorInterface, ListVectorArray
 
-def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, Traits, template_parameters=None):
+# ReturnValue for converting a raw C pointer to a PyBuffer object
+# from pybindgen/examples/buffer/modulegen.py
+class BufferReturn(pybindgen.ReturnValue):
+    CTYPES = []
+
+    def __init__(self, ctype, length_expression):
+        super(BufferReturn, self).__init__(ctype, is_const=False)
+        self.length_expression = length_expression
+
+    def convert_c_to_python(self, wrapper):
+        pybuf = wrapper.after_call.declare_variable("PyObject*", "pybuf")
+        wrapper.after_call.write_code("%s = PyBuffer_FromReadWriteMemory(retval, %s);"
+                                      % (pybuf, self.length_expression))
+        wrapper.build_params.add_parameter("N", [pybuf], prepend=True)
+
+
+def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, Traits, template_parameters=None,
+                                provides_data=False):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, dict))
     assert(isinstance(interfaces, dict))
@@ -66,6 +83,9 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      'bool',
                      [param('const ' + ThisType + ' &', 'other')],
                      throw=[exceptions['DuneException']])
+    # what we want from ProvidesData interface
+    if provides_data:
+        Class.add_method('data', BufferReturn(ScalarType + ' *', 'self->obj->size()  * sizeof(' + ScalarType + ')'), [])
     # what we want from VectorInterface
     Class.add_method('almost_equal',
                      retval('bool'),
@@ -262,6 +282,10 @@ def wrap_vector(cls):
     class WrappedVector(VectorInterface):
 
         wrapped_type = cls
+
+        @property
+        def data(self):
+            return np.frombuffer(self._impl.data(), dtype=np.float)
 
         def __init__(self, v):
             self._impl = v
