@@ -628,13 +628,13 @@ bool EigenRowMajorSparse< S >::linear() const
 template< class S >
 DUNE_STUFF_SSIZE_T EigenRowMajorSparse< S >::dim_source() const
 {
-  return matrix_->rows();
+  return matrix_->cols();
 }
 
 template< class S >
 DUNE_STUFF_SSIZE_T EigenRowMajorSparse< S >::dim_range() const
 {
-  return matrix_->cols();
+  return matrix_->rows();
 }
 
 template< class S >
