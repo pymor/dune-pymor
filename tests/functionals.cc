@@ -31,7 +31,7 @@ using namespace Dune;
 using namespace Dune::Pymor;
 
 typedef testing::Types<
-                        Stuff::LA::DuneDynamicVector< double >
+                        Stuff::LA::CommonDenseVector< double >
 #if HAVE_EIGEN
                       , Stuff::LA::EigenDenseVector< double >
 #endif

@@ -6,7 +6,7 @@
 #ifndef DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 #define DUNE_PYMOR_OPERATORS_DUNEDYNAMIC_HH
 
-#include <dune/stuff/la/container/dunedynamic.hh>
+#include <dune/stuff/la/container/common.hh>
 
 #include <dune//common/exceptions.hh>
 #include <dune/pymor/common/crtp.hh>
@@ -31,9 +31,9 @@ class DuneDynamicInverseTraits
 public:
   typedef ScalarImp                           ScalarType;
   typedef DuneDynamicInverse< ScalarType >    derived_type;
-  typedef Stuff::LA::DuneDynamicMatrix< ScalarType > ContainerType;
-  typedef Stuff::LA::DuneDynamicVector< ScalarType > SourceType;
-  typedef Stuff::LA::DuneDynamicVector< ScalarType > RangeType;
+  typedef Stuff::LA::CommonDenseMatrix< ScalarType > ContainerType;
+  typedef Stuff::LA::CommonDenseVector< ScalarType > SourceType;
+  typedef Stuff::LA::CommonDenseVector< ScalarType > RangeType;
   typedef derived_type                        FrozenType;
   typedef DuneDynamic< ScalarType >           InverseType;
 };
@@ -86,9 +86,9 @@ class DuneDynamicTraits
 public:
   typedef ScalarImp                           ScalarType;
   typedef DuneDynamic< ScalarType >           derived_type;
-  typedef Stuff::LA::DuneDynamicMatrix< ScalarType > ContainerType;
-  typedef Stuff::LA::DuneDynamicVector< ScalarType > SourceType;
-  typedef Stuff::LA::DuneDynamicVector< ScalarType > RangeType;
+  typedef Stuff::LA::CommonDenseMatrix< ScalarType > ContainerType;
+  typedef Stuff::LA::CommonDenseVector< ScalarType > SourceType;
+  typedef Stuff::LA::CommonDenseVector< ScalarType > RangeType;
   typedef derived_type                        FrozenType;
   typedef DuneDynamicInverse< ScalarType >    InverseType;
 };

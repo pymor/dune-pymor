@@ -27,22 +27,22 @@ using namespace Dune::Pymor;
 static const size_t dim = 4;
 
 typedef testing::Types<
-                        Dune::Stuff::LA::DuneDynamicVector< double >
+                        Dune::Stuff::LA::CommonDenseVector< double >
 #if HAVE_EIGEN
                       , Dune::Stuff::LA::EigenDenseVector< double >
 #endif
                       > VectorTypes;
 
 typedef testing::Types<
-                        Dune::Stuff::LA::DuneDynamicMatrix< double >
+                        Dune::Stuff::LA::CommonDenseMatrix< double >
 #if HAVE_EIGEN
                       , Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >
 #endif
                       > MatrixTypes;
 
 typedef testing::Types<
-                        Dune::Stuff::LA::DuneDynamicVector< double >
-                      , Dune::Stuff::LA::DuneDynamicMatrix< double >
+                        Dune::Stuff::LA::CommonDenseVector< double >
+                      , Dune::Stuff::LA::CommonDenseMatrix< double >
 #if HAVE_EIGEN
                       , Dune::Stuff::LA::EigenDenseVector< double >
                       , Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >

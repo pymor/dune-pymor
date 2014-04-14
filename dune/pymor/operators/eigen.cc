@@ -509,7 +509,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
     EigenSolverType eigenSolver(*(matrix_->backend_));
     eigenSolver.setMaxIterations(dim_source());
     eigenSolver.setTolerance(1e-15);
-    *(range.backend_) = eigenSolver.solve(*(source.backend_));
+    range.backend() = eigenSolver.solve(source.backend());
     if (eigenSolver.info() != ::Eigen::Success)
       DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                        "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -521,7 +521,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
-      *(range.backend_) = eigenSolver.solve(*(source.backend_));
+      range.backend() = eigenSolver.solve(source.backend());
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -532,7 +532,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
-      *(range.backend_) = eigenSolver.solve(*(source.backend_));
+      range.backend() = eigenSolver.solve(source.backend());
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -543,7 +543,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       EigenSolverType eigenSolver(*(matrix_->backend_));
       eigenSolver.setMaxIterations(dim_source());
       eigenSolver.setTolerance(1e-15);
-      *(range.backend_) = eigenSolver.solve(*(source.backend_));
+      range.backend() = eigenSolver.solve(source.backend());
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -556,7 +556,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       eigenSolver.setTolerance(1e-15);
       eigenSolver.preconditioner().setDroptol(1e-4);
       eigenSolver.preconditioner().setFillfactor(10);
-      *(range.backend_) = eigenSolver.solve(*(source.backend_));
+      range.backend() = eigenSolver.solve(source.backend());
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -566,7 +566,7 @@ void EigenRowMajorSparseInverse< S >::apply(const SourceType& source, RangeType&
       typedef ::Eigen::SuperLU< typename ContainerType::BackendType > EigenSolverType;
       EigenSolverType eigenSolver;
       eigenSolver.compute(matrix_->backend_->backend());
-      *(range.backend_) = eigenSolver.solve(*(source.backend_));
+      range.backend() = eigenSolver.solve(source.backend());
       if (eigenSolver.info() != ::Eigen::Success)
         DUNE_PYMOR_THROW(Exception::linear_solver_failed,
                          "EIGEN solver reported error code '" << eigenSolver.info() << "',\n"
@@ -650,7 +650,7 @@ void EigenRowMajorSparse< S >::apply(const SourceType& source, RangeType& range,
     DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                      "the dim of range (" << range.dim() << ") does not match the dim_range of this ("
                      << dim_range() << ")!");
-  *(range.backend_) = *(matrix_->backend_) * *(source.backend_);
+  range.backend() = *(matrix_->backend_) * source.backend();
 }
 
 template< class S >

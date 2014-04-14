@@ -3,13 +3,8 @@
 // Copyright Holders: Felix Albrecht, Stephan Rave
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include <config.h>
-#endif // HAVE_CMAKE_CONFIG
-
 #include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/common/float_cmp.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -81,7 +76,7 @@ TEST(Parameter, Parameters_Base)
   std::vector< ValueType > values = param1.values();
   if (values.size() != 1) throw PymorException();
   if (values[0].size() != 1) throw PymorException();
-  if (values[0][0] != 1) throw PymorException();
+  if (Dune::Stuff::Common::FloatCmp::ne(values[0][0], 1.0)) throw PymorException();
   if (param1.get("diffusion") != ValueType({1.0})) throw PymorException();
   if (param1 == param2) throw PymorException();
   if (!(param1 != param2)) throw PymorException();
