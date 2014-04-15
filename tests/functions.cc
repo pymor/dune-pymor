@@ -1,6 +1,6 @@
 // This file is part of the dune-pymor project:
 //   https://github.com/pymor/dune-pymor
-// Copyright Holders: Felix Albrecht, Stephan Rave
+// Copyright Holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 #include <dune/stuff/test/test_common.hh>
@@ -23,7 +23,7 @@ typedef testing::Types<
                       , Dune::Stuff::Function::Expression< double, 3, double, 1 >
                       , Dune::Stuff::Function::Expression< double, 1, double, 2 >
                       , Dune::Stuff::Function::Expression< double, 2, double, 2 >
-                      , Dune::Stuff::Function::Expression< double, 2, double, 3 >
+                      , Dune::Stuff::Function::Expression< double, 3, double, 2 >
                       , Dune::Stuff::Function::Expression< double, 1, double, 3 >
                       , Dune::Stuff::Function::Expression< double, 2, double, 3 >
                       , Dune::Stuff::Function::Expression< double, 3, double, 3 >
