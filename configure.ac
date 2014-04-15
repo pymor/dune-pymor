@@ -32,14 +32,6 @@ AC_CONFIG_FILES([
   doc/doxygen/Doxyfile
   dune/Makefile
   dune/pymor/Makefile
-  dune/pymor/common/Makefile
-  dune/pymor/discretizations/Makefile
-  dune/pymor/functionals/Makefile
-  dune/pymor/functions/Makefile
-  dune/pymor/la/Makefile
-  dune/pymor/la/container/Makefile
-  dune/pymor/operators/Makefile
-  dune/pymor/parameters/Makefile
   lib/Makefile
   m4/Makefile
   dune-pymor.pc
