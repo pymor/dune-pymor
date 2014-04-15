@@ -3,18 +3,13 @@
 // Copyright Holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include <config.h>
-#endif // HAVE_CMAKE_CONFIG
+#include <dune/stuff/test/test_common.hh>
 
 #include <type_traits>
 #include <memory>
 
-#include <dune/stuff/test/test_common.hh>
 #include <dune/stuff/la/container/interfaces.hh>
-#include <dune/stuff/la/container/dunedynamic.hh>
+#include <dune/stuff/la/container/common.hh>
 #include <dune/stuff/la/container/eigen.hh>
 #include <dune/stuff/la/container.hh>
 
