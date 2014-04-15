@@ -3,31 +3,46 @@
 // Copyright Holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
+#include "config.h"
+
 #ifndef DUNE_PYMOR_OPERATORS_EIGEN_HH
 #define DUNE_PYMOR_OPERATORS_EIGEN_HH
-
-#if HAVE_EIGEN
 
 #ifndef DUNE_STUFF_SSIZE_T
 # define DUNE_STUFF_SSIZE_T long int
 #endif
 
+#if HAVE_EIGEN
+
+#include <dune/common/static_assert.hh>
+
+#include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/parameters/base.hh>
 
-#include "interfaces.hh"
+#include "base.hh"
 
 namespace Dune {
 namespace Pymor {
 namespace Operators {
 
 
+// forwards
 template< class ScalarImp = double >
 class EigenRowMajorSparse;
 
 template< class ScalarImp = double >
 class EigenRowMajorSparseInverse;
+
+template< class ScalarImp = double >
+class EigenDense;
+
+template< class ScalarImp = double >
+class EigenDenseInverse;
+
+
+namespace internal {
 
 
 template< class ScalarImp >
@@ -36,54 +51,12 @@ class EigenRowMajorSparseInverseTraits
 public:
   typedef ScalarImp                                           ScalarType;
   typedef EigenRowMajorSparseInverse< ScalarType >            derived_type;
-  typedef Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  ContainerType;
+  typedef Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  MatrixType;
   typedef Stuff::LA::EigenDenseVector< ScalarType >           SourceType;
   typedef Stuff::LA::EigenDenseVector< ScalarType >           RangeType;
   typedef derived_type                                        FrozenType;
   typedef EigenRowMajorSparse< ScalarType >                   InverseType;
 };
-
-
-template< class ScalarImp >
-class EigenRowMajorSparseInverse
-  : public OperatorInterface< EigenRowMajorSparseInverseTraits< ScalarImp > >
-{
-  typedef OperatorInterface< EigenRowMajorSparseInverseTraits< ScalarImp > > BaseType;
-public:
-  typedef EigenRowMajorSparseInverseTraits< ScalarImp > Traits;
-  typedef typename Traits::derived_type   ThisType;
-  typedef typename Traits::ScalarType     ScalarType;
-  typedef typename Traits::SourceType     SourceType;
-  typedef typename Traits::RangeType      RangeType;
-  typedef typename Traits::ContainerType  ContainerType;
-  typedef typename Traits::FrozenType     FrozenType;
-  typedef typename Traits::InverseType    InverseType;
-
-  EigenRowMajorSparseInverse(const ContainerType* matrix_ptr, const std::string option = "bicgstab.ilut");
-
-  EigenRowMajorSparseInverse(const std::shared_ptr< const ContainerType > matrix_ptr, const std::string option = "bicgstab.ilut");
-
-  bool linear() const;
-
-  DUNE_STUFF_SSIZE_T dim_source() const;
-
-  DUNE_STUFF_SSIZE_T dim_range() const;
-
-  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
-
-  using BaseType::apply;
-
-  static std::vector< std::string > invert_options();
-
-  InverseType invert(const std::string option = invert_options()[0],
-                     const Parameter mu = Parameter()) const;
-
-  FrozenType freeze_parameter(const Parameter mu = Parameter()) const;
-
-private:
-  std::shared_ptr< const ContainerType > matrix_;
-  const std::string option_;
-}; // class EigenRowMajorSparseInverse
 
 
 template< class ScalarImp >
@@ -101,56 +74,161 @@ public:
 
 
 template< class ScalarImp >
-class EigenRowMajorSparse
-  : public OperatorInterface< EigenRowMajorSparseTraits< ScalarImp > >
-  , public Stuff::LA::ProvidesConstContainer< EigenRowMajorSparseTraits< ScalarImp > >
+class EigenDenseInverseTraits
 {
-  typedef OperatorInterface< EigenRowMajorSparseTraits< ScalarImp > > BaseType;
 public:
-  typedef EigenRowMajorSparseTraits< ScalarImp >  Traits;
-  typedef typename Traits::derived_type           ThisType;
-  typedef typename Traits::ScalarType             ScalarType;
-  typedef typename Traits::SourceType             SourceType;
-  typedef typename Traits::RangeType              RangeType;
-  typedef typename Traits::ContainerType          ContainerType;
-  typedef typename Traits::FrozenType             FrozenType;
-  typedef typename Traits::InverseType            InverseType;
+  typedef ScalarImp                                 ScalarType;
+  typedef EigenDenseInverse< ScalarType >           derived_type;
+  typedef Stuff::LA::EigenDenseMatrix< ScalarType > MatrixType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType > SourceType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType > RangeType;
+  typedef derived_type                              FrozenType;
+  typedef EigenDense< ScalarType >                  InverseType;
+};
 
-  /**
-   * \attention This class takes ownership of matrix_ptr!
-   */
-  EigenRowMajorSparse(const ContainerType* matrix_ptr);
 
-  EigenRowMajorSparse(const std::shared_ptr< const ContainerType > matrix_ptr);
+template< class ScalarImp >
+class EigenDenseTraits
+{
+public:
+  typedef ScalarImp                                 ScalarType;
+  typedef EigenDense< ScalarType >                  derived_type;
+  typedef Stuff::LA::EigenDenseMatrix< ScalarType > ContainerType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType > SourceType;
+  typedef Stuff::LA::EigenDenseVector< ScalarType > RangeType;
+  typedef derived_type                              FrozenType;
+  typedef EigenDenseInverse< ScalarType >           InverseType;
+};
 
-  bool linear() const;
 
-  DUNE_STUFF_SSIZE_T dim_source() const;
+} // namespace internal
 
-  DUNE_STUFF_SSIZE_T dim_range() const;
 
-  void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const;
+template< class ScalarImp >
+class EigenRowMajorSparseInverse
+  : public MatrixBasedInverseBase< internal::EigenRowMajorSparseInverseTraits< ScalarImp > >
+{
+  typedef MatrixBasedInverseBase< internal::EigenRowMajorSparseInverseTraits< ScalarImp > > BaseType;
+  using typename BaseType::MatrixType;
+  using typename BaseType::LinearSolverType;
 
-  using BaseType::apply;
+public:
+  EigenRowMajorSparseInverse(const MatrixType* matrix_ptr, const std::string type = LinearSolverType::options()[0])
+    : BaseType(matrix_ptr, type)
+  {}
 
-  static std::vector< std::string > invert_options();
+  EigenRowMajorSparseInverse(const MatrixType* matrix_ptr, const Stuff::Common::ConfigTree& options)
+    : BaseType(matrix_ptr, options)
+  {}
 
-  InverseType invert(const std::string option = invert_options()[0],
-                     const Parameter mu = Parameter()) const;
+  EigenRowMajorSparseInverse(const std::shared_ptr< const MatrixType > matrix_ptr,
+                             const std::string type = LinearSolverType::options()[0])
+    : BaseType(matrix_ptr, type)
+  {}
 
-  FrozenType freeze_parameter(const Parameter mu = Parameter()) const;
+  EigenRowMajorSparseInverse(const std::shared_ptr< const MatrixType > matrix_ptr,
+                             const Stuff::Common::ConfigTree& options)
+    : BaseType(matrix_ptr, options)
+  {}
+}; // class EigenRowMajorSparseInverse
 
-  std::shared_ptr< const ContainerType > container() const;
 
-private:
-  std::shared_ptr< const ContainerType > matrix_;
+template< class ScalarImp >
+class EigenRowMajorSparse
+  : public MatrixBasedBase< internal::EigenRowMajorSparseTraits< ScalarImp > >
+{
+  typedef MatrixBasedBase< internal::EigenRowMajorSparseTraits< ScalarImp > > BaseType;
+  using typename BaseType::MatrixType;
+
+public:
+  EigenRowMajorSparse(const MatrixType* matrix_ptr)
+    : BaseType(matrix_ptr)
+  {}
+
+  EigenRowMajorSparse(const std::shared_ptr< const MatrixType > matrix_ptr)
+    : BaseType(matrix_ptr)
+  {}
 }; // class EigenRowMajorSparse
 
+
+template< class ScalarImp >
+class EigenDenseInverse
+  : public MatrixBasedInverseBase< internal::EigenDenseInverseTraits< ScalarImp > >
+{
+  typedef MatrixBasedInverseBase< internal::EigenDenseInverseTraits< ScalarImp > > BaseType;
+  using typename BaseType::MatrixType;
+  using typename BaseType::LinearSolverType;
+
+public:
+  EigenDenseInverse(const MatrixType* matrix_ptr, const std::string type = LinearSolverType::options()[0])
+    : BaseType(matrix_ptr, type)
+  {}
+
+  EigenDenseInverse(const MatrixType* matrix_ptr, const Stuff::Common::ConfigTree& options)
+    : BaseType(matrix_ptr, options)
+  {}
+
+  EigenDenseInverse(const std::shared_ptr< const MatrixType > matrix_ptr,
+                    const std::string type = LinearSolverType::options()[0])
+    : BaseType(matrix_ptr, type)
+  {}
+
+  EigenDenseInverse(const std::shared_ptr< const MatrixType > matrix_ptr,
+                    const Stuff::Common::ConfigTree& options)
+    : BaseType(matrix_ptr, options)
+  {}
+}; // class EigenDenseInverse
+
+
+template< class ScalarImp >
+class EigenDense
+  : public MatrixBasedBase< internal::EigenDenseTraits< ScalarImp > >
+{
+  typedef MatrixBasedBase< internal::EigenDenseTraits< ScalarImp > > BaseType;
+  using typename BaseType::MatrixType;
+
+public:
+  EigenDense(const MatrixType* matrix_ptr)
+    : BaseType(matrix_ptr)
+  {}
+
+  EigenDense(const std::shared_ptr< const MatrixType > matrix_ptr)
+    : BaseType(matrix_ptr)
+  {}
+}; // class EigenDense
+
+
+#else // HAVE_EIGEN
+
+
+template< class ScalarImp = double >
+class EigenRowMajorSparse
+{
+  static_assert(AlwaysFalse< ScalarImp >::value, "You are missing Eigen!");
+};
+
+template< class ScalarImp = double >
+class EigenRowMajorSparseInverse
+{
+  static_assert(AlwaysFalse< ScalarImp >::value, "You are missing Eigen!");
+};
+
+template< class ScalarImp = double >
+class EigenDense
+{
+  static_assert(AlwaysFalse< ScalarImp >::value, "You are missing Eigen!");
+};
+
+template< class ScalarImp = double >
+class EigenDenseInverse
+{
+  static_assert(AlwaysFalse< ScalarImp >::value, "You are missing Eigen!");
+};
+
+#endif // HAVE_EIGEN
 
 } // namespace Operators
 } // namespace Pymor
 } // namespace Dune
-
-#endif // HAVE_EIGEN
 
 #endif // DUNE_PYMOR_OPERATORS_EIGEN_HH

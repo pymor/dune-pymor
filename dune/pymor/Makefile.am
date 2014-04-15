@@ -15,8 +15,9 @@ libpymor_la_SOURCES = \
   functions/checkerboard.cc \
   functions/default.cc \
   functions/interfaces.cc \
-  operators/dunedynamic.cc \
+  operators/commondense.cc \
   operators/eigen.cc \
+  operators/istl.cc \
   parameters/base.cc \
   parameters/functional.cc
 

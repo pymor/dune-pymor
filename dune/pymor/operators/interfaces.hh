@@ -12,7 +12,9 @@
 
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/solver.hh>
 #include <dune/stuff/common/crtp.hh>
+#include <dune/stuff/common/configtree.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -21,15 +23,24 @@
 namespace Dune {
 namespace Pymor {
 
+/**
+ *  \brief  Contains tags mostly needed for python bindings.
+ */
+namespace Tags {
 
-class OperatorInterfaceDynamic {};
+
+class OperatorInterface {};
+class AffinelyDecomposedOperatorInterface {};
+
+
+} // namespace Tags
 
 
 template< class Traits >
 class OperatorInterface
   : public Parametric
-  , public OperatorInterfaceDynamic
-  , protected Stuff::CRTPInterface< OperatorInterface< Traits >, Traits >
+  , public Tags::OperatorInterface
+  , public Stuff::CRTPInterface< OperatorInterface< Traits >, Traits >
 {
 public:
   typedef typename Traits::derived_type derived_type;
@@ -120,27 +131,61 @@ public:
     return derived_type::invert_options();
   }
 
-  InverseType invert(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
+  static Stuff::Common::ConfigTree invert_options(const std::string& type)
+  {
+    return derived_type::invert_options(type);
+  }
+
+  InverseType invert(const std::string type = invert_options()[0], const Parameter mu = Parameter()) const
+  {
+    return invert(invert_options(type), mu);
+  }
+
+  InverseType invert(const Stuff::Common::ConfigTree& option, const Parameter mu = Parameter()) const
   {
     CHECK_CRTP(this->as_imp(*this).invert(option, mu));
     return this->as_imp(*this).invert(option, mu);
   }
 
-  InverseType* invert_and_return_ptr(const std::string option = invert_options()[0], const Parameter mu = Parameter()) const
+  InverseType* invert_and_return_ptr(const std::string type = invert_options()[0],
+                                     const Parameter mu = Parameter()) const
+  {
+    return new InverseType(invert(type, mu));
+  }
+
+  InverseType* invert_and_return_ptr(const Stuff::Common::ConfigTree& option,
+                                     const Parameter mu = Parameter()) const
   {
     return new InverseType(invert(option, mu));
   }
 
   void apply_inverse(const RangeType& range,
                      SourceType& source,
-                     const std::string option = invert_options()[0],
+                     const std::string type = invert_options()[0],
+                     const Parameter mu = Parameter()) const
+  {
+    invert(type, mu).apply(range, source);
+  }
+
+  void apply_inverse(const RangeType& range,
+                     SourceType& source,
+                     const Stuff::Common::ConfigTree& option,
                      const Parameter mu = Parameter()) const
   {
     invert(option, mu).apply(range, source);
   }
 
   SourceType apply_inverse(const RangeType& range,
-                           const std::string option = invert_options()[0],
+                           const std::string type = invert_options()[0],
+                           const Parameter mu = Parameter()) const
+  {
+    SourceType source(dim_source());
+    apply_inverse(range, source, type, mu);
+    return source;
+  }
+
+  SourceType apply_inverse(const RangeType& range,
+                           const Stuff::Common::ConfigTree& option,
                            const Parameter mu = Parameter()) const
   {
     SourceType source(dim_source());
@@ -149,7 +194,14 @@ public:
   }
 
   SourceType* apply_inverse_and_return_ptr(const RangeType& range,
-                                           const std::string option = invert_options()[0],
+                                           const std::string tyep = invert_options()[0],
+                                           const Parameter mu = Parameter()) const
+  {
+    return new SourceType(apply_inverse(range, tyep, mu));
+  }
+
+  SourceType* apply_inverse_and_return_ptr(const RangeType& range,
+                                           const Stuff::Common::ConfigTree& option,
                                            const Parameter mu = Parameter()) const
   {
     return new SourceType(apply_inverse(range, option, mu));
@@ -171,20 +223,17 @@ public:
 }; // class OperatorInterface
 
 
-class AffinelyDecomposedOperatorInterfaceDynamic {};
-
-
 template< class Traits >
 class AffinelyDecomposedOperatorInterface
   : public OperatorInterface< Traits >
-  , public AffinelyDecomposedOperatorInterfaceDynamic
+  , public Tags::AffinelyDecomposedOperatorInterface
 {
   typedef OperatorInterface< Traits > BaseType;
 public:
   typedef typename Traits::derived_type   derived_type;
   typedef typename Traits::ComponentType  ComponentType;
   static_assert(std::is_base_of< OperatorInterface< typename ComponentType::Traits >, ComponentType >::value,
-                "ComponentType has to be derived from FunctionalInterface");
+                "ComponentType has to be derived from OperatorInterface");
 
   AffinelyDecomposedOperatorInterface(const ParameterType mu = ParameterType())
     : BaseType(mu)

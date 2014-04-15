@@ -3,16 +3,10 @@
 // Copyright Holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include <config.h>
-#endif // HAVE_CMAKE_CONFIG
+#include <dune/stuff/test/test_common.hh>
 
 #include <utility>
 #include <type_traits>
-
-#include <dune/stuff/test/test_common.hh>
 
 #include <dune/common/float_cmp.hh>
 
@@ -23,31 +17,33 @@
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/operators/affine.hh>
-#include <dune/pymor/operators/dunedynamic.hh>
-#if HAVE_EIGEN
-# include <dune/pymor/operators/eigen.hh>
-#endif
-
+#include <dune/pymor/operators/commondense.hh>
+#include <dune/pymor/operators/eigen.hh>
+#include <dune/pymor/operators/istl.hh>
 
 using namespace Dune;
-using namespace Dune::Pymor;
+using namespace Pymor;
 
 static const size_t dim = 4;
 
+
 typedef testing::Types<
-                        Dune::Pymor::Operators::DuneDynamic< double >
+                        Pymor::Operators::CommonDense< double >
 #if HAVE_EIGEN
-//                      , Dune::Pymor::Operators::EigenDense< double >
-                      , Dune::Pymor::Operators::EigenRowMajorSparse< double >
+                      , Pymor::Operators::EigenDense< double >
+                      , Pymor::Operators::EigenRowMajorSparse< double >
 #endif // HAVE_EIGEN
-                      > ContainerBasedOperatorTypes;
+#if HAVE_DUNE_ISTL
+                      , Pymor::Operators::IstlRowMajorSparse< double >
+#endif
+                      > MatrixBasedOperatorTypes;
 
 
 template< class OperatorType >
-struct ContainerBasedOperatorTest
+struct MatrixBasedOperatorTests
   : public ::testing::Test
 {
-  void check() const
+  void fulfills_interface() const
   {
     // static tests
     typedef typename OperatorType::Traits         Traits;
@@ -99,13 +95,13 @@ struct ContainerBasedOperatorTest
       d_inverse.apply(range, source);
       d_from_ptr.apply_inverse(source, range, d_invert_options[0]);
     } catch (Dune::Pymor::Exception::linear_solver_failed) {}
-  }
-}; // struct ContainerBasedOperatorTest
+  } // ... fulfills_interface(...)
+}; // struct MatrixBasedOperatorTests
 
 
-TYPED_TEST_CASE(ContainerBasedOperatorTest, ContainerBasedOperatorTypes);
-TYPED_TEST(ContainerBasedOperatorTest, OPERATORS) {
-  this->check();
+TYPED_TEST_CASE(MatrixBasedOperatorTests, MatrixBasedOperatorTypes);
+TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
+  this->fulfills_interface();
 }
 
 
@@ -218,10 +214,10 @@ struct LinearAffinelyDecomposedContainerBasedOperatorTest
 }; // struct LinearAffinelyDecomposedContainerBasedOperatorTest
 
 
-TYPED_TEST_CASE(LinearAffinelyDecomposedContainerBasedOperatorTest, ContainerBasedOperatorTypes);
-TYPED_TEST(LinearAffinelyDecomposedContainerBasedOperatorTest, OPERATORS) {
-  this->check();
-}
+//TYPED_TEST_CASE(LinearAffinelyDecomposedContainerBasedOperatorTest, MatrixBasedOperatorTypes);
+//TYPED_TEST(LinearAffinelyDecomposedContainerBasedOperatorTest, OPERATORS) {
+//  this->check();
+//}
 
 
 int main(int argc, char** argv)
