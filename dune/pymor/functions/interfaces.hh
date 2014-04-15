@@ -26,7 +26,7 @@ namespace Pymor {
 
 
 /**
- * \brief Interface for matrix valued (possibly parametric) functions.
+ * \brief Interface for global valued (possibly parametric) functions.
  */
 template< class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1 >
 class AffinelyDecomposableFunctionInterface
