@@ -22,17 +22,17 @@ set( ENV{PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/bin:$ENV{PATH}" )
 set( ENV{LD_LIBRARY_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/lib:$ENV{LD_LIBRARY_PATH}" )
 set( ENV{PKG_CONFIG_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../local/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}" )
 
-# dune-stuff cmake includes
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_CURRENT_SOURCE_DIR}/../dune-stuff/cmake ${CMAKE_CURRENT_SOURCE_DIR}/../dune-stuff/cmake/modules )
-include(DuneUtils)
-include(GridUtils)
-
-# adjust CXX_FLAGS
-set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3" )
-set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -ggdb" )
-
 # needs to come first to include correct config.h
 include_directories( ${dune-pymor_BINARY_DIR} ${dune-pymor_SOURCE_DIR} )
+
+# dune-stuff cmake includes
+set(CMAKE_MODULE_PATH
+     ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+     ${CMAKE_CURRENT_SOURCE_DIR}/../dune-stuff/cmake
+     ${CMAKE_CURRENT_SOURCE_DIR}/../dune-stuff/cmake/modules
+)
+include(DuneUtils)
+include(GridUtils)
 
 add_dune_modules(
   pymor
@@ -48,8 +48,6 @@ add_dune_modules(
   istl
   common
 )
-
-link_directories( "/usr/lib" ${CCGNU_LIBRARY_DIRS} )
 
 # header
 file( GLOB_RECURSE pymor "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
