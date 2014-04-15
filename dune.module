@@ -7,4 +7,4 @@ Module: dune-pymor
 Version: 0.1
 Maintainer: felix.schindler@wwu.de
 Depends: dune-common (>= 2.3) dune-stuff
-Suggests dune-grid (>= 2.3)
+Suggests dune-grid (>= 2.3) dune-istl (>= 2.3)
