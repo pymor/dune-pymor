@@ -3,20 +3,14 @@
 // Copyright Holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifdef HAVE_CMAKE_CONFIG
-  #include "cmake_config.h"
-#elif defined (HAVE_CONFIG_H)
-  #include <config.h>
-#endif // HAVE_CMAKE_CONFIG
+#include <dune/stuff/test/test_common.hh>
 
 #include <utility>
 
-#include <dune/stuff/test/test_common.hh>
-
-#include <dune/common/float_cmp.hh>
 #include <dune/common/typetraits.hh>
 
-#include <dune/stuff/la/container/dunedynamic.hh>
+#include <dune/stuff/common/float_cmp.hh>
+#include <dune/stuff/la/container/common.hh>
 #include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/common/exceptions.hh>
@@ -81,7 +75,7 @@ struct VectorBasedTest
     if (d_dim_source != dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
     const VectorType source(dim, D_ScalarType(1));
     const D_ScalarType d_apply = d_from_ptr.apply(source);
-    if (d_apply != dim) DUNE_PYMOR_THROW(PymorException, d_apply);
+    if (Stuff::Common::FloatCmp::ne(d_apply, D_ScalarType(dim))) DUNE_PYMOR_THROW(PymorException, d_apply);
     // * of the class as the interface
     const InterfaceType& i_from_ptr = static_cast< const InterfaceType& >(d_from_ptr);
     const bool i_linear = i_from_ptr.linear();
@@ -89,7 +83,7 @@ struct VectorBasedTest
     const DUNE_STUFF_SSIZE_T i_dim_source = i_from_ptr.dim_source();
     if (i_dim_source != dim) DUNE_PYMOR_THROW(PymorException, i_dim_source);
     const I_ScalarType i_apply = i_from_ptr.apply(source);
-    if (i_apply != dim) DUNE_PYMOR_THROW(PymorException, i_apply);
+    if (Stuff::Common::FloatCmp::ne(i_apply, I_ScalarType(dim))) DUNE_PYMOR_THROW(PymorException, i_apply);
   }
 }; // struct VectorBasedTest
 
@@ -162,7 +156,7 @@ struct LinearAffinelyDecomposedVectorBasedTest
     VectorType source(dim, D_ScalarType(1));
     D_ScalarType d_apply = d_functional.apply(source, mu);
     D_ScalarType d_frozen_apply = d_frozen.apply(source);
-    if (d_apply != d_frozen_apply)
+    if (Stuff::Common::FloatCmp::ne(d_apply, d_frozen_apply))
       DUNE_PYMOR_THROW(PymorException, "\nd_apply        = " << d_apply << "\nd_frozen_apply = " << d_frozen_apply);
     // * of the class as the interface
     InterfaceType& i_functional = static_cast< InterfaceType& >(d_functional);
@@ -185,7 +179,7 @@ struct LinearAffinelyDecomposedVectorBasedTest
     if (i_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
     I_ScalarType i_apply = i_functional.apply(source, mu);
     I_ScalarType i_frozen_apply = i_frozen.apply(source);
-    if (i_apply != i_frozen_apply)
+    if (Stuff::Common::FloatCmp::ne(i_apply, i_frozen_apply))
       DUNE_PYMOR_THROW(PymorException, "\ni_apply        = " << i_apply << "\ni_frozen_apply = " << i_frozen_apply);
   }
 }; // struct LinearAffinelyDecomposedVectorBasedTest
