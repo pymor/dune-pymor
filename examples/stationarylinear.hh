@@ -6,6 +6,8 @@
 #ifndef DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 #define DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 
+#include "config.h"
+
 #include <dune/stuff/functions/constant.hh>
 #include <dune/stuff/grid/fakeentity.hh>
 #include <dune/stuff/la/container/common.hh>
