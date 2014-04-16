@@ -18,7 +18,7 @@
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/discretizations/interfaces.hh>
-#include <dune/pymor/operators/dunedynamic.hh>
+#include <dune/pymor/operators/common.hh>
 #include <dune/pymor/operators/affine.hh>
 #include <dune/pymor/functions/default.hh>
 #include <dune/pymor/functionals/default.hh>
@@ -68,7 +68,7 @@ class SimpleDiscretizationTraits
 public:
   typedef SimpleDiscretization derived_type;
   typedef Dune::Stuff::LA::CommonDenseVector< double > VectorType;
-  typedef Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< typename Dune::Pymor::Operators::DuneDynamic< double > > OperatorType;
+  typedef Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< typename Dune::Pymor::Operators::CommonDense< double > > OperatorType;
   typedef Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< VectorType > FunctionalType;
   typedef OperatorType ProductType;
 };

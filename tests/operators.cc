@@ -17,7 +17,7 @@
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/operators/affine.hh>
-#include <dune/pymor/operators/commondense.hh>
+#include <dune/pymor/operators/common.hh>
 #include <dune/pymor/operators/eigen.hh>
 #include <dune/pymor/operators/istl.hh>
 
