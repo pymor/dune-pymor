@@ -6,10 +6,6 @@
 #ifndef DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 #define DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-# define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <memory>
 
 #include <dune/common/fmatrix.hh>

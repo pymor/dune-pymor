@@ -6,10 +6,6 @@
 #ifndef DUNE_PYMOR_PARAMETERS_FUNCTIONAL_HH
 #define DUNE_PYMOR_PARAMETERS_FUNCTIONAL_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-# define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <vector>
 #include <memory>
 

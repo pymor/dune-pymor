@@ -6,10 +6,6 @@
 #ifndef DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 #define DUNE_PYMOR_EXAMPLES_STATIONARYLINEAR_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-# define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <dune/stuff/functions/constant.hh>
 #include <dune/stuff/grid/fakeentity.hh>
 #include <dune/stuff/la/container/common.hh>

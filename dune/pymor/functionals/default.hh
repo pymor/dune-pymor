@@ -6,10 +6,6 @@
 #ifndef DUNE_PYMOR_FUNCTIONALS_DEFAULT_HH
 #define DUNE_PYMOR_FUNCTIONALS_DEFAULT_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-# define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <dune/common/typetraits.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 

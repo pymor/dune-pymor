@@ -6,10 +6,6 @@
 #ifndef DUNE_PYMOR_OPERATORS_BASE_HH
 #define DUNE_PYMOR_OPERATORS_BASE_HH
 
-#ifndef DUNE_STUFF_SSIZE_T
-# define DUNE_STUFF_SSIZE_T long int
-#endif
-
 #include <type_traits>
 
 #include <dune/stuff/la/container/interfaces.hh>
