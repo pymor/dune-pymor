@@ -6,7 +6,7 @@
 #include "config.h"
 
 #include "affine.hh"
-#include "commondense.hh"
+#include "common.hh"
 
 namespace Dune {
 namespace Pymor {
