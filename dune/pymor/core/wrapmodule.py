@@ -21,17 +21,17 @@ except ImportError:
 
 def wrap_module(mod):
 
-    AffinelyDecomposedFunctionalInterface = mod.Dune.Pymor.AffinelyDecomposedFunctionalInterfaceDynamic
-    AffinelyDecomposedOperatorInterface = mod.Dune.Pymor.AffinelyDecomposedOperatorInterfaceDynamic
-    FunctionalInterface = mod.Dune.Pymor.FunctionalInterfaceDynamic
-    VectorInterface = mod.Dune.Stuff.LA.VectorInterfaceDynamic
-    OperatorInterface = mod.Dune.Pymor.OperatorInterfaceDynamic
+    AffinelyDecomposedFunctionalInterface = mod.Dune.Pymor.Tags.AffinelyDecomposedFunctionalInterface
+    AffinelyDecomposedOperatorInterface = mod.Dune.Pymor.Tags.AffinelyDecomposedOperatorInterface
+    FunctionalInterface = mod.Dune.Pymor.Tags.FunctionalInterface
+    VectorInterface = mod.Dune.Stuff.LA.Tags.VectorInterface
+    OperatorInterface = mod.Dune.Pymor.Tags.OperatorInterface
     Parameter = mod.Dune.Pymor.Parameter
     ParameterFunctional = mod.Dune.Pymor.ParameterFunctional
     ParameterType = mod.Dune.Pymor.ParameterType
-    StationaryDiscretizationInterface = mod.Dune.Pymor.StationaryDiscretizationInterfaceDynamic
+    StationaryDiscretizationInterface = mod.Dune.Pymor.Tags.StationaryDiscretizationInterface
     if HAVE_MULTISCALE:
-        StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.StationaryMultiscaleDiscretiztionInterfaceDynamic
+        StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.Tags.StationaryMultiscaleDiscretiztionInterface
 
     wrapped_modules = {}
 

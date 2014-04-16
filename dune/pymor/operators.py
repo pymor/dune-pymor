@@ -80,7 +80,7 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
         for nspace in operator_namespaces:
             operator_namespace = operator_namespace.add_cpp_namespace(nspace)
     Operator = operator_namespace.add_class(operator_name,
-                                            parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'],
+                                            parent=interfaces['Dune::Pymor::Tags::OperatorInterface'],
                                             template_parameters=operator_template_parameters)
     # add the inverse
     inverse_namespace = module
@@ -90,7 +90,7 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
         for nspace in inverse_namespaces:
             inverse_namespace = inverse_namespace.add_cpp_namespace(nspace)
     Inverse = inverse_namespace.add_class(inverse_name,
-                                          parent=interfaces['Dune::Pymor::OperatorInterfaceDynamic'],
+                                          parent=interfaces['Dune::Pymor::Tags::OperatorInterface'],
                                           template_parameters=inverse_template_parameters)
     # fill the operator
     Operator.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
@@ -401,7 +401,7 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
                 assert(len(element.strip()) > 0)
     module = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Operators')
     Class = module.add_class('LinearAffinelyDecomposedContainerBased',
-                             parent=[interfaces['Dune::Pymor::AffinelyDecomposedOperatorInterfaceDynamic'],
+                             parent=[interfaces['Dune::Pymor::Tags::AffinelyDecomposedOperatorInterface'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,

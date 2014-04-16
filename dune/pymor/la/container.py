@@ -60,7 +60,7 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
         for nspace in namespaces:
             namespace = namespace.add_cpp_namespace(nspace)
     Class = namespace.add_class(name,
-                                parent=interfaces['Dune::Stuff::LA::VectorInterfaceDynamic'],
+                                parent=interfaces['Dune::Stuff::LA::Tags::VectorInterface'],
                                 template_parameters=template_parameters)
     Class.add_constructor([])
     Class.add_constructor([param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'size')])
@@ -206,7 +206,7 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
         for nspace in namespaces:
             namespace = namespace.add_cpp_namespace(nspace)
     Class = namespace.add_class(name,
-                                parent=interfaces['Dune::Stuff::LA::MatrixInterfaceDynamic'],
+                                parent=interfaces['Dune::Stuff::LA::Tags::MatrixInterface'],
                                 template_parameters=template_parameters)
     Class.add_constructor([])
     # what we want from ContainerInterface

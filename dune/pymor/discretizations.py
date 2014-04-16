@@ -51,9 +51,9 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                 assert(isinstance(element, str))
                 assert(len(element.strip()) > 0)
     # add interface if necessary
-    if not 'Dune::Pymor::StationaryDiscretizationInterfaceDynamic' in interfaces:
-        (interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic']
-         ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_class('StationaryDiscretizationInterfaceDynamic')
+    if not 'Dune::Pymor::Tags::StationaryDiscretizationInterface' in interfaces:
+        (interfaces['Dune::Pymor::Tags::StationaryDiscretizationInterface']
+         ) = module.add_class('Dune::Pymor::Tags::StationaryDiscretizationInterface')
     namespace = module
     namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
     name = name.split('::')[-1].strip()
@@ -61,7 +61,7 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
         for nspace in namespaces:
             namespace = namespace.add_cpp_namespace(nspace)
     Class = namespace.add_class(name,
-                                parent=[interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic'],
+                                parent=[interfaces['Dune::Pymor::Tags::StationaryDiscretizationInterface'],
                                         interfaces['Dune::Pymor::Parametric']],
                                 template_parameters=template_parameters)
     Class.add_method('get_operator_and_return_ptr',
@@ -232,12 +232,12 @@ try:
                     assert(isinstance(element, str))
                     assert(len(element.strip()) > 0)
         # add interface if necessary
-        if not 'Dune::Pymor::StationaryDiscretizationInterfaceDynamic' in interfaces:
-            (interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic']
-             ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_class('StationaryDiscretizationInterfaceDynamic')
-        if not 'Dune::Pymor::StationaryMultiscaleDiscretiztionInterfaceDynamic' in interfaces:
-            (interfaces['Dune::Pymor::StationaryMultiscaleDiscretiztionInterfaceDynamic']
-             ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_class('StationaryMultiscaleDiscretiztionInterfaceDynamic')
+        if not 'Dune::Pymor::Tags::StationaryDiscretizationInterface' in interfaces:
+            (interfaces['Dune::Pymor::Tags::StationaryDiscretizationInterface']
+             ) = module.add_class('Dune::Pymor::Tags::StationaryDiscretizationInterface')
+        if not 'Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface' in interfaces:
+            (interfaces['Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface']
+             ) = module.add_class('Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface')
         namespace = module
         namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
         name = name.split('::')[-1].strip()
@@ -245,9 +245,9 @@ try:
             for nspace in namespaces:
                 namespace = namespace.add_cpp_namespace(nspace)
         Class = namespace.add_class(name,
-                                    parent=[interfaces['Dune::Pymor::StationaryDiscretizationInterfaceDynamic'],
+                                    parent=[interfaces['Dune::Pymor::Tags::StationaryDiscretizationInterface'],
                                             interfaces['Dune::Pymor::Parametric'],
-                                            interfaces['Dune::Pymor::StationaryMultiscaleDiscretiztionInterfaceDynamic']],
+                                            interfaces['Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface']],
                                     template_parameters=template_parameters)
         Class.add_method('get_operator_and_return_ptr',
                          retval(OperatorType + ' *', caller_owns_return=True),

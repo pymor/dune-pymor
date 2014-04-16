@@ -40,7 +40,7 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
                 assert(len(element.strip()) > 0)
     module = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Functionals')
     Class = module.add_class('VectorBased',
-                             parent=[interfaces['Dune::Pymor::FunctionalInterfaceDynamic'],
+                             parent=[interfaces['Dune::Pymor::Tags::FunctionalInterface'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
@@ -174,7 +174,7 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                 assert(len(element.strip()) > 0)
     module = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Functionals')
     Class = module.add_class('LinearAffinelyDecomposedVectorBased',
-                             parent=[interfaces['Dune::Pymor::AffinelyDecomposedFunctionalInterfaceDynamic'],
+                             parent=[interfaces['Dune::Pymor::Tags::AffinelyDecomposedFunctionalInterface'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
