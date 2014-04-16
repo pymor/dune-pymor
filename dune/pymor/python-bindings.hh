@@ -7,10 +7,10 @@
 #define DUNE_PYMOR_PYTHON_BINDINGS_HH
 
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container/common.hh>
+#include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/la/container/eigen.hh>
 #include <dune/stuff/la/container.hh>
-
-//#include <dune/pymor/la/container/dunedynamic.hh>
 
 #include <dune/pymor/discretizations/interfaces.hh>
 #include <dune/pymor/functionals/affine.hh>
@@ -20,6 +20,7 @@
 #include <dune/pymor/operators/affine.hh>
 #include <dune/pymor/operators/common.hh>
 #include <dune/pymor/operators/eigen.hh>
+#include <dune/pymor/operators/istl.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
