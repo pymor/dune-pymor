@@ -227,7 +227,7 @@ public:
       DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error, "This must not happen");
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                      "do not call freeze_parameter(" << mu << ") if parametric() == false!");
-    return FrozenType(nullptr, invert_options()[0]);
+    return FrozenType(nullptr);
   } // ... freeze_parameter(...)
 
   std::shared_ptr< const ContainerType > container() const
