@@ -17,15 +17,21 @@
 
 namespace Dune {
 namespace Pymor {
+namespace Tags {
 
 
-class FunctionalInterfaceDynamic {};
+class FunctionalInterface {};
+class AffinelyDecomposedFunctionalInterface : public FunctionalInterface {};
+
+
+} // namespace Tags
+
 
 template< class Traits >
 class FunctionalInterface
   : CRTPInterface< FunctionalInterface< Traits >, Traits >
   , public Parametric
-  , public FunctionalInterfaceDynamic
+  , public Tags::FunctionalInterface
 {
 protected:
   typedef CRTPInterface< FunctionalInterface< Traits >, Traits > CRTP;
@@ -77,19 +83,18 @@ public:
 }; // class FunctionalInterface
 
 
-class AffinelyDecomposedFunctionalInterfaceDynamic {};
-
 template< class Traits >
 class AffinelyDecomposedFunctionalInterface
   : public CRTPInterface< AffinelyDecomposedFunctionalInterface< Traits >, Traits >
   , public FunctionalInterface< Traits >
+  , public Tags::AffinelyDecomposedFunctionalInterface
 {
   typedef CRTPInterface< AffinelyDecomposedFunctionalInterface< Traits >, Traits > CRTP;
-  typedef FunctionalInterface< Traits > BaseType;
+  typedef Pymor::FunctionalInterface< Traits > BaseType;
 public:
   typedef typename Traits::derived_type   derived_type;
   typedef typename Traits::ComponentType  ComponentType;
-  static_assert(std::is_base_of< FunctionalInterface< typename ComponentType::Traits >, ComponentType >::value,
+  static_assert(std::is_base_of< Pymor::FunctionalInterface< typename ComponentType::Traits >, ComponentType >::value,
                 "ComponentType has to be derived from FunctionalInterface");
 
   AffinelyDecomposedFunctionalInterface(const ParameterType mu = ParameterType())

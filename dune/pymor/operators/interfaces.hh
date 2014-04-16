@@ -26,7 +26,7 @@ namespace Tags {
 
 
 class OperatorInterface {};
-class AffinelyDecomposedOperatorInterface {};
+class AffinelyDecomposedOperatorInterface : public OperatorInterface {};
 
 
 } // namespace Tags
@@ -224,11 +224,11 @@ class AffinelyDecomposedOperatorInterface
   : public OperatorInterface< Traits >
   , public Tags::AffinelyDecomposedOperatorInterface
 {
-  typedef OperatorInterface< Traits > BaseType;
+  typedef Pymor::OperatorInterface< Traits > BaseType;
 public:
   typedef typename Traits::derived_type   derived_type;
   typedef typename Traits::ComponentType  ComponentType;
-  static_assert(std::is_base_of< OperatorInterface< typename ComponentType::Traits >, ComponentType >::value,
+  static_assert(std::is_base_of< Pymor::OperatorInterface< typename ComponentType::Traits >, ComponentType >::value,
                 "ComponentType has to be derived from OperatorInterface");
 
   AffinelyDecomposedOperatorInterface(const ParameterType mu = ParameterType())

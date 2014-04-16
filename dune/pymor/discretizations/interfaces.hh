@@ -18,17 +18,22 @@
 
 namespace Dune {
 namespace Pymor {
+namespace Tags {
 
 
-class StationaryDiscretizationInterfaceDynamic {};
+class StationaryDiscretizationInterface {};
 
-class StationaryMultiscaleDiscretiztionInterfaceDynamic {};
+class StationaryMultiscaleDiscretiztionInterface {};
+
+
+} // namespace Tags
 
 
 template< class Traits >
 class StationaryDiscretizationInterface
   : public Parametric
   , public CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits >
+  , public Tags::StationaryDiscretizationInterface
 {
   typedef CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits > CRTP;
 public:
