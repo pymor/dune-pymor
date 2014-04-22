@@ -22,87 +22,13 @@ namespace Pymor {
 namespace Operators {
 
 
-// forwards
 template< class ScalarImp = double >
-class EigenRowMajorSparse;
-
-template< class ScalarImp = double >
-class EigenRowMajorSparseInverse;
-
-template< class ScalarImp = double >
-class EigenDense;
-
-template< class ScalarImp = double >
-class EigenDenseInverse;
-
-
-namespace internal {
-
-
-template< class ScalarImp >
-class EigenRowMajorSparseInverseTraits
-{
-public:
-  typedef ScalarImp                                           ScalarType;
-  typedef EigenRowMajorSparseInverse< ScalarType >            derived_type;
-  typedef Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  MatrixType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType >           SourceType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType >           RangeType;
-  typedef derived_type                                        FrozenType;
-  typedef EigenRowMajorSparse< ScalarType >                   InverseType;
-};
-
-
-template< class ScalarImp >
-class EigenRowMajorSparseTraits
-{
-public:
-  typedef ScalarImp                                           ScalarType;
-  typedef EigenRowMajorSparse< ScalarType >                   derived_type;
-  typedef Stuff::LA::EigenRowMajorSparseMatrix< ScalarType >  ContainerType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType >           SourceType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType >           RangeType;
-  typedef derived_type                                        FrozenType;
-  typedef EigenRowMajorSparseInverse< ScalarType >            InverseType;
-};
-
-
-template< class ScalarImp >
-class EigenDenseInverseTraits
-{
-public:
-  typedef ScalarImp                                 ScalarType;
-  typedef EigenDenseInverse< ScalarType >           derived_type;
-  typedef Stuff::LA::EigenDenseMatrix< ScalarType > MatrixType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType > SourceType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType > RangeType;
-  typedef derived_type                              FrozenType;
-  typedef EigenDense< ScalarType >                  InverseType;
-};
-
-
-template< class ScalarImp >
-class EigenDenseTraits
-{
-public:
-  typedef ScalarImp                                 ScalarType;
-  typedef EigenDense< ScalarType >                  derived_type;
-  typedef Stuff::LA::EigenDenseMatrix< ScalarType > ContainerType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType > SourceType;
-  typedef Stuff::LA::EigenDenseVector< ScalarType > RangeType;
-  typedef derived_type                              FrozenType;
-  typedef EigenDenseInverse< ScalarType >           InverseType;
-};
-
-
-} // namespace internal
-
-
-template< class ScalarImp >
 class EigenRowMajorSparseInverse
-  : public MatrixBasedInverseBase< internal::EigenRowMajorSparseInverseTraits< ScalarImp > >
+  : public MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< ScalarImp >
+                                    , Stuff::LA::EigenDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedInverseBase< internal::EigenRowMajorSparseInverseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< ScalarImp >
+                                   , Stuff::LA::EigenDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
   using typename BaseType::LinearSolverType;
 
@@ -127,11 +53,13 @@ public:
 }; // class EigenRowMajorSparseInverse
 
 
-template< class ScalarImp >
+template< class ScalarImp = double >
 class EigenRowMajorSparse
-  : public MatrixBasedBase< internal::EigenRowMajorSparseTraits< ScalarImp > >
+  : public MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< ScalarImp >
+                             , Stuff::LA::EigenDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedBase< internal::EigenRowMajorSparseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< ScalarImp >
+                            , Stuff::LA::EigenDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
 
 public:
@@ -145,11 +73,13 @@ public:
 }; // class EigenRowMajorSparse
 
 
-template< class ScalarImp >
+template< class ScalarImp = double >
 class EigenDenseInverse
-  : public MatrixBasedInverseBase< internal::EigenDenseInverseTraits< ScalarImp > >
+  : public MatrixBasedInverseDefault< Stuff::LA::EigenDenseMatrix< ScalarImp >
+                                    , Stuff::LA::EigenDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedInverseBase< internal::EigenDenseInverseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedInverseDefault< Stuff::LA::EigenDenseMatrix< ScalarImp >
+                                   , Stuff::LA::EigenDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
   using typename BaseType::LinearSolverType;
 
@@ -174,11 +104,13 @@ public:
 }; // class EigenDenseInverse
 
 
-template< class ScalarImp >
+template< class ScalarImp = double >
 class EigenDense
-  : public MatrixBasedBase< internal::EigenDenseTraits< ScalarImp > >
+  : public MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< ScalarImp >
+                             , Stuff::LA::EigenDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedBase< internal::EigenDenseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< ScalarImp >
+                            , Stuff::LA::EigenDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
 
 public:

@@ -17,31 +17,12 @@ namespace Operators {
 
 
 template< class ScalarImp = double >
-class CommonDense;
-
-template< class ScalarImp = double >
-class CommonDenseInverse;
-
-
-template< class ScalarImp >
-class CommonDenseInverseTraits
-{
-public:
-  typedef ScalarImp                           ScalarType;
-  typedef CommonDenseInverse< ScalarType >    derived_type;
-  typedef Stuff::LA::CommonDenseMatrix< ScalarType > MatrixType;
-  typedef Stuff::LA::CommonDenseVector< ScalarType > SourceType;
-  typedef Stuff::LA::CommonDenseVector< ScalarType > RangeType;
-  typedef derived_type                        FrozenType;
-  typedef CommonDense< ScalarType >           InverseType;
-};
-
-
-template< class ScalarImp >
 class CommonDenseInverse
-  : public MatrixBasedInverseBase< CommonDenseInverseTraits< ScalarImp > >
+  : public MatrixBasedInverseDefault< Stuff::LA::CommonDenseMatrix< ScalarImp >
+                                    , Stuff::LA::CommonDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedInverseBase< CommonDenseInverseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedInverseDefault< Stuff::LA::CommonDenseMatrix< ScalarImp >
+                                   , Stuff::LA::CommonDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
   using typename BaseType::LinearSolverType;
 
@@ -55,36 +36,24 @@ public:
   {}
 
   CommonDenseInverse(const std::shared_ptr< const MatrixType > matrix_ptr,
-                             const std::string type = LinearSolverType::options()[0])
+                     const std::string type = LinearSolverType::options()[0])
     : BaseType(matrix_ptr, type)
   {}
 
   CommonDenseInverse(const std::shared_ptr< const MatrixType > matrix_ptr,
-                             const Stuff::Common::ConfigTree& options)
+                     const Stuff::Common::ConfigTree& options)
     : BaseType(matrix_ptr, options)
   {}
 }; // class CommonDenseInverse
 
 
-template< class ScalarImp >
-class CommonDenseTraits
-{
-public:
-  typedef ScalarImp                           ScalarType;
-  typedef CommonDense< ScalarType >           derived_type;
-  typedef Stuff::LA::CommonDenseMatrix< ScalarType > ContainerType;
-  typedef Stuff::LA::CommonDenseVector< ScalarType > SourceType;
-  typedef Stuff::LA::CommonDenseVector< ScalarType > RangeType;
-  typedef derived_type                        FrozenType;
-  typedef CommonDenseInverse< ScalarType >    InverseType;
-};
-
-
-template< class ScalarImp >
+template< class ScalarImp = double >
 class CommonDense
-  : public MatrixBasedBase< CommonDenseTraits< ScalarImp > >
+  : public MatrixBasedDefault< Stuff::LA::CommonDenseMatrix< ScalarImp >
+                             , Stuff::LA::CommonDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedBase< CommonDenseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedDefault< Stuff::LA::CommonDenseMatrix< ScalarImp >
+                            , Stuff::LA::CommonDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
 
 public:

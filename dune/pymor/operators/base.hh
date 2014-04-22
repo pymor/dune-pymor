@@ -19,43 +19,94 @@ namespace Pymor {
 namespace Operators {
 
 
-template< class ImpTraits >
-class MatrixBasedInverseBase
-  : public OperatorInterface< ImpTraits >
+// forwards
+template< class MatrixType, class VectorType >
+class MatrixBasedInverseDefault;
+
+template< class MatrixType, class VectorType >
+class MatrixBasedDefault;
+
+
+namespace internal {
+
+
+template< class MatrixType, class VectorType >
+class MatrixBasedDefaultTraits
 {
-  typedef OperatorInterface< ImpTraits > BaseType;
+  static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
+                "MatrixType has to be derived from Stuff::LA::MatrixInterface!");
+  static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename VectorType::Traits >, VectorType >::value,
+                "VectorType has to be derived from Stuff::LA::VectorInterface!");
+  static_assert(std::is_same< typename MatrixType::ScalarType, typename VectorType::ScalarType >::value,
+                "Types do not match!");
 public:
-  typedef ImpTraits Traits;
+  typedef MatrixBasedDefault< MatrixType, VectorType > derived_type;
+  typedef MatrixType ContainerType;
+  typedef VectorType SourceType;
+  typedef VectorType RangeType;
+  typedef typename MatrixType::ScalarType ScalarType;
+  typedef MatrixBasedDefault< MatrixType, VectorType > FrozenType;
+  typedef MatrixBasedInverseDefault< MatrixType, VectorType > InverseType;
+}; // class MatrixBasedDefaultTraits
+
+
+template< class MatrixType, class VectorType >
+class MatrixBasedInverseDefaultTraits
+{
+  static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
+                "MatrixType has to be derived from Stuff::LA::MatrixInterface!");
+  static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename VectorType::Traits >, VectorType >::value,
+                "VectorType has to be derived from Stuff::LA::VectorInterface!");
+  static_assert(std::is_same< typename MatrixType::ScalarType, typename VectorType::ScalarType >::value,
+                "Types do not match!");
+public:
+  typedef MatrixBasedInverseDefault< MatrixType, VectorType > derived_type;
+  typedef VectorType SourceType;
+  typedef VectorType RangeType;
+  typedef typename MatrixType::ScalarType ScalarType;
+  typedef MatrixBasedInverseDefault< MatrixType, VectorType > FrozenType;
+  typedef MatrixBasedDefault< MatrixType, VectorType > InverseType;
+}; // class MatrixBasedInverseDefaultTraits
+
+
+} // namespace internal
+
+
+template< class MatrixImp, class VectorType >
+class MatrixBasedInverseDefault
+  : public OperatorInterface< internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType > >
+{
+  typedef OperatorInterface< internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType > > BaseType;
+public:
+  typedef internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType > Traits;
   typedef typename Traits::ScalarType   ScalarType;
   typedef typename Traits::SourceType   SourceType;
   typedef typename Traits::RangeType    RangeType;
-  typedef typename Traits::MatrixType   MatrixType;
   typedef typename Traits::FrozenType   FrozenType;
   typedef typename Traits::InverseType  InverseType;
 protected:
-  typedef Stuff::LA::Solver< MatrixType >  LinearSolverType;
-  static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
-                "MatrixType has to be derived from Stuff::LA::MatrixInterface!");
+  typedef MatrixImp MatrixType;
+  typedef Stuff::LA::Solver< MatrixType > LinearSolverType;
 
 public:
-  MatrixBasedInverseBase(const MatrixType* matrix_ptr, const std::string type = LinearSolverType::options()[0])
+  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const std::string type = LinearSolverType::options()[0])
     : matrix_(matrix_ptr)
     , options_(LinearSolverType::options(type))
   {}
 
-  MatrixBasedInverseBase(const MatrixType* matrix_ptr, const Stuff::Common::ConfigTree& options)
+  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const Stuff::Common::ConfigTree& options)
     : matrix_(matrix_ptr)
     , options_(options)
   {}
 
-  MatrixBasedInverseBase(const std::shared_ptr< const MatrixType > matrix_ptr,
-                         const std::string type = LinearSolverType::options()[0])
+  MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr,
+                            const std::string type = LinearSolverType::options()[0])
     : matrix_(matrix_ptr)
     , options_(LinearSolverType::options(type))
   {}
 
-  MatrixBasedInverseBase(const std::shared_ptr< const MatrixType > matrix_ptr,
-                         const Stuff::Common::ConfigTree& options)
+  MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr,
+                            const Stuff::Common::ConfigTree& options)
     : matrix_(matrix_ptr)
     , options_(options)
   {}
@@ -129,28 +180,29 @@ public:
 private:
   std::shared_ptr< const MatrixType > matrix_;
   const Stuff::Common::ConfigTree options_;
-}; // class MatrixBasedInverseBase
+}; // class MatrixBasedInverseDefault
 
 
-template< class ImpTraits >
-class MatrixBasedBase
-  : public OperatorInterface< ImpTraits >
-  , public Stuff::LA::ProvidesConstContainer< ImpTraits >
+template< class MatrixImp, class VectorType >
+class MatrixBasedDefault
+  : public OperatorInterface< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > >
+  , public Stuff::LA::ProvidesConstContainer< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > >
 {
-  typedef OperatorInterface< ImpTraits > BaseType;
+  typedef OperatorInterface< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > > BaseType;
 public:
-  typedef ImpTraits Traits;
-  typedef typename Traits::derived_type           ThisType;
-  typedef typename Traits::ScalarType             ScalarType;
-  typedef typename Traits::SourceType             SourceType;
-  typedef typename Traits::RangeType              RangeType;
-  typedef typename Traits::ContainerType          ContainerType;
-  typedef typename Traits::FrozenType             FrozenType;
-  typedef typename Traits::InverseType            InverseType;
-  typedef ContainerType MatrixType;
+  typedef internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > Traits;
+  typedef typename Traits::derived_type   ThisType;
+  typedef typename Traits::ScalarType     ScalarType;
+  typedef typename Traits::SourceType     SourceType;
+  typedef typename Traits::RangeType      RangeType;
+  typedef typename Traits::ContainerType  ContainerType;
+  typedef typename Traits::FrozenType     FrozenType;
+  typedef typename Traits::InverseType    InverseType;
 
+protected:
+  typedef MatrixImp MatrixType;
 private:
-  typedef Stuff::LA::Solver< MatrixType >  LinearSolverType;
+  typedef Stuff::LA::Solver< MatrixImp >  LinearSolverType;
   static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
                 "MatrixType has to be derived from Stuff::LA::MatrixInterface!");
 
@@ -158,11 +210,11 @@ public:
   /**
    * \attention This class takes ownership of matrix_ptr!
    */
-  MatrixBasedBase(const MatrixType* matrix_ptr)
+  MatrixBasedDefault(const MatrixType* matrix_ptr)
     : matrix_(matrix_ptr)
   {}
 
-  MatrixBasedBase(const std::shared_ptr< const MatrixType > matrix_ptr)
+  MatrixBasedDefault(const std::shared_ptr< const MatrixType > matrix_ptr)
     : matrix_(matrix_ptr)
   {}
 
@@ -237,7 +289,7 @@ public:
 
 private:
   std::shared_ptr< const ContainerType > matrix_;
-}; // class MatrixBasedBase
+}; // class MatrixBasedDefault
 
 
 } // namespace Operators

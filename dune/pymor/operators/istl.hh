@@ -18,32 +18,13 @@ namespace Operators {
 #if HAVE_DUNE_ISTL
 
 
-template< class ScalarImp = double >
-class IstlRowMajorSparse;
-
-template< class ScalarImp = double >
-class IstlRowMajorSparseInverse;
-
-
-template< class ScalarImp >
-class IstlRowMajorSparseInverseTraits
-{
-public:
-  typedef ScalarImp                                         ScalarType;
-  typedef IstlRowMajorSparseInverse< ScalarType >           derived_type;
-  typedef Stuff::LA::IstlRowMajorSparseMatrix< ScalarType > MatrixType;
-  typedef Stuff::LA::IstlDenseVector< ScalarType >          SourceType;
-  typedef Stuff::LA::IstlDenseVector< ScalarType >          RangeType;
-  typedef derived_type                                      FrozenType;
-  typedef IstlRowMajorSparse< ScalarType >                  InverseType;
-};
-
-
 template< class ScalarImp >
 class IstlRowMajorSparseInverse
-  : public MatrixBasedInverseBase< IstlRowMajorSparseInverseTraits< ScalarImp > >
+  : public MatrixBasedInverseDefault< Stuff::LA::IstlRowMajorSparseMatrix< ScalarImp >
+                                    , Stuff::LA::IstlDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedInverseBase< IstlRowMajorSparseInverseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedInverseDefault< Stuff::LA::IstlRowMajorSparseMatrix< ScalarImp >
+                                   , Stuff::LA::IstlDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
   using typename BaseType::LinearSolverType;
 
@@ -69,24 +50,12 @@ public:
 
 
 template< class ScalarImp >
-class IstlRowMajorSparseTraits
-{
-public:
-  typedef ScalarImp                                         ScalarType;
-  typedef IstlRowMajorSparse< ScalarType >                  derived_type;
-  typedef Stuff::LA::IstlRowMajorSparseMatrix< ScalarType > ContainerType;
-  typedef Stuff::LA::IstlDenseVector< ScalarType >          SourceType;
-  typedef Stuff::LA::IstlDenseVector< ScalarType >          RangeType;
-  typedef derived_type                                      FrozenType;
-  typedef IstlRowMajorSparseInverse< ScalarType >           InverseType;
-};
-
-
-template< class ScalarImp >
 class IstlRowMajorSparse
-  : public MatrixBasedBase< IstlRowMajorSparseTraits< ScalarImp > >
+  : public MatrixBasedDefault< Stuff::LA::IstlRowMajorSparseMatrix< ScalarImp >
+                             , Stuff::LA::IstlDenseVector< ScalarImp > >
 {
-  typedef MatrixBasedBase< IstlRowMajorSparseTraits< ScalarImp > > BaseType;
+  typedef MatrixBasedDefault< Stuff::LA::IstlRowMajorSparseMatrix< ScalarImp >
+                            , Stuff::LA::IstlDenseVector< ScalarImp > > BaseType;
   using typename BaseType::MatrixType;
 
 public:

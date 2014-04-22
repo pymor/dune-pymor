@@ -26,6 +26,7 @@ namespace Tags {
 
 
 class OperatorInterface {};
+
 class AffinelyDecomposedOperatorInterface : public OperatorInterface {};
 
 

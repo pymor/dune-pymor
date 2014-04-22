@@ -49,7 +49,7 @@ struct MatrixBasedOperatorTests
     typedef typename OperatorType::Traits         Traits;
     // * of the traits
     typedef typename Traits::derived_type T_derived_type;
-    static_assert(std::is_same< OperatorType, T_derived_type >::value,
+    static_assert(std::is_base_of< T_derived_type, OperatorType >::value,
                   "OperatorType::Traits::derived_type is wrong!");
     typedef typename Traits::SourceType   T_SourceType;
     typedef typename Traits::RangeType    T_RangeType;
