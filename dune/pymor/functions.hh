@@ -11,6 +11,7 @@
 
 #include <dune/common/parametertree.hh>
 
+#include <dune/stuff/common/memory.hh>
 #include <dune/stuff/functions.hh>
 
 #include "functions/interfaces.hh"
@@ -48,20 +49,18 @@ public:
       DUNE_PYMOR_THROW(Exception::wrong_input, "unknown function '" << type << "' requested!");
   } // ... defaultSettings(...)
 
-  static AffinelyDecomposableFunctionInterface< E, D, d, R, r, rC >*
-  create(const std::string type = available()[0], const ParameterTree settings = defaultSettings())
+  static std::unique_ptr< AffinelyDecomposableFunctionInterface< E, D, d, R, r, rC > >
+  create(const std::string type = available()[0], const Stuff::Common::ConfigTree settings = defaultSettings())
   {
-    typedef Function::NonparametricDefault< E, D, d, R, r, rC > NonparametricType;
-    auto dune_stuff_functions = Stuff::Functions< E, D, d, R, r, rC >::available();
-    for (auto dune_stuff_function : dune_stuff_functions)
-      if (type.compare(dune_stuff_function))
-        return new NonparametricType(Stuff::Functions< E, D, d, R, r, rC >::create(type, settings));
-    if (type.compare(Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::static_id()))
-      return Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::create(settings);
-    else if (type.compare(Function::Checkerboard< E, D, d, R, r, rC >::static_id()))
-      return Function::Checkerboard< E, D, d, R, r, rC >::create(settings);
-    else
-      DUNE_PYMOR_THROW(Exception::wrong_input, "unknown function '" << type << "' requested!");
+    if (type == Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::static_id())
+      return std::unique_ptr< Function::AffinelyDecomposableDefault< E, D, d, R, r, rC > >(Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::create(settings));
+    else if (type == Function::Checkerboard< E, D, d, R, r, rC >::static_id())
+      return std::unique_ptr< Function::Checkerboard< E, D, d, R, r, rC > >(Function::Checkerboard< E, D, d, R, r, rC >::create(settings));
+    else {
+      typedef Function::NonparametricDefault< E, D, d, R, r, rC > NonparametricType;
+      return Stuff::Common::make_unique< NonparametricType >(Stuff::Functions< E, D, d, R, r, rC >::create(type,
+                                                                                                           settings));
+    }
   } // ... create(...)
 }; // class AffinelyDecomposableFunctions
 
