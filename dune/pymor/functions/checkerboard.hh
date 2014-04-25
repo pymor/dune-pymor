@@ -85,7 +85,8 @@ public:
       BaseType::register_component(new NonparametricCheckerboardType(std::vector< DomainFieldType >(lowerLeft),
                                                                      std::vector< DomainFieldType >(upperRight),
                                                                      std::vector< size_t >(numElements),
-                                                                     std::move(indicator)),
+                                                                     std::move(indicator),
+                                                                     name + "_component_" + DSC::toString(ii)),
                                    new ParameterFunctional(parameterType,
                                                            parameterName + "[" + DSC::toString(ii) + "]"));
     } // create the coefficients and components
