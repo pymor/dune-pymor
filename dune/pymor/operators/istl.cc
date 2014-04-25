@@ -17,7 +17,8 @@ namespace Operators {
 
 template class IstlRowMajorSparseInverse< double >;
 template class IstlRowMajorSparse< double >;
-template class LinearAffinelyDecomposedContainerBased< IstlRowMajorSparse< double > >;
+template class LinearAffinelyDecomposedContainerBased< Stuff::LA::IstlRowMajorSparseMatrix< double >,
+                                                       Stuff::LA::IstlDenseVector< double > >;
 
 
 } // namespace Operators

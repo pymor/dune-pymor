@@ -10,8 +10,25 @@
 #include "eigen.hh"
 #include "affine.hh"
 
-template class Dune::Pymor::Operators::EigenRowMajorSparseInverse< double >;
-template class Dune::Pymor::Operators::EigenRowMajorSparse< double >;
-template class Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< Dune::Pymor::Operators::EigenRowMajorSparse< double > >;
+namespace Dune {
+namespace Pymor {
+namespace Operators {
+
+
+template class EigenRowMajorSparseInverse< double >;
+template class EigenRowMajorSparse< double >;
+template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenDenseMatrix< double >,
+                                                       Stuff::LA::EigenDenseVector< double > >;
+template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenDenseMatrix< double >,
+                                                       Stuff::LA::EigenMappedDenseVector< double > >;
+template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                       Stuff::LA::EigenDenseVector< double > >;
+template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                       Stuff::LA::EigenMappedDenseVector< double > >;
+
+
+} // namespace Operators
+} // namespace Pymor
+} // namespace Dune
 
 #endif // HAVE_EIGEN

@@ -11,6 +11,8 @@
 #include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/la/container/affine.hh>
+
+#include "base.hh"
 #include "interfaces.hh"
 
 namespace Dune {
@@ -18,45 +20,41 @@ namespace Pymor {
 namespace Operators {
 
 
-template< class OperatorType >
+template< class MatrixImp, class VectorImp >
 class LinearAffinelyDecomposedContainerBased;
 
 
-template< class OperatorType >
+template< class MatrixImp, class VectorImp >
 class LinearAffinelyDecomposedContainerBasedTraits
 {
 public:
-  typedef LinearAffinelyDecomposedContainerBased< OperatorType >  derived_type;
-  static_assert(std::is_base_of< Stuff::LA::ProvidesConstContainer< typename OperatorType::Traits >, OperatorType > ::value,
-                "OperatorType has to be derived from Stuff::LA::ProvidesContainer!");
-  typedef typename OperatorType::ContainerType                    ContainerType;
-  static_assert(std::is_base_of< OperatorInterface< typename OperatorType::Traits >, OperatorType > ::value,
-                "OperatorType has to be derived from OperatorInterface!");
-  typedef OperatorType                                            ComponentType;
-  typedef typename OperatorType::SourceType                       SourceType;
-  typedef typename OperatorType::RangeType                        RangeType;
-  typedef typename OperatorType::ScalarType                       ScalarType;
-  typedef typename OperatorType::FrozenType                       FrozenType;
-  typedef typename OperatorType::InverseType                      InverseType;
+  typedef LinearAffinelyDecomposedContainerBased< MatrixImp, VectorImp > derived_type;
+  typedef Operators::MatrixBasedDefault< MatrixImp, VectorImp > ComponentType;
+  typedef ComponentType                       FrozenType;
+  typedef typename ComponentType::SourceType  SourceType;
+  typedef typename ComponentType::RangeType   RangeType;
+  typedef typename ComponentType::ScalarType  ScalarType;
+  typedef typename ComponentType::InverseType InverseType;
 }; // class LinearAffinelyDecomposedContainerBasedTraits
 
 
-template< class OperatorType >
+template< class MatrixImp, class VectorImp >
 class LinearAffinelyDecomposedContainerBased
-  : public AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits < OperatorType > >
+  : public AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp > >
 {
-  typedef AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits < OperatorType > > BaseType;
+  typedef AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp > > BaseType;
 public:
-  typedef LinearAffinelyDecomposedContainerBasedTraits < OperatorType > Traits;
+  typedef LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp > Traits;
   typedef typename Traits::derived_type   ThisType;
-  typedef typename Traits::ContainerType  ContainerType;
   typedef typename Traits::ComponentType  ComponentType;
   typedef typename Traits::SourceType     SourceType;
   typedef typename Traits::RangeType      RangeType;
   typedef typename Traits::ScalarType     ScalarType;
   typedef typename Traits::FrozenType     FrozenType;
   typedef typename Traits::InverseType    InverseType;
-  typedef LA::AffinelyDecomposedConstContainer< ContainerType > AffinelyDecomposedContainerType;
+
+private:
+  typedef LA::AffinelyDecomposedConstContainer< MatrixImp > AffinelyDecomposedContainerType;
 
   LinearAffinelyDecomposedContainerBased(const AffinelyDecomposedContainerType affinelyDecomposedContainer)
     : BaseType(affinelyDecomposedContainer)
@@ -149,7 +147,7 @@ public:
     if (mu.type() != Parametric::parameter_type())
       DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
                        << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
-    return FrozenType(new ContainerType(affinelyDecomposedContainer_.freeze_parameter(mu)));
+    return FrozenType(new MatrixImp(affinelyDecomposedContainer_.freeze_parameter(mu)));
   }
 
 private:

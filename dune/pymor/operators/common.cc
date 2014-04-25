@@ -15,7 +15,8 @@ namespace Operators {
 
 template class CommonDenseInverse< double >;
 template class CommonDense< double >;
-template class LinearAffinelyDecomposedContainerBased< CommonDense< double > >;
+template class LinearAffinelyDecomposedContainerBased< Stuff::LA::CommonDenseMatrix< double >,
+                                                       Stuff::LA::CommonDenseVector< double > >;
 
 
 } // namespace Operators
