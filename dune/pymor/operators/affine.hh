@@ -56,6 +56,7 @@ public:
 private:
   typedef LA::AffinelyDecomposedConstContainer< MatrixImp > AffinelyDecomposedContainerType;
 
+public:
   LinearAffinelyDecomposedContainerBased(const AffinelyDecomposedContainerType affinelyDecomposedContainer)
     : BaseType(affinelyDecomposedContainer)
     , affinelyDecomposedContainer_(affinelyDecomposedContainer)
