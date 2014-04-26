@@ -10,6 +10,21 @@
 
 #include <dune/stuff/common/color.hh>
 
+namespace Dune {
+namespace Pymor {
+namespace Exceptions {
+
+
+class wrong_parameter_type : public Exception {};
+
+class wrong_parameter : public Exception {};
+
+
+} // namespace Exceptions
+} // namespace Pymor
+} // namespace Dune
+
+
 /**
  *  \brief Macro to throw an exception in dune-pymor.
  *
