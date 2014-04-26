@@ -10,11 +10,12 @@
 #include <string>
 
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/common/crtp.hh>
 
-#include <dune/pymor/common/crtp.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/functionals/interfaces.hh>
+#include <dune/pymor/la/container/affine.hh>
 
 namespace Dune {
 namespace Pymor {
@@ -32,16 +33,17 @@ class StationaryMultiscaleDiscretiztionInterface {};
 template< class Traits >
 class StationaryDiscretizationInterface
   : public Parametric
-  , public CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits >
+  , public Stuff::CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits >
   , public Tags::StationaryDiscretizationInterface
 {
-  typedef CRTPInterface< StationaryDiscretizationInterface< Traits >, Traits > CRTP;
 public:
   typedef typename Traits::derived_type   derived_type;
   typedef typename Traits::OperatorType   OperatorType;
   typedef typename Traits::FunctionalType FunctionalType;
   typedef typename Traits::ProductType    ProductType;
   typedef typename Traits::VectorType     VectorType;
+
+  typedef Pymor::LA::AffinelyDecomposedContainer< VectorType > AffinelyDecomposedVectorType;
 
   StationaryDiscretizationInterface(const ParameterType tt = ParameterType())
     : Parametric(tt)
@@ -53,8 +55,8 @@ public:
 
   OperatorType get_operator() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_operator());
-    return CRTP::as_imp(*this).get_operator();
+    CHECK_CRTP(this->as_imp(*this).get_operator());
+    return this->as_imp(*this).get_operator();
   }
 
   OperatorType* get_operator_and_return_ptr() const
@@ -64,8 +66,8 @@ public:
 
   FunctionalType get_rhs() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_rhs());
-    return CRTP::as_imp(*this).get_rhs();
+    CHECK_CRTP(this->as_imp(*this).get_rhs());
+    return this->as_imp(*this).get_rhs();
   }
 
   FunctionalType* get_rhs_and_return_ptr() const
@@ -75,14 +77,14 @@ public:
 
   std::vector< std::string > available_products() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).available_products());
-    return CRTP::as_imp(*this).available_products();
+    CHECK_CRTP(this->as_imp(*this).available_products());
+    return this->as_imp(*this).available_products();
   }
 
   ProductType get_product(const std::string id) const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).get_product(id));
-    return CRTP::as_imp(*this).get_product(id);
+    CHECK_CRTP(this->as_imp(*this).get_product(id));
+    return this->as_imp(*this).get_product(id);
   }
 
   ProductType* get_product_and_return_ptr(const std::string id) const
@@ -90,10 +92,27 @@ public:
     return new ProductType(get_product(id));
   }
 
+  std::vector< std::string > available_vectors() const
+  {
+    CHECK_CRTP(this->as_imp(*this).available_vectors());
+    return this->as_imp(*this).available_vectors();
+  }
+
+  AffinelyDecomposedVectorType get_vector(const std::string id) const
+  {
+    CHECK_CRTP(this->as_imp(*this).get_vector(id));
+    return this->as_imp(*this).get_vector(id);
+  }
+
+  VectorType* get_vector_and_return_ptr(const std::string id) const
+  {
+    return new VectorType(get_vector(id));
+  }
+
   VectorType create_vector() const
   {
-    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).create_vector());
-    return CRTP::as_imp(*this).create_vector();
+    CHECK_CRTP(this->as_imp(*this).create_vector());
+    return this->as_imp(*this).create_vector();
   }
 
   VectorType* create_vector_and_return_ptr() const
@@ -103,19 +122,19 @@ public:
 
 //  std::vector< std::string > solver_options() const
 //  {
-//    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options());
-//    return CRTP::as_imp(*this).solver_options();
+//    CHECK_CRTP(this->as_imp(*this).solver_options());
+//    return this->as_imp(*this).solver_options();
 //  }
 
 //  std::string solver_options(const std::string context) const
 //  {
-//    CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solver_options(context));
-//    return CRTP::as_imp(*this).solver_options(context);
+//    CHECK_CRTP(this->as_imp(*this).solver_options(context));
+//    return this->as_imp(*this).solver_options(context);
 //  }
 
   void solve(VectorType& vector, const Parameter mu = Parameter()) const
   {
-    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).solve(vector, mu));
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).solve(vector, mu));
   }
 
   VectorType solve(const Parameter mu = Parameter()) const
@@ -132,7 +151,7 @@ public:
 
   void visualize(const VectorType& vector, const std::string filename, const std::string name) const
   {
-    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).visualize(vector, filename, name));
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).visualize(vector, filename, name));
   }
 }; // class StationaryDiscretizationInterface
 
