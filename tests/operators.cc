@@ -105,113 +105,113 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 }
 
 
-template< class OperatorImp >
-struct LinearAffinelyDecomposedContainerBasedOperatorTest
-  : public ::testing::Test
-{
-  void check() const
-  {
-    // static tests
-    typedef Operators::LinearAffinelyDecomposedContainerBased< OperatorImp > OperatorType;
-    typedef typename OperatorType::Traits Traits;
-    // * of the traits
-    typedef typename Traits::derived_type T_derived_type;
-    static_assert(std::is_same< OperatorType, T_derived_type >::value,
-                  "OperatorType::Traits::derived_type is wrong!");
-    typedef typename Traits::ComponentType ComponentType;
-    // * of the class itself (aka the derived type)
-    typedef typename OperatorType::ComponentType  D_ComponentType;
-    typedef typename OperatorType::FrozenType     D_FrozenType;
-    typedef typename OperatorType::ScalarType     D_ScalarType;
-    typedef typename OperatorType::SourceType     D_SourceType;
-    typedef typename OperatorType::RangeType      D_RangeType;
-    typedef typename OperatorType::InverseType    D_InverseType;
-    // * of the class as the interface
-    typedef AffinelyDecomposedOperatorInterface< Traits > InterfaceType;
-    typedef typename InterfaceType::derived_type I_derived_type;
-    static_assert(std::is_same< OperatorType, I_derived_type >::value,
-                  "InterfaceType::derived_type is wrong!");
-    typedef typename InterfaceType::ComponentType I_ComponentType;
-    typedef typename InterfaceType::FrozenType    I_FrozenType;
-    typedef typename InterfaceType::ScalarType    I_ScalarType;
-    typedef typename InterfaceType::SourceType    I_SourceType;
-    typedef typename InterfaceType::RangeType     I_RangeType;
-    typedef typename InterfaceType::InverseType   I_InverseType;
-    // dynamic tests
-    // * of the class itself (aka the derived type)
-    typedef typename OperatorImp::ContainerType MatrixType;
-    typedef LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
-    AffinelyDecomposedMatrixType affinelyDecomposedMatrix(new MatrixType(Stuff::LA::Container< MatrixType >::create(dim)));
-    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
-                                                new ParameterFunctional("diffusion", 1, "diffusion[0]"));
-    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
-                                                new ParameterFunctional("force", 2, "force[0]"));
-    const Parameter mu = {{"diffusion", "force"},
-                          {{1.0}, {1.0, 1.0}}};
-    if (affinelyDecomposedMatrix.parameter_type() != mu.type())
-      DUNE_PYMOR_THROW(PymorException,
-                       "\nmu.type()                                 = " << mu.type()
-                       << "\naffinelyDecomposedMatrix.parameter_type() = "
-                       << affinelyDecomposedMatrix.parameter_type());
-    OperatorType d_operator(affinelyDecomposedMatrix);
-    if (!d_operator.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    if (d_operator.parameter_type() != mu.type())
-      DUNE_PYMOR_THROW(PymorException,
-                       "\nmu.type()                   = " << mu.type()
-                       << "\nd_operator.parameter_type() = " << d_operator.parameter_type());
-    const DUNE_STUFF_SSIZE_T d_num_components = d_operator.num_components();
-    if (d_num_components != 2) DUNE_PYMOR_THROW(PymorException, d_num_components);
-    for (unsigned int qq = 0; qq < d_num_components; ++qq) {
-      D_ComponentType component = d_operator.component(qq);
-      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-      ParameterFunctional DUNE_UNUSED(coefficient) = d_operator.coefficient(qq);
-    }
-    if (!d_operator.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
-    D_ComponentType d_affine_part = d_operator.affine_part();
-    if (d_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    D_FrozenType d_frozen = d_operator.freeze_parameter(mu);
-    if (d_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    D_SourceType d_source(dim, D_ScalarType(1));
-    D_RangeType d_range = d_operator.apply(d_source, mu);
-    D_RangeType d_frozen_apply = d_frozen.apply(d_source);
-    if (!d_range.almost_equal(d_frozen_apply)) DUNE_PYMOR_THROW(PymorException, "");
-    std::vector< std::string > d_invert_options = d_operator.invert_options();
-    D_InverseType d_inverse = d_operator.invert(d_invert_options[0], mu);
-    try {
-      d_inverse.apply(d_range, d_source);
-      d_operator.apply_inverse(d_source, d_range, d_invert_options[0], mu);
-    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
-    // * of the class as the interface
-    InterfaceType& i_operator = static_cast< InterfaceType& >(d_operator);
-    if (!i_operator.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    if (i_operator.parameter_type() != mu.type())
-      DUNE_PYMOR_THROW(PymorException,
-                       "\nmu.type()                   = " << mu.type()
-                       << "\ni_operator.parameter_type() = " << i_operator.parameter_type());
-    const DUNE_STUFF_SSIZE_T i_num_components = i_operator.num_components();
-    if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
-    for (DUNE_STUFF_SSIZE_T qq = 0; qq < i_num_components; ++qq) {
-      I_ComponentType component = i_operator.component(qq);
-      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-      ParameterFunctional DUNE_UNUSED(coefficient) = i_operator.coefficient(qq);
-    }
-    if (!i_operator.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
-    I_ComponentType i_affine_part = i_operator.affine_part();
-    if (i_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    I_FrozenType i_frozen = i_operator.freeze_parameter(mu);
-    if (i_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
-    I_SourceType i_source(dim, I_ScalarType(1));
-    I_RangeType i_range = i_operator.apply(i_source, mu);
-    I_RangeType i_frozen_apply = i_frozen.apply(i_source);
-    if (!i_range.almost_equal(i_frozen_apply)) DUNE_PYMOR_THROW(PymorException, "");
-    std::vector< std::string > i_invert_options = i_operator.invert_options();
-    I_InverseType i_inverse = i_operator.invert(i_invert_options[0], mu);
-    try {
-      i_inverse.apply(i_range, i_source);
-      i_operator.apply_inverse(i_source, i_range, i_invert_options[0], mu);
-    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
-  }
-}; // struct LinearAffinelyDecomposedContainerBasedOperatorTest
+//template< class OperatorImp >
+//struct LinearAffinelyDecomposedContainerBasedOperatorTest
+//  : public ::testing::Test
+//{
+//  void check() const
+//  {
+//    // static tests
+//    typedef Operators::LinearAffinelyDecomposedContainerBased< OperatorImp > OperatorType;
+//    typedef typename OperatorType::Traits Traits;
+//    // * of the traits
+//    typedef typename Traits::derived_type T_derived_type;
+//    static_assert(std::is_same< OperatorType, T_derived_type >::value,
+//                  "OperatorType::Traits::derived_type is wrong!");
+//    typedef typename Traits::ComponentType ComponentType;
+//    // * of the class itself (aka the derived type)
+//    typedef typename OperatorType::ComponentType  D_ComponentType;
+//    typedef typename OperatorType::FrozenType     D_FrozenType;
+//    typedef typename OperatorType::ScalarType     D_ScalarType;
+//    typedef typename OperatorType::SourceType     D_SourceType;
+//    typedef typename OperatorType::RangeType      D_RangeType;
+//    typedef typename OperatorType::InverseType    D_InverseType;
+//    // * of the class as the interface
+//    typedef AffinelyDecomposedOperatorInterface< Traits > InterfaceType;
+//    typedef typename InterfaceType::derived_type I_derived_type;
+//    static_assert(std::is_same< OperatorType, I_derived_type >::value,
+//                  "InterfaceType::derived_type is wrong!");
+//    typedef typename InterfaceType::ComponentType I_ComponentType;
+//    typedef typename InterfaceType::FrozenType    I_FrozenType;
+//    typedef typename InterfaceType::ScalarType    I_ScalarType;
+//    typedef typename InterfaceType::SourceType    I_SourceType;
+//    typedef typename InterfaceType::RangeType     I_RangeType;
+//    typedef typename InterfaceType::InverseType   I_InverseType;
+//    // dynamic tests
+//    // * of the class itself (aka the derived type)
+//    typedef typename OperatorImp::ContainerType MatrixType;
+//    typedef LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
+//    AffinelyDecomposedMatrixType affinelyDecomposedMatrix(new MatrixType(Stuff::LA::Container< MatrixType >::create(dim)));
+//    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
+//                                                new ParameterFunctional("diffusion", 1, "diffusion[0]"));
+//    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
+//                                                new ParameterFunctional("force", 2, "force[0]"));
+//    const Parameter mu = {{"diffusion", "force"},
+//                          {{1.0}, {1.0, 1.0}}};
+//    if (affinelyDecomposedMatrix.parameter_type() != mu.type())
+//      DUNE_PYMOR_THROW(PymorException,
+//                       "\nmu.type()                                 = " << mu.type()
+//                       << "\naffinelyDecomposedMatrix.parameter_type() = "
+//                       << affinelyDecomposedMatrix.parameter_type());
+//    OperatorType d_operator(affinelyDecomposedMatrix);
+//    if (!d_operator.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (d_operator.parameter_type() != mu.type())
+//      DUNE_PYMOR_THROW(PymorException,
+//                       "\nmu.type()                   = " << mu.type()
+//                       << "\nd_operator.parameter_type() = " << d_operator.parameter_type());
+//    const DUNE_STUFF_SSIZE_T d_num_components = d_operator.num_components();
+//    if (d_num_components != 2) DUNE_PYMOR_THROW(PymorException, d_num_components);
+//    for (unsigned int qq = 0; qq < d_num_components; ++qq) {
+//      D_ComponentType component = d_operator.component(qq);
+//      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//      ParameterFunctional DUNE_UNUSED(coefficient) = d_operator.coefficient(qq);
+//    }
+//    if (!d_operator.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
+//    D_ComponentType d_affine_part = d_operator.affine_part();
+//    if (d_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    D_FrozenType d_frozen = d_operator.freeze_parameter(mu);
+//    if (d_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    D_SourceType d_source(dim, D_ScalarType(1));
+//    D_RangeType d_range = d_operator.apply(d_source, mu);
+//    D_RangeType d_frozen_apply = d_frozen.apply(d_source);
+//    if (!d_range.almost_equal(d_frozen_apply)) DUNE_PYMOR_THROW(PymorException, "");
+//    std::vector< std::string > d_invert_options = d_operator.invert_options();
+//    D_InverseType d_inverse = d_operator.invert(d_invert_options[0], mu);
+//    try {
+//      d_inverse.apply(d_range, d_source);
+//      d_operator.apply_inverse(d_source, d_range, d_invert_options[0], mu);
+//    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
+//    // * of the class as the interface
+//    InterfaceType& i_operator = static_cast< InterfaceType& >(d_operator);
+//    if (!i_operator.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (i_operator.parameter_type() != mu.type())
+//      DUNE_PYMOR_THROW(PymorException,
+//                       "\nmu.type()                   = " << mu.type()
+//                       << "\ni_operator.parameter_type() = " << i_operator.parameter_type());
+//    const DUNE_STUFF_SSIZE_T i_num_components = i_operator.num_components();
+//    if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
+//    for (DUNE_STUFF_SSIZE_T qq = 0; qq < i_num_components; ++qq) {
+//      I_ComponentType component = i_operator.component(qq);
+//      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//      ParameterFunctional DUNE_UNUSED(coefficient) = i_operator.coefficient(qq);
+//    }
+//    if (!i_operator.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
+//    I_ComponentType i_affine_part = i_operator.affine_part();
+//    if (i_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    I_FrozenType i_frozen = i_operator.freeze_parameter(mu);
+//    if (i_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    I_SourceType i_source(dim, I_ScalarType(1));
+//    I_RangeType i_range = i_operator.apply(i_source, mu);
+//    I_RangeType i_frozen_apply = i_frozen.apply(i_source);
+//    if (!i_range.almost_equal(i_frozen_apply)) DUNE_PYMOR_THROW(PymorException, "");
+//    std::vector< std::string > i_invert_options = i_operator.invert_options();
+//    I_InverseType i_inverse = i_operator.invert(i_invert_options[0], mu);
+//    try {
+//      i_inverse.apply(i_range, i_source);
+//      i_operator.apply_inverse(i_source, i_range, i_invert_options[0], mu);
+//    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
+//  }
+//}; // struct LinearAffinelyDecomposedContainerBasedOperatorTest
 
 
 //TYPED_TEST_CASE(LinearAffinelyDecomposedContainerBasedOperatorTest, MatrixBasedOperatorTypes);
