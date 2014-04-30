@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 
+#include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/common/crtp.hh>
 
@@ -106,7 +107,10 @@ public:
 
   VectorType* get_vector_and_return_ptr(const std::string id) const
   {
-    return new VectorType(get_vector(id));
+    auto vec = get_vector(id);
+    if (vec.parametric())
+      DUNE_THROW_COLORFULLY(NotImplemented, "Not implemented yet for parametric vectors!");
+    return new VectorType(*(vec.affine_part()));
   }
 
   VectorType create_vector() const
