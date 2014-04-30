@@ -22,7 +22,7 @@
 using namespace Dune;
 using namespace Pymor;
 
-static const size_t dim = 4;
+static const size_t test_dim = 4;
 
 
 typedef testing::Types<
@@ -76,18 +76,18 @@ struct MatrixBasedOperatorTests
                   "OperatorType has to be derived from Stuff::LA::ProvidesConstContainer!");
     // dynamic tests
     // * of the class itself (aka the derived type)
-    OperatorType d_from_ptr(new D_ContainerType(Stuff::LA::Container< D_ContainerType >::create(dim)));
-    OperatorType d_from_shared_ptr(std::make_shared< D_ContainerType >(Stuff::LA::Container< D_ContainerType >::create(dim)));
+    OperatorType d_from_ptr(new D_ContainerType(Stuff::LA::Container< D_ContainerType >::create(test_dim)));
+    OperatorType d_from_shared_ptr(std::make_shared< D_ContainerType >(Stuff::LA::Container< D_ContainerType >::create(test_dim)));
     d_from_shared_ptr = d_from_ptr;
     OperatorType DUNE_UNUSED(d_copy_constructor)(d_from_ptr); // <- at this point, all operators share the same matrix!
     const bool d_linear = d_from_ptr.linear();
     if (!d_linear) DUNE_PYMOR_THROW(PymorException, "");
     if (d_from_ptr.parametric()) DUNE_PYMOR_THROW(PymorException, "");
     const DUNE_STUFF_SSIZE_T d_dim_source = d_from_ptr.dim_source();
-    if (d_dim_source != dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
+    if (d_dim_source != test_dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
     const DUNE_STUFF_SSIZE_T d_dim_range = d_from_ptr.dim_range();
-    if (d_dim_range != dim) DUNE_PYMOR_THROW(PymorException, d_dim_range);
-    D_SourceType source = Stuff::LA::Container< D_SourceType >::create(dim);
+    if (d_dim_range != test_dim) DUNE_PYMOR_THROW(PymorException, d_dim_range);
+    D_SourceType source = Stuff::LA::Container< D_SourceType >::create(test_dim);
     D_SourceType range = d_from_ptr.apply(source);
     d_from_ptr.apply(source, range);
     D_ScalarType DUNE_UNUSED(d_apply2) = d_from_ptr.apply2(range, source);
@@ -143,10 +143,10 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 //    // * of the class itself (aka the derived type)
 //    typedef typename OperatorImp::ContainerType MatrixType;
 //    typedef LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
-//    AffinelyDecomposedMatrixType affinelyDecomposedMatrix(new MatrixType(Stuff::LA::Container< MatrixType >::create(dim)));
-//    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
+//    AffinelyDecomposedMatrixType affinelyDecomposedMatrix(new MatrixType(Stuff::LA::Container< MatrixType >::create(test_dim)));
+//    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(test_dim))),
 //                                                new ParameterFunctional("diffusion", 1, "diffusion[0]"));
-//    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(dim))),
+//    affinelyDecomposedMatrix.register_component(new MatrixType((Stuff::LA::Container< MatrixType >::create(test_dim))),
 //                                                new ParameterFunctional("force", 2, "force[0]"));
 //    const Parameter mu = {{"diffusion", "force"},
 //                          {{1.0}, {1.0, 1.0}}};
