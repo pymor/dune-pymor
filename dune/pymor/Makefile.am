@@ -16,6 +16,7 @@ libpymor_la_SOURCES = \
   functions/default.cc \
   functions/interfaces.cc \
   operators/base.cc \
+  operators/affine.cc \
   parameters/base.cc \
   parameters/functional.cc
 
