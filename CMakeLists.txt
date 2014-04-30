@@ -41,6 +41,7 @@ add_dune_modules(
   fem
   fem-localfunctions
   pdelab
+  typetree
   localfunctions
   grid-multiscale
   grid
