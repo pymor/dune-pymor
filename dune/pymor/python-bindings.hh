@@ -17,10 +17,8 @@
 #include <dune/pymor/functionals/default.hh>
 #include <dune/pymor/functionals/interfaces.hh>
 #include <dune/pymor/la/container/affine.hh>
+#include <dune/pymor/operators/base.hh>
 #include <dune/pymor/operators/affine.hh>
-#include <dune/pymor/operators/common.hh>
-#include <dune/pymor/operators/eigen.hh>
-#include <dune/pymor/operators/istl.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
