@@ -17,9 +17,7 @@
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/operators/interfaces.hh>
 #include <dune/pymor/operators/affine.hh>
-#include <dune/pymor/operators/common.hh>
-#include <dune/pymor/operators/eigen.hh>
-#include <dune/pymor/operators/istl.hh>
+#include <dune/pymor/operators/base.hh>
 
 using namespace Dune;
 using namespace Pymor;
@@ -28,13 +26,17 @@ static const size_t dim = 4;
 
 
 typedef testing::Types<
-                        Pymor::Operators::CommonDense< double >
+                        Pymor::Operators::MatrixBasedDefault< Stuff::LA::CommonDenseMatrix< double >,
+                                                              Stuff::LA::CommonDenseVector< double > >
 #if HAVE_EIGEN
-                      , Pymor::Operators::EigenDense< double >
-                      , Pymor::Operators::EigenRowMajorSparse< double >
+                      , Pymor::Operators::MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< double >,
+                                                              Stuff::LA::EigenDenseVector< double > >
+                      , Pymor::Operators::MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                              Stuff::LA::EigenDenseVector< double > >
 #endif // HAVE_EIGEN
 #if HAVE_DUNE_ISTL
-                      , Pymor::Operators::IstlRowMajorSparse< double >
+                      , Pymor::Operators::MatrixBasedDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
+                                                              Stuff::LA::IstlDenseVector< double > >
 #endif
                       > MatrixBasedOperatorTypes;
 
