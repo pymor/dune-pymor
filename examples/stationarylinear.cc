@@ -99,7 +99,6 @@ SimpleDiscretization::SimpleDiscretization(const AnalyticalProblem* prob)
   : problem_(prob)
   , dim_(prob->dim())
 {
-  typedef typename OperatorType::ContainerType MatrixType;
   typedef Dune::Pymor::LA::AffinelyDecomposedConstContainer< MatrixType > AffinelyDecomposedMatrixType;
   AffinelyDecomposedMatrixType diffusionMatrix;
   // left hand side
