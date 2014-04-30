@@ -27,13 +27,16 @@ if __name__ == '__main__':
     # add example user code
     inject_Example(module)
     # add the users discretization
+    MatrixType = 'Dune::Stuff::LA::CommonDenseMatrix< double >'
+    VectorType = 'Dune::Stuff::LA::CommonDenseVector< double >'
+    OperatorType = 'Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< ' + MatrixType + ', ' + VectorType + ' >'
     discretization = inject_StationaryDiscretizationImplementation(
         module, exceptions, interfaces, CONFIG_H,
         'Example::SimpleDiscretization',
-        Traits={'VectorType': 'Dune::Stuff::LA::CommonDenseVector< double >',
-                'OperatorType': 'Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< Dune::Pymor::Operators::CommonDense< double > >',
-                'FunctionalType': 'Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< Dune::Stuff::LA::CommonDenseVector< double > >',
-                'ProductType': 'Dune::Pymor::Operators::LinearAffinelyDecomposedContainerBased< Dune::Pymor::Operators::CommonDense< double > >'})
+        Traits={'VectorType': VectorType,
+                'OperatorType': OperatorType,
+                'FunctionalType': 'Dune::Pymor::Functionals::LinearAffinelyDecomposedVectorBased< ' + VectorType + ' >',
+                'ProductType': OperatorType})
     # and add the custom constructor to the discretization
     discretization.add_constructor([param('const Example::AnalyticalProblem *', 'prob', transfer_ownership=True)])
     # and finally write the pybindgen .cc file
