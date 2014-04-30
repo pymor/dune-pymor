@@ -76,7 +76,7 @@ public:
     // build parameter
     const ParameterType parameterType(parameterName, parameterSize);
     // create the coefficients and components
-    typedef Dune::Stuff::Function::Checkerboard
+    typedef Dune::Stuff::Functions::Checkerboard
         < EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
       NonparametricCheckerboardType;
     for (size_t ii = 0; ii < parameterSize; ++ii) {

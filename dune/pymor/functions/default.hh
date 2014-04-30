@@ -308,7 +308,7 @@ public:
 
   {
     DSC::ExtendedParameterTree settings;
-    typedef Stuff::Functions< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
+    typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
         NonparametricFunctions;
     const std::string nonparametricType = NonparametricFunctions::available()[0];
     settings.add(NonparametricFunctions::defaultSettings(nonparametricType), "component.0");
@@ -335,7 +335,7 @@ public:
   static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
 
   {
-    typedef Stuff::Functions< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
+    typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
         NonparametricFunctions;
     const std::string name = settings.get< std::string >("name", static_id());
     ThisType* ret = new ThisType(name);

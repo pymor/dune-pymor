@@ -29,7 +29,7 @@ class AnalyticalProblem
   : public Dune::Pymor::Parametric
 {
 public:
-  typedef Dune::Stuff::Function::Constant< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
+  typedef Dune::Stuff::Functions::Constant< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
     ConstantFunctionType;
   typedef Dune::Pymor::Function::AffinelyDecomposableDefault< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
     FunctionType;
