@@ -53,7 +53,7 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
     # add interface if necessary
     if not 'Dune::Pymor::Tags::StationaryDiscretizationInterface' in interfaces:
         (interfaces['Dune::Pymor::Tags::StationaryDiscretizationInterface']
-         ) = module.add_class('Dune::Pymor::Tags::StationaryDiscretizationInterface')
+         ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Tags').add_class('StationaryDiscretizationInterface')
     namespace = module
     namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
     name = name.split('::')[-1].strip()
@@ -234,10 +234,10 @@ try:
         # add interface if necessary
         if not 'Dune::Pymor::Tags::StationaryDiscretizationInterface' in interfaces:
             (interfaces['Dune::Pymor::Tags::StationaryDiscretizationInterface']
-             ) = module.add_class('Dune::Pymor::Tags::StationaryDiscretizationInterface')
+             ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Tags').add_class('StationaryDiscretizationInterface')
         if not 'Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface' in interfaces:
             (interfaces['Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface']
-             ) = module.add_class('Dune::Pymor::Tags::StationaryMultiscaleDiscretiztionInterface')
+             ) = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor').add_cpp_namespace('Tags').add_class('StationaryMultiscaleDiscretiztionInterface')
         namespace = module
         namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
         name = name.split('::')[-1].strip()
