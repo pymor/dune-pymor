@@ -21,7 +21,7 @@ def inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H):
     ParameterFunctional.add_copy_constructor()
     ParameterFunctional.add_constructor([param('const Dune::Pymor::ParameterType&', 'tt'),
                                          param('const std::string', 'exp')],
-                                        throw=[exceptions['sizes_do_not_match']])
+                                        throw=[exceptions['Exception']])
     ParameterFunctional.add_method('expression', retval('const std::string'), [], is_const=True)
     ParameterFunctional.add_method('report', retval('std::string'), [], is_const=True)
     ParameterFunctional.add_method('report',
@@ -31,7 +31,7 @@ def inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H):
     ParameterFunctional.add_method('evaluate',
                                    'double',
                                    [param('const Parameter&', 'mu')],
-                                   throw=[exceptions['wrong_parameter_type']],
+                                   throw=[exceptions['Exception']],
                                    is_const=True)
     ParameterFunctional.allow_subclassing = True
     return module, ParameterFunctional

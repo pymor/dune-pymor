@@ -94,196 +94,196 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                                           template_parameters=inverse_template_parameters)
     # fill the operator
     Operator.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+                        throw=[exceptions['Exception']])
     Operator.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
-                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+                        throw=[exceptions['Exception']])
     Operator.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
-                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+                        throw=[exceptions['Exception']])
     Operator.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
-                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+                        throw=[exceptions['Exception']])
     Operator.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
-                        throw=[exceptions['PymorException'], exceptions['DuneException']])
+                        throw=[exceptions['Exception']])
     Operator.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
-                        throw=[exceptions['PymorException'], exceptions['DuneException']])
-    Operator.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+                        throw=[exceptions['Exception']])
+    Operator.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('dim_source',
                         retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                        [], is_const=True, throw=[exceptions['PymorException']])
+                        [], is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('dim_range',
                         retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                        [], is_const=True, throw=[exceptions['PymorException']])
+                        [], is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply', None,
                         [param('const ' + operator_SourceType + ' &', 'source'),
                          param(operator_RangeType + ' &', 'range')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply', None,
                         [param('const ' + operator_SourceType + ' &', 'source'),
                          param(operator_RangeType + ' &', 'range'),
                          param('Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply_and_return_ptr',
                         retval(operator_RangeType + ' *', caller_owns_return=True),
                         [param('const ' + operator_SourceType + ' &', 'source')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='apply')
     Operator.add_method('apply_and_return_ptr',
                         retval(operator_RangeType + ' *', caller_owns_return=True),
                         [param('const ' + operator_SourceType + ' &', 'source'),
                          param('Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='apply')
     Operator.add_method('apply2', operator_ScalarType,
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param('const ' + operator_SourceType + ' &', 'source')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply2', operator_ScalarType,
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param('const ' + operator_SourceType + ' &', 'source'),
                          param('Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('invert_options',
                         retval('std::vector< std::string >'),
-                        [], is_const=True, is_static=True, throw=[exceptions['PymorException']])
+                        [], is_const=True, is_static=True, throw=[exceptions['Exception']])
     Operator.add_method('invert_and_return_ptr',
                         retval(operator_InverseType + ' *', caller_owns_return=True),
-                        [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                        [], is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Operator.add_method('invert_and_return_ptr',
                         retval(operator_InverseType + ' *', caller_owns_return=True),
                         [param('const std::string', 'option')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Operator.add_method('invert_and_return_ptr',
                         retval(operator_InverseType + ' *', caller_owns_return=True),
                         [param('const std::string', 'option'),
                          param('Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Operator.add_method('apply_inverse', None,
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param(operator_SourceType + ' &', 'source')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply_inverse', None,
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param(operator_SourceType + ' &', 'source'),
                          param('const std::string', 'option')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply_inverse', None,
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param(operator_SourceType + ' &', 'source'),
                          param('const std::string', 'option'),
                          param('const Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']])
+                        is_const=True, throw=[exceptions['Exception']])
     Operator.add_method('apply_inverse_and_return_ptr',
                         retval(operator_SourceType + ' *', caller_owns_return=True),
                         [param('const ' + operator_RangeType + ' &', 'range')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Operator.add_method('apply_inverse_and_return_ptr',
                         retval(operator_SourceType + ' *', caller_owns_return=True),
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param('const std::string', 'option')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Operator.add_method('apply_inverse_and_return_ptr',
                         retval(operator_SourceType + ' *', caller_owns_return=True),
                         [param('const ' + operator_RangeType + ' &', 'range'),
                          param('const std::string', 'option'),
                          param('const Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Operator.add_method('freeze_parameter_and_return_ptr',
                         retval(operator_FrozenType + ' *', caller_owns_return=True),
                         [param('Dune::Pymor::Parameter', 'mu')],
-                        is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
+                        is_const=True, throw=[exceptions['Exception']], custom_name='freeze_parameter')
     # fill the inverse
     Inverse.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+                       throw=[exceptions['Exception']])
     Inverse.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
-                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+                       throw=[exceptions['Exception']])
     Inverse.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
-                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+                       throw=[exceptions['Exception']])
     Inverse.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
-                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+                       throw=[exceptions['Exception']])
     Inverse.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
-                       throw=[exceptions['PymorException'], exceptions['DuneException']])
+                       throw=[exceptions['Exception']])
     Inverse.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
-                       throw=[exceptions['PymorException'], exceptions['DuneException']])
-    Inverse.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+                       throw=[exceptions['Exception']])
+    Inverse.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('dim_source',
                        retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                       [], is_const=True, throw=[exceptions['PymorException']])
+                       [], is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('dim_range',
                        retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                       [], is_const=True, throw=[exceptions['PymorException']])
+                       [], is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply', None,
                        [param('const ' + inverse_SourceType + ' &', 'source'),
                         param(inverse_RangeType + ' &', 'range')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply', None,
                        [param('const ' + inverse_SourceType + ' &', 'source'),
                         param(inverse_RangeType + ' &', 'range'),
                         param('Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply_and_return_ptr',
                        retval(inverse_RangeType + ' *', caller_owns_return=True),
                        [param('const ' + inverse_SourceType + ' &', 'source')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='apply')
     Inverse.add_method('apply_and_return_ptr',
                        retval(inverse_RangeType + ' *', caller_owns_return=True),
                        [param('const ' + inverse_SourceType + ' &', 'source'),
                         param('Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='apply')
     Inverse.add_method('apply2', inverse_ScalarType,
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param('const ' + inverse_SourceType + ' &', 'source')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply2', inverse_ScalarType,
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param('const ' + inverse_SourceType + ' &', 'source'),
                         param('Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('invert_options',
                        retval('std::vector< std::string >'),
-                       [], is_const=True, throw=[exceptions['PymorException']])
+                       [], is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('invert_and_return_ptr',
                        retval(inverse_InverseType + ' *', caller_owns_return=True),
-                       [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                       [], is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Inverse.add_method('invert_and_return_ptr',
                        retval(inverse_InverseType + ' *', caller_owns_return=True),
                        [param('const std::string', 'option')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Inverse.add_method('invert_and_return_ptr',
                        retval(inverse_InverseType + ' *', caller_owns_return=True),
                        [param('const std::string', 'option'),
                         param('Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Inverse.add_method('apply_inverse', None,
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param(inverse_SourceType + ' &', 'source')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply_inverse', None,
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param(inverse_SourceType + ' &', 'source'),
                         param('const std::string', 'option')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply_inverse', None,
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param(inverse_SourceType + ' &', 'source'),
                         param('const std::string', 'option'),
                         param('const Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']])
+                       is_const=True, throw=[exceptions['Exception']])
     Inverse.add_method('apply_inverse_and_return_ptr',
                        retval(inverse_SourceType + ' *', caller_owns_return=True),
                        [param('const ' + inverse_RangeType + ' &', 'range')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Inverse.add_method('apply_inverse_and_return_ptr',
                        retval(inverse_SourceType + ' *', caller_owns_return=True),
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param('const std::string', 'option')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Inverse.add_method('apply_inverse_and_return_ptr',
                        retval(inverse_SourceType + ' *', caller_owns_return=True),
                        [param('const ' + inverse_RangeType + ' &', 'range'),
                         param('const std::string', 'option'),
                         param('const Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Inverse.add_method('freeze_parameter_and_return_ptr',
                        retval(inverse_FrozenType + ' *', caller_owns_return=True),
                        [param('Dune::Pymor::Parameter', 'mu')],
-                       is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
+                       is_const=True, throw=[exceptions['Exception']], custom_name='freeze_parameter')
     return Operator, Inverse
 
 
@@ -405,122 +405,122 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['PymorException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('num_components',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['PymorException']])
+                     [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('component_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),
                      [param('const int', 'qq')],
                      is_const=True,
-                     throw=[exceptions['PymorException']],
+                     throw=[exceptions['Exception']],
                      custom_name='component')
     Class.add_method('coefficient_and_return_ptr',
                      retval('Dune::Pymor::ParameterFunctional *', caller_owns_return=True),
                      [param('const int', 'qq')],
                      is_const=True,
-                     throw=[exceptions['PymorException']],
+                     throw=[exceptions['Exception']],
                      custom_name='coefficient')
-    Class.add_method('has_affine_part', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('has_affine_part', retval('bool'), [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('affine_part_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),
                      [],
                      is_const=True,
-                     throw=[exceptions['PymorException']],
+                     throw=[exceptions['Exception']],
                      custom_name='affine_part')
-    Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['PymorException']])
+    Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('dim_source',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['PymorException']])
+                     [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('dim_range',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['PymorException']])
+                     [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply', None,
                      [param('const ' + SourceType + ' &', 'source'),
                       param(RangeType + ' &', 'range')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply', None,
                      [param('const ' + SourceType + ' &', 'source'),
                       param(RangeType + ' &', 'range'),
                       param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply_and_return_ptr',
                      retval(RangeType + ' *', caller_owns_return=True),
                      [param('const ' + SourceType + ' &', 'source')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='apply')
     Class.add_method('apply_and_return_ptr',
                      retval(RangeType + ' *', caller_owns_return=True),
                      [param('const ' + SourceType + ' &', 'source'),
                       param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='apply')
     Class.add_method('apply2', ScalarType,
                      [param('const ' + RangeType + ' &', 'range'),
                       param('const ' + SourceType + ' &', 'source')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply2', ScalarType,
                      [param('const ' + RangeType + ' &', 'range'),
                       param('const ' + SourceType + ' &', 'source'),
                       param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('invert_options',
                      retval('std::vector< std::string >'),
-                     [], is_const=True, throw=[exceptions['PymorException']])
+                     [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('invert_and_return_ptr',
                      retval(InverseType + ' *', caller_owns_return=True),
-                     [], is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                     [], is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Class.add_method('invert_and_return_ptr',
                      retval(InverseType + ' *', caller_owns_return=True),
                      [param('const std::string', 'option')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Class.add_method('invert_and_return_ptr',
                      retval(InverseType + ' *', caller_owns_return=True),
                      [param('const std::string', 'option'),
                       param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='invert')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='invert')
     Class.add_method('apply_inverse', None,
                      [param('const ' + RangeType + ' &', 'range'),
                       param(SourceType + ' &', 'source')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply_inverse', None,
                      [param('const ' + RangeType + ' &', 'range'),
                       param(SourceType + ' &', 'source'),
                       param('const std::string', 'option')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply_inverse', None,
                      [param('const ' + RangeType + ' &', 'range'),
                       param(SourceType + ' &', 'source'),
                       param('const std::string', 'option'),
                       param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('apply_inverse_and_return_ptr',
                      retval(SourceType + ' *', caller_owns_return=True),
                      [param('const ' + RangeType + ' &', 'range')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Class.add_method('apply_inverse_and_return_ptr',
                      retval(SourceType + ' *', caller_owns_return=True),
                      [param('const ' + RangeType + ' &', 'range'),
                       param('const std::string', 'option')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Class.add_method('apply_inverse_and_return_ptr',
                      retval(SourceType + ' *', caller_owns_return=True),
                      [param('const ' + RangeType + ' &', 'range'),
                       param('const std::string', 'option'),
                       param('const Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='apply_inverse')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='apply_inverse')
     Class.add_method('freeze_parameter_and_return_ptr',
                      retval(FrozenType + ' *', caller_owns_return=True),
                      [param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['PymorException']], custom_name='freeze_parameter')
+                     is_const=True, throw=[exceptions['Exception']], custom_name='freeze_parameter')
     return Class
 
 

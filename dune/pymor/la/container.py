@@ -68,21 +68,21 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_copy_constructor()
     # what we want from ContainerInterface
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['DuneException']])
-    Class.add_method('copy', retval(ThisType), [], is_const=True, throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
+    Class.add_method('copy', retval(ThisType), [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('scal',
                      None,
                      [param('const ' + ScalarType + ' &', 'alpha')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('axpy',
                      None,
                      [param('const ' + ScalarType + ' &', 'alpha'),
                       param('const ' + ThisType + ' &', 'xx')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('has_equal_shape',
                      'bool',
                      [param('const ' + ThisType + ' &', 'other')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     # what we want from ProvidesData interface
     if provides_data:
         Class.add_method('data', BufferReturn(ScalarType + ' *', 'self->obj->size()  * sizeof(' + ScalarType + ')'), [])
@@ -91,84 +91,84 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      retval('bool'),
                      [param('const ' + ThisType + ' &', 'other'),
                       param('const ' + ScalarType, 'epsilon')],
-                     is_const=True, throw=[exceptions['DuneException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('almost_equal',
                      retval('bool'),
                      [param('const ' + ThisType + ' &', 'other')],
-                     is_const=True, throw=[exceptions['DuneException']])
+                     is_const=True, throw=[exceptions['Exception']])
     Class.add_method('dot',
                      retval(ScalarType),
                      [param('const ' + ThisType + ' &', 'other')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
-    Class.add_method('l1_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['DuneException']])
-    Class.add_method('l2_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['DuneException']])
-    Class.add_method('sup_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
+    Class.add_method('l1_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['Exception']])
+    Class.add_method('l2_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['Exception']])
+    Class.add_method('sup_norm', retval(ScalarType), [], is_const=True, throw=[exceptions['Exception']])
     Class.add_method('add',
                      None,
                      [param('const ' + ThisType + ' &', 'other'),
                       param(ThisType + ' &', 'result')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('add',
                      retval(ThisType),
                      [param('const ' + ThisType + ' &', 'other')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('iadd',
                      None,
                      [param('const ' + ThisType + ' &', 'other')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('sub',
                      None,
                      [param('const ' + ThisType + ' &', 'other'),
                       param(ThisType + ' &', 'result')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('sub',
                      retval(ThisType),
                      [param('const ' + ThisType + ' &', 'other')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('isub',
                      None,
                      [param('const ' + ThisType + ' &', 'other')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('pb_dim',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                      [],
                      is_const=True,
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='dim')
     Class.add_method('pb_add_to_entry',
                      None,
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
                       param('const ' + ScalarType + ' &', 'value')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='add_to_entry')
     Class.add_method('pb_set_entry',
                      None,
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
                       param('const ' + ScalarType + ' &', 'value')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='set_entry')
     Class.add_method('pb_get_entry',
                      retval(ScalarType),
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      is_const=True,
                      custom_name='get_entry')
     Class.add_method('pb_amax',
                      retval('std::vector< ' + ScalarType + ' >'),
                      [],
                      is_const=True,
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='amax')
     Class.add_method('components',
                      retval('std::vector< ' + ScalarType + ' >'),
                      [param('const std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + '> &', 'component_indices')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
 
 
     return module, Class
@@ -211,69 +211,69 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_constructor([])
     # what we want from ContainerInterface
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['DuneException'], exceptions['DuneException']])
+                     throw=[exceptions['Exception'], exceptions['Exception']])
     Class.add_method('copy',
                      retval(ThisType),
                      [],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('scal',
                      None,
                      [param('const ' + ScalarType + ' &', 'alpha')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('axpy',
                      None,
                      [param('const ' + ScalarType + ' &', 'alpha'),
                       param('const ' + ThisType + ' &', 'xx')],
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     Class.add_method('has_equal_shape',
                      retval('bool'),
                      [param('const ' + ThisType + ' &', 'other')],
                      is_const=True,
-                     throw=[exceptions['DuneException']])
+                     throw=[exceptions['Exception']])
     # what we want from MatrixInterface
     Class.add_method('pb_rows',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['DuneException']],
+                     [], is_const=True, throw=[exceptions['Exception']],
                      custom_name='rows')
     Class.add_method('pb_cols',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['DuneException']],
+                     [], is_const=True, throw=[exceptions['Exception']],
                      custom_name='cols')
     Class.add_method('pb_add_to_entry',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
                             param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj'),
                             param(ScalarType, 'value')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='add_to_entry')
     Class.add_method('pb_set_entry',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
                             param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj'),
                             param(ScalarType, 'value')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='set_entry')
     Class.add_method('pb_get_entry',
                      retval(ScalarType),
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
                       param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
-                     is_const=True, throw=[exceptions['DuneException']],
+                     is_const=True, throw=[exceptions['Exception']],
                      custom_name='set_entry')
     return module, Class
     Class.add_method('pb_clear_row',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='clear_row')
     Class.add_method('pb_unit_col',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='unit_col')
     Class.add_method('pb_clear_row',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='clear_row')
     Class.add_method('pb_unit_col',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
-                     throw=[exceptions['DuneException']],
+                     throw=[exceptions['Exception']],
                      custom_name='unit_col')
 
 
