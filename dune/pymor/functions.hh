@@ -9,8 +9,7 @@
 #include <string>
 #include <vector>
 
-#include <dune/common/parametertree.hh>
-
+#include <dune/stuff/common/configtree.hh>
 #include <dune/stuff/common/memory.hh>
 #include <dune/stuff/functions.hh>
 
@@ -35,27 +34,26 @@ public:
     return availableFunctions;
   } // ... available(...)
 
-  static Dune::ParameterTree defaultSettings(const std::string type = available()[0])
+  static Stuff::Common::ConfigTree default_config(const std::string type = available()[0])
   {
     if (type == Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::static_id())
-      return Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::defaultSettings();
+      return Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::default_config();
     else if (type == Function::Checkerboard< E, D, d, R, r, rC >::static_id())
-      return Function::Checkerboard< E, D, d, R, r, rC >::defaultSettings();
+      return Function::Checkerboard< E, D, d, R, r, rC >::default_config();
     else
-      return Stuff::FunctionsProvider< E, D, d, R, r, rC >::defaultSettings(type);
-  } // ... defaultSettings(...)
+      return Stuff::FunctionsProvider< E, D, d, R, r, rC >::default_config(type);
+  } // ... default_config(...)
 
-  static std::unique_ptr< AffinelyDecomposableFunctionInterface< E, D, d, R, r, rC > >
-  create(const std::string type = available()[0], const Stuff::Common::ConfigTree settings = defaultSettings())
+      static std::unique_ptr< AffinelyDecomposableFunctionInterface< E, D, d, R, r, rC > >
+  create(const std::string type = available()[0], const Stuff::Common::ConfigTree config = default_config())
   {
     if (type == Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::static_id())
-      return std::unique_ptr< Function::AffinelyDecomposableDefault< E, D, d, R, r, rC > >(Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::create(settings));
+      return Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::create(config);
     else if (type == Function::Checkerboard< E, D, d, R, r, rC >::static_id())
-      return std::unique_ptr< Function::Checkerboard< E, D, d, R, r, rC > >(Function::Checkerboard< E, D, d, R, r, rC >::create(settings));
+      return Function::Checkerboard< E, D, d, R, r, rC >::create(config);
     else {
       typedef Function::NonparametricDefault< E, D, d, R, r, rC > NonparametricType;
-      return Stuff::Common::make_unique< NonparametricType >(Stuff::FunctionsProvider< E, D, d, R, r, rC >::create(type,
-                                                                                                                   settings));
+      return Stuff::Common::make_unique< NonparametricType >(Stuff::FunctionsProvider< E, D, d, R, r, rC >::create(type, config));
     }
   } // ... create(...)
 }; // class AffinelyDecomposableFunctions
