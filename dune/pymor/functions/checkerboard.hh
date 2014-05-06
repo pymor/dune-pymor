@@ -7,9 +7,11 @@
 #define DUNE_PYMOR_FUNCTIONS_CHECKERBOARD_HH
 
 #include <vector>
+#include <memory>
 
 #include <dune/stuff/functions/checkerboard.hh>
-#include <dune/stuff/common/parameter/tree.hh>
+#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/memory.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/functional.hh>
@@ -92,42 +94,38 @@ public:
     } // create the coefficients and components
   } // Checkerboard()
 
-  static Dune::ParameterTree defaultSettings(const std::string subName = "")
+  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
   {
-    Dune::ParameterTree description;
-    description["lowerLeft"] = "[0.0; 0.0; 0.0]";
-    description["upperRight"] = "[1.0; 1.0; 1.0]";
-    description["numElements"] = "[2; 2; 2]";
-    description["parameterName"] = "value";
-    description["name"] = static_id();
-    if (subName.empty())
-      return description;
+    Stuff::Common::ConfigTree config;
+    config["lower_left"] = "[0.0 0.0 0.0]";
+    config["upper_right"] = "[1.0 1.0 1.0]";
+    config["num_elements"] = "[2 2 2]";
+    config["parameter_name"] = "value";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
     else {
-      DSC::ExtendedParameterTree extendedDescription;
-      extendedDescription.add(description, subName);
-      return extendedDescription;
+      Stuff::Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
     }
-  } // ... defaultSettings(...)
+  } // ... default_config(...)
 
-  static ThisType* create(const DSC::ExtendedParameterTree settings = defaultSettings())
+  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
+                                            const std::string sub_name = static_id())
 
   {
-    // get data
-    const std::string nm = settings.get< std::string >("name", static_id());
-    const std::string paramName = settings.get< std::string >("parameterName", "value");
-    std::vector< DomainFieldType > lowerLeft = settings.getVector("lowerLeft", DomainFieldType(0), dimDomain);
-    std::vector< DomainFieldType > upperRight = settings.getVector("upperRight", DomainFieldType(1), dimDomain);
-    std::vector< size_t > numElements = settings.getVector("numElements", size_t(1), dimDomain);
-    // get paramSize
-    size_t paramSize = 1;
-    for (size_t dd = 0; dd < dimDomain; ++dd) {
-      if (numElements[dd] <= 0)
-        DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
-                         "numElements[" << dd << "] has to be posititve (is " << numElements[dd] << ")!");
-      paramSize *= numElements[dd];
-    }
-    // create and return
-    return new ThisType(lowerLeft, upperRight, numElements, paramName, nm);
+    // get correct config
+    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Stuff::Common::ConfigTree default_cfg = default_config();
+    // create
+    return Stuff::Common::make_unique< ThisType >(
+          cfg.get("lower_left",     default_cfg.get< std::vector< DomainFieldType > >("lower_left")),
+          cfg.get("upper_right",    default_cfg.get< std::vector< DomainFieldType > >("upper_right")),
+          cfg.get("num_elements",   default_cfg.get< std::vector< size_t > >("num_elements")),
+          cfg.get("parameter_name", default_cfg.get< std::string >("parameter_name")),
+          cfg.get("name",           default_cfg.get< std::string >("name"))
+    );
   } // ... create(...)
 }; // class Checkerboard
 
