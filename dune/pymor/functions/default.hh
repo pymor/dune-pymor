@@ -112,6 +112,98 @@ public:
     return BaseType::static_id() + ".affinelydecomposabledefault";
   }
 
+  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Stuff::Common::ConfigTree config;
+    typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
+        NonparametricFunctions;
+    const std::string nonparametricType = NonparametricFunctions::available()[0];
+    config.add(NonparametricFunctions::default_config(nonparametricType), "component.0");
+    config["component.0.type"] = nonparametricType;
+    config["component.0.name"] = "component_0";
+    config["coefficient.0.diffusion"] = "1";
+    config["coefficient.0.expression"] = "diffusion[0]";
+    config.add(NonparametricFunctions::default_config(nonparametricType), "component.1");
+    config["component.1.type"] = nonparametricType;
+    config["component.1.name"] = "component_1";
+    config["coefficient.1.force"] = "2";
+    config["coefficient.1.expression"] = "force[0] + sin(force[1])";
+    config.add(NonparametricFunctions::default_config(nonparametricType), "affine_part");
+    config["affine_part.type"] = nonparametricType;
+    config["affine_part.name"] = "affine_part";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
+    else {
+      Stuff::Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
+                                            const std::string sub_name = static_id())
+
+  {
+    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
+        NonparametricFunctions;
+    const std::string name = cfg.get< std::string >("name", static_id());
+    auto ret = Stuff::Common::make_unique< ThisType >(name);
+    if (cfg.has_sub("affine_part")) {
+      auto affinePartCfg = cfg.sub("affine_part");
+      if (!affinePartCfg.has_key("type"))
+        DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                         "no 'type' given in the following 'affine_part' config:\n\n"
+                         << affinePartCfg);
+      if (!affinePartCfg.has_key("name"))
+        affinePartCfg["name"] = name + ", affine part";
+      const std::string type = affinePartCfg.get< std::string >("type");
+      ret->register_affine_part(NonparametricFunctions::create(type, affinePartCfg));
+    }
+    size_t pp = 0;
+    while (cfg.has_sub("component." + Stuff::Common::toString(pp))
+           && cfg.has_sub("coefficient." + Stuff::Common::toString(pp))) {
+      auto componentCfg = cfg.sub("component." + Stuff::Common::toString(pp));
+      if (!componentCfg.has_key("type"))
+        DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                         "no 'type' given in the following 'component." << pp << "' config:\n\n"
+                         << componentCfg);
+      if (!componentCfg.has_key("name"))
+        componentCfg["name"] = name + ", component " + Stuff::Common::toString(pp);
+      const std::string componentType = componentCfg.get< std::string >("type");
+      const auto coefficientCfg = cfg.sub("coefficient." + Stuff::Common::toString(pp));
+      if (!coefficientCfg.has_key("expression"))
+        DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                         "no 'expression' given in the following 'coefficient." << pp << "' config:\n\n"
+                         << coefficientCfg);
+      const std::string coefficientExpression = coefficientCfg.get< std::string >("expression");
+      ParameterType coefficientMu;
+      for (std::string key : coefficientCfg.getValueKeys()) {
+        if (key != "expression")
+          coefficientMu.set(key, coefficientCfg.get< int >(key));
+      }
+      if (coefficientMu.empty())
+        DUNE_PYMOR_THROW(Pymor::Exception::wrong_option_given,
+                         "no 'key = size' pair given in the following 'coefficient." << pp << "' config:\n\n"
+                         << coefficientCfg);
+      ret->register_component(NonparametricFunctions::create(componentType, componentCfg),
+                              new ParameterFunctional(coefficientMu, coefficientExpression));
+      ++pp;
+    }
+    if (cfg.has_sub("component." + Stuff::Common::toString(pp))
+        && !cfg.has_sub("coefficient." + Stuff::Common::toString(pp)))
+      DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                       "missing 'coefficient." << pp << "' to match 'component." << pp
+                       << "' in the following config:\n\n" << cfg);
+    if (!cfg.has_sub("component." + Stuff::Common::toString(pp))
+        && cfg.has_sub("coefficient." + Stuff::Common::toString(pp)))
+      DUNE_PYMOR_THROW(Exception::wrong_option_given,
+                       "missing 'component." << pp << "' to match 'coefficient." << pp
+                       << "' in the following config:\n\n" << cfg);
+    return ret;
+  } // ... create(...)
+
   AffinelyDecomposableDefault(const std::string nm = static_id())
     : BaseType()
     , name_(nm)
@@ -122,8 +214,7 @@ public:
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
    */
-  AffinelyDecomposableDefault(const NonparametricType* aff_ptr,
-                              const std::string nm = static_id())
+  AffinelyDecomposableDefault(const NonparametricType* aff_ptr, const std::string nm = static_id())
     : BaseType()
     , name_(nm)
     , num_components_(0)
@@ -235,8 +326,7 @@ public:
   void register_component(const NonparametricType* comp_ptr,
                           const std::shared_ptr< const ParameterFunctional > coeff_ptr)
   {
-    register_component(comp_ptr,
-                       std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
   /**
@@ -303,99 +393,6 @@ public:
                        << " is not satisfied!");
     return coefficients_[qq];
   }
-
-  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
-  {
-    Stuff::Common::ConfigTree config;
-    typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
-        NonparametricFunctions;
-    const std::string nonparametricType = NonparametricFunctions::available()[0];
-    config.add(NonparametricFunctions::default_config(nonparametricType), "component.0");
-    config["component.0.type"] = nonparametricType;
-    config["component.0.name"] = "component_0";
-    config["coefficient.0.diffusion"] = "1";
-    config["coefficient.0.expression"] = "diffusion[0]";
-    config.add(NonparametricFunctions::default_config(nonparametricType), "component.1");
-    config["component.1.type"] = nonparametricType;
-    config["component.1.name"] = "component_1";
-    config["coefficient.1.force"] = "2";
-    config["coefficient.1.expression"] = "force[0] + sin(force[1])";
-    config.add(NonparametricFunctions::default_config(nonparametricType), "affine_part");
-    config["affine_part.type"] = nonparametricType;
-    config["affine_part.name"] = "affine_part";
-    config["name"] = static_id();
-    config["order"] = "4";
-    if (sub_name.empty())
-      return config;
-    else {
-      Stuff::Common::ConfigTree tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
-                                            const std::string sub_name = static_id())
-
-  {
-    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
-        NonparametricFunctions;
-    const std::string name = cfg.get< std::string >("name", static_id());
-    auto ret = Stuff::Common::make_unique< ThisType >(name);
-    if (cfg.hasSub("affine_part")) {
-      auto affinePartCfg = cfg.sub("affine_part");
-      if (!affinePartCfg.hasKey("type"))
-        DUNE_PYMOR_THROW(Exception::wrong_option_given,
-                         "no 'type' given in the following 'affine_part' config:\n\n"
-                         << affinePartCfg);
-      if (!affinePartCfg.hasKey("name"))
-        affinePartCfg["name"] = name + ", affine part";
-      const std::string type = affinePartCfg.get< std::string >("type");
-      ret->register_affine_part(NonparametricFunctions::create(type, affinePartCfg));
-    }
-    size_t pp = 0;
-    while (cfg.hasSub("component." + Stuff::Common::toString(pp))
-           && cfg.hasSub("coefficient." + Stuff::Common::toString(pp))) {
-      auto componentCfg = cfg.sub("component." + Stuff::Common::toString(pp));
-      if (!componentCfg.hasKey("type"))
-        DUNE_PYMOR_THROW(Exception::wrong_option_given,
-                         "no 'type' given in the following 'component." << pp << "' config:\n\n"
-                         << componentCfg);
-      if (!componentCfg.hasKey("name"))
-        componentCfg["name"] = name + ", component " + Stuff::Common::toString(pp);
-      const std::string componentType = componentCfg.get< std::string >("type");
-      const auto coefficientCfg = cfg.sub("coefficient." + Stuff::Common::toString(pp));
-      if (!coefficientCfg.hasKey("expression"))
-        DUNE_PYMOR_THROW(Exception::wrong_option_given,
-                         "no 'expression' given in the following 'coefficient." << pp << "' config:\n\n"
-                         << coefficientCfg);
-      const std::string coefficientExpression = coefficientCfg.get< std::string >("expression");
-      ParameterType coefficientMu;
-      for (std::string key : coefficientCfg.getValueKeys()) {
-        if (key != "expression")
-          coefficientMu.set(key, coefficientCfg.get< int >(key));
-      }
-      if (coefficientMu.empty())
-        DUNE_PYMOR_THROW(Pymor::Exception::wrong_option_given,
-                         "no 'key = size' pair given in the following 'coefficient." << pp << "' config:\n\n"
-                         << coefficientCfg);
-      ret->register_component(NonparametricFunctions::create(componentType, componentCfg),
-                              new ParameterFunctional(coefficientMu, coefficientExpression));
-      ++pp;
-    }
-    if (cfg.hasSub("component." + Stuff::Common::toString(pp))
-        && !cfg.hasSub("coefficient." + Stuff::Common::toString(pp)))
-      DUNE_PYMOR_THROW(Exception::wrong_option_given,
-                       "missing 'coefficient." << pp << "' to match 'component." << pp
-                       << "' in the following config:\n\n" << cfg);
-    if (!cfg.hasSub("component." + Stuff::Common::toString(pp))
-        && cfg.hasSub("coefficient." + Stuff::Common::toString(pp)))
-      DUNE_PYMOR_THROW(Exception::wrong_option_given,
-                       "missing 'component." << pp << "' to match 'coefficient." << pp
-                       << "' in the following config:\n\n" << cfg);
-    return ret;
-  } // ... create(...)
 
 public:
   std::string name_;
