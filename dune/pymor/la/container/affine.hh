@@ -307,6 +307,14 @@ public:
     BaseType::register_component(components_[0], coeff_ptr);
   }
 
+  template< class... Args >
+  void register_affine_part(Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    register_affine_part(std::shared_ptr< ContainerType >(container_ptr));
+  }
+
   /**
    * \attention This class takes ownership of aff_ptr!
    */
@@ -322,10 +330,67 @@ public:
     BaseType::register_affine_part(affinePart_);
   }
 
+  template< class... Args >
+  DUNE_STUFF_SSIZE_T register_component(const ParameterFunctional* coeff_ptr, Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    return register_component(std::shared_ptr< ContainerType >(container_ptr),
+                              std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+  }
+
+  template< class... Args >
+  DUNE_STUFF_SSIZE_T register_component(const ParameterType& tt, const std::string& exp, Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    return register_component(std::shared_ptr< ContainerType >(container_ptr),
+                              std::make_shared< ParameterFunctional >(tt, exp));
+  }
+
+  template< class... Args >
+  DUNE_STUFF_SSIZE_T register_component(const std::string& kk, const DUNE_STUFF_SSIZE_T & vv, const std::string& exp,
+                                        Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    return register_component(std::shared_ptr< ContainerType >(container_ptr),
+                              std::make_shared< ParameterFunctional >(kk, vv, exp));
+  }
+
+  template< class... Args >
+  DUNE_STUFF_SSIZE_T register_component(const std::vector< std::string >& kk,
+                                        const std::vector< DUNE_STUFF_SSIZE_T >& vv,
+                                        const std::string& exp,
+                                        Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    return register_component(std::shared_ptr< ContainerType >(container_ptr),
+                              std::make_shared< ParameterFunctional >(kk, vv, exp));
+  }
+
+  template< class... Args >
+  DUNE_STUFF_SSIZE_T register_component(const ParameterFunctional& other, Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    return register_component(std::shared_ptr< ContainerType >(container_ptr),
+                              std::make_shared< ParameterFunctional >(other));
+  }
+
   DUNE_STUFF_SSIZE_T register_component(ContainerType* comp_ptr, const ParameterFunctional* coeff_ptr)
   {
     return register_component(std::shared_ptr< ContainerType >(comp_ptr),
                               std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+  }
+
+  template< class... Args >
+  DUNE_STUFF_SSIZE_T register_component(const std::shared_ptr< const ParameterFunctional > coeff_ptr, Args&& ...args)
+  {
+    // doing this in two separate steps instead of using std::make_shared for easyer debugging on failure
+    ContainerType* container_ptr = new ContainerType(std::forward< Args >(args)...);
+    return register_component(std::shared_ptr< ContainerType >(container_ptr), coeff_ptr);
   }
 
   /**
