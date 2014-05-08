@@ -56,12 +56,12 @@ public:
 
   static std::string static_id()
   {
-    return "dune.pymor.function";
+    return "pymor.function";
   }
 
   virtual std::string name() const
   {
-    return "dune.pymor.function";
+    return "pymor.function";
   }
 
   /**
