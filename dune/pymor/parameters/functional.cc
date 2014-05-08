@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include <dune/stuff/common/print.hh>
+#include <dune/stuff/common/exceptions.hh>
 
 #include "functional.hh"
 
@@ -89,15 +90,17 @@ void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
   // perform sanity check
   if (std::abs(ret) > (0.9 * std::numeric_limits< double >::max())) {
     std::stringstream ss;
-    Stuff::Common::print(variables_, "the variables of this functional thus are", ss);
-    DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
-                     "evaluating this functional yielded an unlikely value!\n"
-                     << "The parameter_type() of this functional is: " << parameter_type() << "\n,"
-                     << ss.str() << ",\n"
-                     << "you tried to evaluate it with mu = " << mu << ",\n"
-                     << "and the result was " << ret << "!");
+    for (size_t ii = 0; ii < serialized_mu.size(); ++ii)
+      ss << "  " << variables_[ii] << std::endl;
+    DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error,
+                          "evaluating this functional yielded an unlikely value!\n"
+                          << "The parameter_type() of this functional is:\n  " << parameter_type() << "\n"
+                          << "The variables of this functional are:\n" << ss.str()
+                          << "The expression of this functional is:\n  " << expression_ << "\n"
+                          << "You tried to evaluate it with:\n  mu = " << mu << "\n"
+                          << "The result was:\n  " << ret);
   }
-}
+} // ... evaluate(...)
 
 double ParameterFunctional::evaluate(const Parameter& mu) const
 {
