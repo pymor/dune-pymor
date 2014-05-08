@@ -207,17 +207,17 @@ public:
    */
   void register_affine_part(const NonparametricType* aff_ptr)
   {
-    if (hasAffinePart_)
-      DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
-                       "do not call register_affine_part() if has_affine_part() == true!");
-    affinePart_ = std::shared_ptr< const NonparametricType >(aff_ptr);
-    hasAffinePart_ = true;
-  } // ... register_component(...)
+    register_affine_part(std::shared_ptr< const NonparametricType >(aff_ptr));
+  }
 
   void register_affine_part(const std::shared_ptr< const NonparametricType > aff_ptr)
   {
-    register_affine_part(std::shared_ptr< const NonparametricType >(aff_ptr));
-  }
+    if (hasAffinePart_)
+      DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
+                       "do not call register_affine_part() if has_affine_part() == true!");
+    affinePart_ = aff_ptr;
+    hasAffinePart_ = true;
+  } // ... register_component(...)
 
   /**
    * \attention This class takes ownership of comp_ptr and coeff_ptr (in the sense, that you must not delete it
@@ -245,8 +245,7 @@ public:
   void register_component(const std::shared_ptr< const NonparametricType > comp_ptr,
                           const ParameterFunctional* coeff_ptr)
   {
-    register_component(std::shared_ptr< const NonparametricType >(comp_ptr),
-                       coeff_ptr);
+    register_component(comp_ptr, std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
   void register_component(const std::shared_ptr< const NonparametricType > comp_ptr,
