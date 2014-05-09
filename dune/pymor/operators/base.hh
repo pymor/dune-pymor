@@ -138,7 +138,7 @@ public:
       DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
                        "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
                        << dim_range() << ")!");
-    return LinearSolverType(*matrix_).apply(source, range, options_);
+    LinearSolverType(*matrix_).apply(source, range, options_);
   } // ... apply(...)
 
   using BaseType::apply;
