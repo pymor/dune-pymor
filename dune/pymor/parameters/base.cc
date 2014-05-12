@@ -335,7 +335,7 @@ std::string Parameter::report() const
     ret << kk[kk.size() - 1] << "\"}, {";
     for (size_t ii = 0; ii < (vv.size() - 1); ++ii) {
       if (vv[ii].size() == 1) {
-        ret << vv[ii][0];
+        ret << vv[ii][0] << ", ";
       } else {
         ret << "{";
         for (size_t jj = 0; jj < (vv[ii].size() - 1); ++jj)
@@ -344,7 +344,7 @@ std::string Parameter::report() const
       }
     }
     if (vv[vv.size() - 1].size() == 1) {
-      ret << vv[vv.size() - 1][0];
+      ret << vv[vv.size() - 1][0] << "}";
     } else {
       ret << "{";
       for (size_t jj = 0; jj < (vv[vv.size() - 1].size() - 1); ++jj)
