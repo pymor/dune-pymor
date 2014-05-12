@@ -63,6 +63,11 @@ public:
     , nonparametric_(nonparametric_ptr)
   {}
 
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return BaseType::static_id() + ".nonparametricdefault";
+  }
+
   virtual std::string name() const DS_OVERRIDE
   {
     return nonparametric_->name();

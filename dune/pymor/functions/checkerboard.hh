@@ -50,6 +50,40 @@ public:
     return BaseType::BaseType::static_id() + ".checkerboard";
   }
 
+  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
+  {
+    Stuff::Common::ConfigTree config;
+    config["lower_left"] = "[0.0 0.0 0.0]";
+    config["upper_right"] = "[1.0 1.0 1.0]";
+    config["num_elements"] = "[2 2 2]";
+    config["parameter_name"] = "value";
+    config["name"] = static_id();
+    if (sub_name.empty())
+      return config;
+    else {
+      Stuff::Common::ConfigTree tmp;
+      tmp.add(config, sub_name);
+      return tmp;
+    }
+  } // ... default_config(...)
+
+  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
+                                            const std::string sub_name = static_id())
+
+  {
+    // get correct config
+    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Stuff::Common::ConfigTree default_cfg = default_config();
+    // create
+    return Stuff::Common::make_unique< ThisType >(
+          cfg.get("lower_left",     default_cfg.get< std::vector< DomainFieldType > >("lower_left")),
+          cfg.get("upper_right",    default_cfg.get< std::vector< DomainFieldType > >("upper_right")),
+          cfg.get("num_elements",   default_cfg.get< std::vector< size_t > >("num_elements")),
+          cfg.get("parameter_name", default_cfg.get< std::string >("parameter_name")),
+          cfg.get("name",           default_cfg.get< std::string >("name"))
+    );
+  } // ... create(...)
+
   Checkerboard(const std::vector< DomainFieldType >& lowerLeft,
                const std::vector< DomainFieldType >& upperRight,
                const std::vector< size_t >& numElements,
@@ -94,39 +128,10 @@ public:
     } // create the coefficients and components
   } // Checkerboard()
 
-  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
+  virtual std::string type() const DS_OVERRIDE
   {
-    Stuff::Common::ConfigTree config;
-    config["lower_left"] = "[0.0 0.0 0.0]";
-    config["upper_right"] = "[1.0 1.0 1.0]";
-    config["num_elements"] = "[2 2 2]";
-    config["parameter_name"] = "value";
-    config["name"] = static_id();
-    if (sub_name.empty())
-      return config;
-    else {
-      Stuff::Common::ConfigTree tmp;
-      tmp.add(config, sub_name);
-      return tmp;
-    }
-  } // ... default_config(...)
-
-  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
-                                            const std::string sub_name = static_id())
-
-  {
-    // get correct config
-    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Stuff::Common::ConfigTree default_cfg = default_config();
-    // create
-    return Stuff::Common::make_unique< ThisType >(
-          cfg.get("lower_left",     default_cfg.get< std::vector< DomainFieldType > >("lower_left")),
-          cfg.get("upper_right",    default_cfg.get< std::vector< DomainFieldType > >("upper_right")),
-          cfg.get("num_elements",   default_cfg.get< std::vector< size_t > >("num_elements")),
-          cfg.get("parameter_name", default_cfg.get< std::string >("parameter_name")),
-          cfg.get("name",           default_cfg.get< std::string >("name"))
-    );
-  } // ... create(...)
+    return BaseType::BaseType::static_id() + ".checkerboard";
+  }
 }; // class Checkerboard
 
 

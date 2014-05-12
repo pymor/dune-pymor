@@ -59,6 +59,11 @@ public:
     return "pymor.function";
   }
 
+  virtual std::string type() const
+  {
+    return "pymor.function";
+  }
+
   virtual std::string name() const
   {
     return "pymor.function";
