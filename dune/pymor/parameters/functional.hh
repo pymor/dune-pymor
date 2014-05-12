@@ -53,6 +53,7 @@ private:
   void cleanup();
 
   std::string expression_;
+  size_t actual_size_;
   std::vector< std::string > variables_;
   mutable double* arg_[DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE];
   RVar* var_arg_[DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE];
