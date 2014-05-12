@@ -121,7 +121,7 @@ public:
   void register_affine_part(const std::shared_ptr< const ContainerType > aff_ptr)
   {
     if (hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrongly,
+      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
                             "do not call register_affine_part(aff_ptr) if has_affine_part() == true!");
     if (num_components_ > 0 && !components_[0]->has_equal_shape(*aff_ptr))
       DUNE_THROW_COLORFULLY(Stuff::Exceptions::shapes_do_not_match,

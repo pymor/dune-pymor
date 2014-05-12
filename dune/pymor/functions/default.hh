@@ -313,7 +313,7 @@ public:
   void register_affine_part(const std::shared_ptr< const NonparametricType > aff_ptr)
   {
     if (hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrongly,
+      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
                             "do not call register_affine_part() if has_affine_part() == true!");
     affinePart_ = aff_ptr;
     hasAffinePart_ = true;
@@ -369,7 +369,7 @@ public:
   virtual std::shared_ptr< const NonparametricType > affine_part() const DS_OVERRIDE
   {
     if (!hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrongly,
+      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
                             "do not call affine_part() if has_affine_part() == false!");
     return affinePart_;
   }
