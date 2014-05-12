@@ -7,11 +7,13 @@
 #define DUNE_PYMOR_FUNCTIONS_INTERFACES_HH
 
 #include <memory>
+#include <ostream>
 
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/stuff/functions/interfaces.hh>
+#include <dune/stuff/common/string.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
@@ -28,6 +30,8 @@ template< class EntityImp, class DomainFieldImp, int domainDim, class RangeField
 class AffinelyDecomposableFunctionInterface
   : public Parametric
 {
+  typedef AffinelyDecomposableFunctionInterface
+      < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > ThisType;
 public:
   typedef Stuff::LocalizableFunctionInterface
       < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > NonparametricType;
@@ -130,7 +134,38 @@ public:
                        "Do not call coefficient(" << qq << ") if num_coefficients() == 0!");
     return nullptr;
   } // ... coefficient(...)
+
+  virtual void report(std::ostream& out, const std::string prefix = "") const
+  {
+    out << prefix << "affinely decomposable function '" << name() << "' (of type " << type() << "):" << std::endl;
+    out << prefix << "  has_affine_part: ";
+    if (has_affine_part())
+      out << "true";
+    else
+      out << "false";
+    out << std::endl;
+    out << prefix << "  num_components: " << num_components() << std::endl;
+    if (parametric())
+      out << prefix << "  parameter_type: " << parameter_type() << std::endl;
+    if (has_affine_part())
+      affine_part()->report(out, prefix + "  affine_part: ");
+    for (size_t qq = 0; qq < num_components(); ++qq)
+      component(qq)->report(out, prefix + "  component " + Stuff::Common::toString(qq) + ": ");
+  } // ... report(...)
+
+private:
+  template< class T >
+  friend std::ostream& operator<<(std::ostream& /*out*/, const ThisType& /*function*/);
 }; // class AffinelyDecomposableFunctionInterface
+
+
+template< class E, class D, int d, class R, int r, int rC >
+std::ostream& operator<<(std::ostream& out,
+                         const AffinelyDecomposableFunctionInterface< E, D, d, R, r, rC >& function)
+{
+  function.report(out);
+  return out;
+} // ... operator<<(...)
 
 
 } // namespace Pymor
