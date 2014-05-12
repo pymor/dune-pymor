@@ -144,13 +144,17 @@ public:
     else
       out << "false";
     out << std::endl;
-    out << prefix << "  num_components: " << num_components() << std::endl;
+    out << prefix << "  num_components: " << num_components();
     if (parametric())
-      out << prefix << "  parameter_type: " << parameter_type() << std::endl;
-    if (has_affine_part())
+      out << "\n" << prefix << "  parameter_type: " << parameter_type();
+    if (has_affine_part()) {
+      out << "\n";
       affine_part()->report(out, prefix + "  affine_part: ");
-    for (size_t qq = 0; qq < num_components(); ++qq)
+    }
+    for (size_t qq = 0; qq < num_components(); ++qq) {
+      out << "\n";
       component(qq)->report(out, prefix + "  component " + Stuff::Common::toString(qq) + ": ");
+    }
   } // ... report(...)
 
 private:
