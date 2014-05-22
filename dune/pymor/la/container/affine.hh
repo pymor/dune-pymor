@@ -430,6 +430,8 @@ public:
     return affinePart_;
   }
 
+  using BaseType::component;
+
   std::shared_ptr< ContainerType > component(const DUNE_STUFF_SSIZE_T qq)
   {
     if (BaseType::num_components() == 0)
