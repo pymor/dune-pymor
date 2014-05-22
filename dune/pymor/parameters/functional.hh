@@ -39,6 +39,10 @@ public:
 
   ParameterFunctional& operator=(const ParameterFunctional& other);
 
+  bool operator==(const ParameterFunctional& other) const;
+
+  bool operator!=(const ParameterFunctional& other) const;
+
   const std::string& expression() const;
 
   std::string report(const std::string name = "ParameterFunctional") const;

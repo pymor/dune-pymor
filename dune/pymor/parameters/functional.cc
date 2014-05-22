@@ -69,6 +69,16 @@ ParameterFunctional& ParameterFunctional::operator=(const ParameterFunctional& o
   return *this;
 }
 
+bool ParameterFunctional::operator==(const ParameterFunctional& other) const
+{
+  return (parameter_type() == other.parameter_type() && expression_ == other.expression());
+}
+
+bool ParameterFunctional::operator!=(const ParameterFunctional& other) const
+{
+  return !(operator==(other));
+}
+
 const std::string& ParameterFunctional::expression() const
 {
   return expression_;
