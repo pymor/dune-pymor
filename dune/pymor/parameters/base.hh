@@ -13,8 +13,6 @@
 #include <sstream>
 #include <ostream>
 
-#include <dune/pymor/common/exceptions.hh>
-
 namespace Dune {
 namespace Pymor {
 

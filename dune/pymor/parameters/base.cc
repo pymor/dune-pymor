@@ -5,6 +5,8 @@
 
 #include "config.h"
 
+#include <dune/stuff/common/exceptions.hh>
+
 #include "base.hh"
 
 namespace Dune {
@@ -33,16 +35,16 @@ template< class KeyType, class ValueType >
 KeyValueBase< KeyType, ValueType >::KeyValueBase(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv)
 {
   if (kk.size() != vv.size())
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
-  if (kk.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "kk and vv are empty!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
+  if (kk.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "kk and vv are empty!");
   const auto kk_end = kk.end();
   const auto vv_end = vv.end();
   auto kk_it = kk.begin();
   size_t counter = 0;
   for (auto vv_it = vv.begin(); (kk_it != kk_end) && (vv_it != vv_end); ++kk_it, ++vv_it, ++counter) {
     const KeyType& key = *kk_it;
-    if (key.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "kk[" << counter << "] is empty!");
+    if (key.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "kk[" << counter << "] is empty!");
     const ValueType& value = *vv_it;
     dict_.insert(std::make_pair(key, value));
   }
@@ -78,7 +80,7 @@ template< class KeyType, class ValueType >
 const ValueType& KeyValueBase< KeyType, ValueType >::get(const KeyType& key) const
 {
   const auto result = dict_.find(key);
-  if (result == dict_.end()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key does not exist!");
+  if (result == dict_.end()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "key does not exist!");
   return result->second;
 }
 
@@ -133,17 +135,17 @@ ParameterType::ParameterType()
 ParameterType::ParameterType(const KeyType& kk, const ValueType& vv)
   : BaseType(kk, vv)
 {
-  if (kk.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "kk is empty!");
-  if (vv <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "vv has to be positive (is " << vv << ")!");
+  if (kk.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "kk is empty!");
+  if (vv <= 0) DUNE_THROW(Stuff::Exceptions::index_out_of_range, "vv has to be positive (is " << vv << ")!");
 }
 
 ParameterType::ParameterType(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv)
   : BaseType(kk, vv)
 {
   if (kk.size() != vv.size())
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
-  if (kk.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "kk and vv are empty!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
+  if (kk.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "kk and vv are empty!");
   const auto kk_end = kk.end();
   const auto vv_end = vv.end();
   auto kk_it = kk.begin();
@@ -151,17 +153,17 @@ ParameterType::ParameterType(const std::vector< KeyType >& kk, const std::vector
   for (auto vv_it = vv.begin(); (kk_it != kk_end) && (vv_it != vv_end); ++kk_it, ++vv_it, ++counter) {
     const KeyType& key = *kk_it;
     const ValueType& value = *vv_it;
-    if (key.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "kk[" << counter << "] is empty!");
+    if (key.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "kk[" << counter << "] is empty!");
     if (value <= 0)
-      DUNE_PYMOR_THROW(Exception::index_out_of_range,
-                       "vv[" << counter << "] has to be positive (is " << value << ")!");
+      DUNE_THROW(Stuff::Exceptions::index_out_of_range,
+                 "vv[" << counter << "] has to be positive (is " << value << ")!");
   }
 }
 
 void ParameterType::set(const KeyType& key, const ValueType& value)
 {
-  if (key.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key is empty!");
-  if (value <= 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "value has to be positive (is " << value << ")!");
+  if (key.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "key is empty!");
+  if (value <= 0) DUNE_THROW(Stuff::Exceptions::index_out_of_range, "value has to be positive (is " << value << ")!");
   if (!hasKey(key)) {
     BaseType::dict_[key] = value;
     BaseType::update();
@@ -233,32 +235,32 @@ Parameter::Parameter(const ParameterType& tt, const double& vv)
   : BaseType(tt.keys(), {{vv}})
   , type_(tt)
 {
-  if (tt.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "tt is empty!");
-  if (tt.size() != 1) DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                                       "tt should be of size 1 (is " << tt.size() << ")!");
+  if (tt.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "tt is empty!");
+  if (tt.size() != 1) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                                 "tt should be of size 1 (is " << tt.size() << ")!");
   if (tt.values()[0] != 1)
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "tt.get(\"" << tt.keys()[0] << "\") should be 1 (is " << tt.values()[0] << ")!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "tt.get(\"" << tt.keys()[0] << "\") should be 1 (is " << tt.values()[0] << ")!");
 }
 
 Parameter::Parameter(const KeyType& kk, const ValueType& vv)
   : BaseType(kk, vv)
   , type_(kk, vv.size())
 {
-  if (kk.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "kk is empty!");
-  if (vv.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "vv is empty!");
+  if (kk.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "kk is empty!");
+  if (vv.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "vv is empty!");
 }
 
 Parameter::Parameter(const ParameterType& tt, const ValueType& vv)
   : BaseType(tt.keys(), {vv})
   , type_(tt)
 {
-  if (tt.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "tt is empty!");
-  if (tt.size() != 1) DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                                       "tt should be of size 1 (is " << tt.size() << ")!");
+  if (tt.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "tt is empty!");
+  if (tt.size() != 1) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                                 "tt should be of size 1 (is " << tt.size() << ")!");
   if (tt.values()[0] != vv.size())
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "vv should be of size " << tt.values()[0] << " (is " << vv.size() << ")!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "vv should be of size " << tt.values()[0] << " (is " << vv.size() << ")!");
 }
 
 Parameter::Parameter(const std::vector< KeyType >& kk,
@@ -266,14 +268,13 @@ Parameter::Parameter(const std::vector< KeyType >& kk,
   : BaseType(kk, vv)
 {
   if (kk.size() != vv.size())
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
-  if (kk.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "kk and vv are empty!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "the size of kk (" << kk.size() << ") has to equal the size of vv (" << vv.size() << ")!");
+  if (kk.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "kk and vv are empty!");
   std::vector< DUNE_STUFF_SSIZE_T > valueSizes(vv.size());
   for (size_t ii = 0; ii < vv.size(); ++ii) {
     if (vv[ii].size() == 0)
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "vv[" << ii << "] is empty!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "vv[" << ii << "] is empty!");
     valueSizes[ii] = vv[ii].size();
   }
   type_ = ParameterType(kk, valueSizes);
@@ -285,14 +286,14 @@ Parameter::Parameter(const ParameterType& tt,
   , type_(tt)
 {
   if (tt.size() != vv.size())
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "the size of t (" << tt.size() << ") has to equal the size of vv (" << vv.size() << ")!");
-  if (tt.size() == 0) DUNE_PYMOR_THROW(Exception::sizes_do_not_match, "tt and vv are empty!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "the size of t (" << tt.size() << ") has to equal the size of vv (" << vv.size() << ")!");
+  if (tt.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "tt and vv are empty!");
   const auto& valueSizes = type_.values();
   for (size_t ii = 0; ii < vv.size(); ++ii) {
     if (vv[ii].size() != valueSizes[ii])
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "vv[" << ii << "] has to be of size " << valueSizes[ii] << " (is " << vv[ii].size() << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "vv[" << ii << "] has to be of size " << valueSizes[ii] << " (is " << vv[ii].size() << ")!");
   }
 }
 
@@ -303,8 +304,8 @@ const ParameterType& Parameter::type() const
 
 void Parameter::set(const KeyType& key, const ValueType& value)
 {
-  if (key.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "key is empty!");
-  if (value.size() == 0) DUNE_PYMOR_THROW(Exception::index_out_of_range, "value is empty!");
+  if (key.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "key is empty!");
+  if (value.size() == 0) DUNE_THROW(Stuff::Exceptions::index_out_of_range, "value is empty!");
   BaseType::dict_[key] = value;
   BaseType::update();
   type_.set(key, value.size());
@@ -454,19 +455,19 @@ bool Parametric::parametric() const
 
 void Parametric::inherit_parameter_type(const ParameterType& tt, const std::string id)
 {
-  if (id.empty()) DUNE_PYMOR_THROW(Exception::key_is_not_valid, "id must not be empty!");
+  if (id.empty()) DUNE_THROW(Stuff::Exceptions::wrong_input_given, "id must not be empty!");
   const auto result = inherits_map_.find(id);
   if (result != inherits_map_.end() && result->second != tt)
-    DUNE_PYMOR_THROW(Exception::key_is_not_valid,
-                     "inheriting the same id twice with different types does not make any sense (type of tt is "
-                     << tt << ", while type " << result->second << " is already registered for '" << id << "'!");
+    DUNE_THROW(Stuff::Exceptions::wrong_input_given,
+               "inheriting the same id twice with different types does not make any sense (type of tt is "
+               << tt << ", while type " << result->second << " is already registered for '" << id << "'!");
   inherits_map_[id] = tt;
   for (auto key : tt.keys()) {
     if (type_.hasKey(key) && (type_.get(key) != tt.get(key)))
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "the size for key '" << key << "' in tt (" << tt.get(key)
-                       << ") does not match the size for '" << key << "' in this parameter_type ("
-                       << type_.get(key) << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "the size for key '" << key << "' in tt (" << tt.get(key)
+                 << ") does not match the size for '" << key << "' in this parameter_type ("
+                 << type_.get(key) << ")!");
     else
       type_.set(key, tt.get(key));
   }
@@ -485,7 +486,7 @@ void Parametric::inherit_parameter_type(const Parametric& other, const std::stri
 Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) const
 {
   if (inherits_map_.empty())
-    DUNE_PYMOR_THROW(Exception::requirements_not_met, "there is nothing to map!");
+    DUNE_THROW(Stuff::Exceptions::wrong_input_given, "there is nothing to map!");
   const auto result = inherits_map_.find(id);
   if (result == inherits_map_.end()) {
     std::stringstream msg;
@@ -505,7 +506,7 @@ Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) c
       }
     }
     msg << "'" << it->first << "'} (is '" << id << "')!";
-    DUNE_PYMOR_THROW(Exception::key_is_not_valid, msg.str());
+    DUNE_THROW(Stuff::Exceptions::wrong_input_given, msg.str());
   }
   const ParameterType& localType = result->second;
   Parameter muLocal;
@@ -517,7 +518,7 @@ Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) c
 const ParameterType& Parametric::map_parameter_type(const std::string id) const
 {
   if (inherits_map_.empty())
-    DUNE_PYMOR_THROW(Exception::requirements_not_met, "there is nothing to map!");
+    DUNE_THROW(Stuff::Exceptions::wrong_input_given, "there is nothing to map!");
   const auto result = inherits_map_.find(id);
   if (result == inherits_map_.end()) {
     std::stringstream msg;
@@ -537,7 +538,7 @@ const ParameterType& Parametric::map_parameter_type(const std::string id) const
       }
     }
     msg << "'" << it->first << "'} (is '" << id << "')!";
-    DUNE_PYMOR_THROW(Exception::key_is_not_valid, msg.str());
+    DUNE_THROW(Stuff::Exceptions::wrong_input_given, msg.str());
   }
   return result->second;
 }
