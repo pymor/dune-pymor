@@ -11,6 +11,8 @@
 #include <dune/stuff/common/print.hh>
 #include <dune/stuff/common/exceptions.hh>
 
+#include <dune/pymor/common/exceptions.hh>
+
 #include "functional.hh"
 
 namespace Dune {
@@ -92,9 +94,9 @@ std::string ParameterFunctional::report(const std::string name) const
 void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
 {
   if (mu.type() != parameter_type())
-    DUNE_PYMOR_THROW(Exception::wrong_parameter_type,
-                     "the type of mu (" << mu.type().report() << ") does not match the parameter_type of this ("
-                     << parameter_type().report() << ")!");
+    DUNE_THROW(Pymor::Exceptions::wrong_parameter_type,
+               "the type of mu (" << mu.type().report() << ") does not match the parameter_type of this ("
+               << parameter_type().report() << ")!");
   // parse argument
   const auto serialized_mu = mu.serialize();
   assert(serialized_mu.size() == actual_size_);
@@ -107,13 +109,13 @@ void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
     std::stringstream ss;
     for (size_t ii = 0; ii < actual_size_; ++ii)
       ss << "  " << variables_[ii] << std::endl;
-    DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error,
-                          "evaluating this functional yielded an unlikely value!\n"
-                          << "The parameter_type() of this functional is:\n  " << parameter_type() << "\n"
-                          << "The variables of this functional are:\n" << ss.str()
-                          << "The expression of this functional is:\n  " << expression_ << "\n"
-                          << "You tried to evaluate it with:\n  mu = " << mu << "\n"
-                          << "The result was:\n  " << ret);
+    DUNE_THROW(Stuff::Exceptions::internal_error,
+               "evaluating this functional yielded an unlikely value!\n"
+               << "The parameter_type() of this functional is:\n  " << parameter_type() << "\n"
+               << "The variables of this functional are:\n" << ss.str()
+               << "The expression of this functional is:\n  " << expression_ << "\n"
+               << "You tried to evaluate it with:\n  mu = " << mu << "\n"
+               << "The result was:\n  " << ret);
   }
 } // ... evaluate(...)
 
@@ -132,12 +134,12 @@ void ParameterFunctional::setup()
     const size_t variable_size = type.get(variable_prefix);
     if (variable_size == 1) {
       if (expression_.find(variable_prefix + "[") != std::string::npos)
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::wrong_input_given,
-                              "There was a problem setting up this parameter functional:\n"
-                              << "At least one part of the parameter is scalar and the expression you gave indicates"
-                              << " that you expect it to be vector valued!\n"
-                              << "The parameter_type you provided is:\n  " << parameter_type() << "\n"
-                              << "The expression you provided is:\n  " << expression_ << "\n");
+        DUNE_THROW(Stuff::Exceptions::wrong_input_given,
+                   "There was a problem setting up this parameter functional:\n"
+                   << "At least one part of the parameter is scalar and the expression you gave indicates"
+                   << " that you expect it to be vector valued!\n"
+                   << "The parameter_type you provided is:\n  " << parameter_type() << "\n"
+                   << "The expression you provided is:\n  " << expression_ << "\n");
       variables_.push_back(variable_prefix);
     } else {
       for (size_t ii = 0; ii < variable_size; ++ii) {
@@ -149,11 +151,11 @@ void ParameterFunctional::setup()
   }
   actual_size_ = variables_.size();
   if (actual_size_ > DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE)
-    DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                     "the given ParameterType requires " << variables_.size()
-                     << " variables, but DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE is "
-                     << DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE
-                     << "! Recompile with larger DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE!");
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "the given ParameterType requires " << variables_.size()
+               << " variables, but DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE is "
+               << DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE
+               << "! Recompile with larger DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE!");
   for (size_t ii = variables_.size(); ii < DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE; ++ii)
     variables_.push_back("this_is_a_dummy_expression");
   assert(variables_.size() == DUNE_PYMOR_PARAMETERS_FUNCTIONAL_MAX_SIZE && "This should not happen!");
