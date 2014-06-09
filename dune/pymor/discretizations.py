@@ -428,7 +428,7 @@ try:
 
             def local_product(self, subdomain, id):
                 assert subdomain < self._impl.num_subdomains()
-                assert id in { 'l2', 'h1' }
+                assert id in { 'l2', 'h1_semi' }
                 return self._wrapper[self._impl.get_local_product(subdomain, id)]
 
             def local_operator(self, subdomain):
