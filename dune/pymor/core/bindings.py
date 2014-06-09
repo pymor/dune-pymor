@@ -112,7 +112,7 @@ def inject_lib_dune_pymor(module):
                     'ScalarType': 'double'},
             template_parameters='double',
             provides_data=False)
-    if CONFIG_H['HAVE_ISTL']:
+    if CONFIG_H['HAVE_DUNE_ISTL']:
         IstlDenseVector = 'Dune::Stuff::LA::IstlDenseVector< double >'
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
@@ -123,7 +123,7 @@ def inject_lib_dune_pymor(module):
             Traits={'ThisType': IstlDenseVector,
                     'ScalarType': 'double'},
             template_parameters='double',
-            provides_data=True)
+            provides_data=False)
     #   and the matrices
     CommonDenseMatrix = 'Dune::Stuff::LA::CommonDenseMatrix< double >'
     module, _ = dune.pymor.la.container.inject_MatrixImplementation(
@@ -147,7 +147,7 @@ def inject_lib_dune_pymor(module):
             Traits={'ThisType' : EigenRowMajorSparseMatrix,
                     'ScalarType' : 'double'},
             template_parameters='double')
-    if CONFIG_H['HAVE_ISTL']:
+    if CONFIG_H['HAVE_DUNE_ISTL']:
         IstlRowMajorSparseMatrix = 'Dune::Stuff::LA::IstlRowMajorSparseMatrix< double >'
         module, _ = dune.pymor.la.container.inject_MatrixImplementation(
             module, exceptions, interfaces, CONFIG_H,
@@ -203,7 +203,7 @@ def inject_lib_dune_pymor(module):
                     'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenMappedDenseVector + ' >',
                     'ScalarType' : 'double'},
             template_parameters=EigenMappedDenseVector)
-    if CONFIG_H['HAVE_ISTL']:
+    if CONFIG_H['HAVE_DUNE_ISTL']:
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : IstlDenseVector,
@@ -265,7 +265,7 @@ def inject_lib_dune_pymor(module):
         inject_affinelydecomposed_operator(EigenDenseMatrix, EigenMappedDenseVector)
         inject_affinelydecomposed_operator(EigenRowMajorSparseMatrix, EigenDenseVector)
         inject_affinelydecomposed_operator(EigenRowMajorSparseMatrix, EigenMappedDenseVector)
-    if CONFIG_H['HAVE_ISTL']:
+    if CONFIG_H['HAVE_DUNE_ISTL']:
         inject_operator_inverse_combo(IstlRowMajorSparseMatrix, IstlDenseVector)
         inject_affinelydecomposed_operator(IstlRowMajorSparseMatrix, IstlDenseVector)
 
