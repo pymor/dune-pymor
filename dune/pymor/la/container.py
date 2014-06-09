@@ -211,7 +211,7 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_constructor([])
     # what we want from ContainerInterface
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception'], exceptions['Exception']])
+                     throw=[exceptions['Exception']])
     Class.add_method('copy',
                      retval(ThisType),
                      [],

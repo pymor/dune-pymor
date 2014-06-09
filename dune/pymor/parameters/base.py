@@ -17,13 +17,10 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
     ParameterType.add_constructor([])
     ParameterType.add_constructor([param('std::string', 'kk'),
                                    param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'vv')],
-                                  throw=[exceptions['Exception'],
-                                         exceptions['Exception']])
+                                  throw=[exceptions['Exception']])
     ParameterType.add_constructor([param('std::vector< std::string >', 'kk'),
                                    param('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >', 'vv')],
-                                  throw=[exceptions['Exception'],
-                                         exceptions['Exception'],
-                                         exceptions['Exception']])
+                                  throw=[exceptions['Exception']])
     ParameterType.add_method('empty', retval('bool'), [], is_const=True)
     ParameterType.add_method('keys',
                              retval('std::vector< std::string >'),
@@ -41,9 +38,7 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
                              None,
                              [param('std::string', 'key'),
                               param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'value')],
-                             throw=[exceptions['Exception'],
-                                    exceptions['Exception'],
-                                    exceptions['Exception']])
+                             throw=[exceptions['Exception']])
     ParameterType.add_method('get',
                              retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                              [param('std::string', 'key')],
@@ -71,19 +66,16 @@ def inject_Parameter(module, exceptions, CONFIG_H):
                               throw=[exceptions['Exception']])
     Parameter.add_constructor([param('std::string', 'kk'),
                                param('std::vector< double >', 'vv')],
-                              throw=[exceptions['Exception'],
-                                     exceptions['Exception']])
+                              throw=[exceptions['Exception']])
     Parameter.add_constructor([param('Dune::Pymor::ParameterType', 'tt'),
                                param('std::vector< double >', 'vv')],
                               throw=[exceptions['Exception']])
     Parameter.add_constructor([param('std::vector< std::string >', 'kk'),
                                param('std::vector< std::vector< double > >', 'vv')],
-                              throw=[exceptions['Exception'],
-                                     exceptions['Exception']])
+                              throw=[exceptions['Exception']])
     Parameter.add_constructor([param('Dune::Pymor::ParameterType', 'tt'),
                                param('std::vector< std::vector< double > >', 'vv')],
-                              throw=[exceptions['Exception'],
-                                     exceptions['Exception']])
+                              throw=[exceptions['Exception']])
     Parameter.add_method('type', retval('Dune::Pymor::ParameterType'), [], is_const=True)
     Parameter.add_method('empty', retval('bool'), [], is_const=True)
     Parameter.add_method('keys',
@@ -102,9 +94,7 @@ def inject_Parameter(module, exceptions, CONFIG_H):
                          None,
                          [param('std::string', 'key'),
                           param('std::vector< double >', 'value')],
-                         throw=[exceptions['Exception'],
-                                exceptions['Exception'],
-                                exceptions['Exception']])
+                         throw=[exceptions['Exception']])
     Parameter.add_method('get',
                          retval('std::vector< double >'),
                          [param('std::string', 'key')],
