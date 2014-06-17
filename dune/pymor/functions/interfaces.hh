@@ -8,12 +8,14 @@
 
 #include <memory>
 #include <ostream>
+#include <limits>
 
 #include <dune/common/fmatrix.hh>
 #include <dune/common/fvector.hh>
 
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/common/string.hh>
+#include <dune/stuff/common/memory.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
@@ -21,6 +23,14 @@
 
 namespace Dune {
 namespace Pymor {
+namespace internal {
+
+
+template< class ParametricFunctionType >
+class FunctionWithParameter;
+
+
+} // namespace internal
 
 
 /**
@@ -151,6 +161,19 @@ public:
     }
   } // ... report(...)
 
+  virtual std::shared_ptr< const NonparametricType > with_mu(const Parameter& mu) const
+  {
+    if (this->parametric()) {
+      if (mu.type() != this->parameter_type())
+        DUNE_THROW(Pymor::Exceptions::wrong_parameter_type,
+                   "mu is " << mu.type() << ", should be " << this->parameter_type() << "!");
+      return std::make_shared< internal::FunctionWithParameter< ThisType > >(*this, mu);
+    } else {
+      assert(has_affine_part());
+      return affine_part();
+    }
+  } // ... with_mu(...)
+
   virtual double gamma(const Parameter& mu_1, const Parameter& mu_2) const
   {
     if (parametric()) {
@@ -216,6 +239,154 @@ std::ostream& operator<<(std::ostream& out,
 } // ... operator<<(...)
 
 
+namespace internal {
+
+
+template< class ParametricFunctionType >
+class FunctionWithParameter
+  : public Stuff::LocalizableFunctionInterface< typename ParametricFunctionType::EntityType
+                                              , typename ParametricFunctionType::DomainFieldType
+                                              , ParametricFunctionType::dimDomain
+                                              , typename ParametricFunctionType::RangeFieldType
+                                              , ParametricFunctionType::dimRange
+                                              , ParametricFunctionType::dimRangeCols >
+{
+  typedef FunctionWithParameter< ParametricFunctionType > ThisType;
+  typedef typename ParametricFunctionType::EntityType EE;
+  typedef typename ParametricFunctionType::DomainFieldType DD;
+  static const unsigned int dd = ParametricFunctionType::dimDomain;
+  typedef typename ParametricFunctionType::RangeFieldType RR;
+  static const unsigned int rr = ParametricFunctionType::dimRange;
+  static const unsigned int rC = ParametricFunctionType::dimRangeCols;
+  typedef Stuff::LocalizableFunctionInterface< EE, DD, dd, RR, rr, rC > BaseType;
+
+  class LocalFunction
+    : public Stuff::LocalfunctionInterface< EE, DD, dd, RR, rr, rC >
+  {
+    typedef Stuff::LocalfunctionInterface< EE, DD, dd, RR, rr, rC > BaseType;
+    typedef typename BaseType::DomainType DomainType;
+    typedef typename BaseType::RangeType  RangeType;
+    typedef typename BaseType::JacobianRangeType JacobianRangeType;
+
+  public:
+    LocalFunction(const EE& entity, const ParametricFunctionType& function, const std::vector< double >& coefficients)
+      : BaseType(entity)
+      , coefficients_(coefficients)
+      , local_components_(function.num_components(), nullptr)
+      , order_(0)
+      , tmp_range_(0)
+      , tmp_jacobian_range_(0)
+    {
+      for (size_t qq = 0; qq < function.num_components(); ++qq) {
+        local_components_[qq] = function.component(qq)->local_function(entity);
+        order_ = std::max(order_, local_components_[qq]->order());
+      }
+      if (function.has_affine_part())
+        affine_part_.push_back(function.affine_part()->local_function(entity));
+    } // LocalFunction(...)
+
+    LocalFunction(const LocalFunction& /*other*/) = delete;
+
+    LocalFunction& operator=(const LocalFunction& /*other*/) = delete;
+
+    virtual size_t order() const DS_OVERRIDE
+    {
+      return order_;
+    }
+
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+    {
+      ret *= 0.0;
+      for (size_t qq = 0; qq < local_components_.size(); ++qq) {
+        local_components_[qq]->evaluate(xx, tmp_range_);
+        tmp_range_ *= coefficients_[qq];
+        ret += tmp_range_;
+      }
+      if (affine_part_.size() > 0) {
+        affine_part_[0]->evaluate(xx, tmp_range_);
+        ret += tmp_range_;
+      }
+    } // ... evaluate(...)
+
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+    {
+      ret *= 0.0;
+      for (size_t qq = 0; qq < local_components_.size(); ++qq) {
+        local_components_[qq]->jacobian(xx, tmp_jacobian_range_);
+        tmp_jacobian_range_ *= coefficients_[qq];
+        ret += tmp_jacobian_range_;
+      }
+      if (affine_part_.size() > 0) {
+        affine_part_[0]->jacobian(xx, tmp_jacobian_range_);
+        ret += tmp_jacobian_range_;
+      }
+    } // ... jacobian(...)
+
+  private:
+    const std::vector< double >& coefficients_;
+    std::vector< std::shared_ptr< BaseType > > local_components_;
+    size_t order_;
+    mutable RangeType tmp_range_;
+    mutable JacobianRangeType tmp_jacobian_range_;
+    std::vector< std::shared_ptr< BaseType > > affine_part_;
+  }; // class LocalFunction
+
+public:
+  typedef typename BaseType::EntityType EntityType;
+  typedef typename BaseType::LocalfunctionType LocalfunctionType;
+
+  FunctionWithParameter(const ParametricFunctionType& parametric_function,
+                        const Parameter mu,
+                        const std::string nm = "")
+    : parametric_function_(parametric_function)
+    , name_(nm.empty() ? parametric_function_.name() /*+ " (with mu = " + mu.report() + ")"*/ : nm)
+    , type_(parametric_function_.type() /*+ " (with mu = " + mu.report() + ")"*/)
+    , coefficients_(parametric_function_.num_components())
+  {
+    assert(parametric_function_.parametric());
+    assert(mu.type() == parametric_function_.parameter_type());
+    for (size_t qq = 0; qq < parametric_function_.num_components(); ++qq)
+      coefficients_[qq] = parametric_function_.coefficient(qq)->evaluate(mu);
+  }
+
+  FunctionWithParameter(const ThisType& other)
+    : parametric_function_(other.parametric_function_)
+    , name_(other.name_)
+    , type_(other.type_)
+    , coefficients_(other.coefficients_)
+  {}
+
+  ThisType& operator=(const ThisType& other) = delete;
+
+  virtual std::unique_ptr< LocalfunctionType > local_function(const EntityType& entity) const DS_OVERRIDE
+  {
+    return Stuff::Common::make_unique< LocalFunction >(entity, parametric_function_, coefficients_);
+  }
+
+  virtual ThisType* copy() const DS_OVERRIDE
+  {
+    DUNE_THROW(NotImplemented, "Implement me!");
+  }
+
+  virtual std::string type() const DS_OVERRIDE
+  {
+    return type_;
+  }
+
+  virtual std::string name() const DS_OVERRIDE
+  {
+    return name_;
+  }
+
+private:
+  const ParametricFunctionType& parametric_function_;
+  const std::string name_;
+  const std::string type_;
+  std::vector< double > coefficients_;
+}; // class FunctionWithParameter
+
+
+} // namespace internal
 } // namespace Pymor
 } // namespace Dune
 
