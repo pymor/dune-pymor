@@ -86,7 +86,7 @@ public:
     return !parametric();
   }
 
-  virtual std::shared_ptr< const NonparametricType > affine_part() const
+  virtual const std::shared_ptr< const NonparametricType >& affine_part() const
   {
     if (has_affine_part())
       DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
@@ -107,7 +107,7 @@ public:
     return false;
   } // ... num_components(...)
 
-  virtual std::shared_ptr< const NonparametricType > component(const DUNE_STUFF_SSIZE_T qq) const
+  virtual const std::shared_ptr< const NonparametricType >& component(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (!parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
@@ -121,7 +121,7 @@ public:
     return nullptr;
   } // ... component(...)
 
-  virtual std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_STUFF_SSIZE_T qq) const
+  virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (!parametric())
       DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
