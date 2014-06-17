@@ -404,7 +404,10 @@ try:
                 if not self.logging_disabled:
                     self.logger.info('Solving {} for {} ...'.format(self.name, mu))
                 mu = self._wrapper.dune_parameter(mu)
-                global_solution = self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
+                global_solution = self._impl.solve_and_return_ptr(mu)
+                assert global_solution.valid()
+                global_solution = self._wrapper[global_solution]
+                global_solution = self._wrapper.vector_array(global_solution)
                 return BlockVectorArray([self.localize_vector(global_solution, ss) for ss in np.arange(self._impl.num_subdomains())])
 
             _solve = solve
