@@ -137,14 +137,7 @@ public:
 
   virtual void report(std::ostream& out, const std::string prefix = "") const
   {
-    out << prefix << "affinely decomposable function '" << name() << "' (of type " << type() << "):" << std::endl;
-    out << prefix << "  has_affine_part: ";
-    if (has_affine_part())
-      out << "true";
-    else
-      out << "false";
-    out << std::endl;
-    out << prefix << "  num_components: " << num_components();
+    out << prefix << "affinely decomposable function '" << name() << "' (of type " << type() << "):";
     if (parametric())
       out << "\n" << prefix << "  parameter_type: " << parameter_type();
     if (has_affine_part()) {
@@ -154,6 +147,7 @@ public:
     for (size_t qq = 0; qq < num_components(); ++qq) {
       out << "\n";
       component(qq)->report(out, prefix + "  component " + Stuff::Common::toString(qq) + ": ");
+      out << "\n" << prefix << "  coefficient " << qq << ": " << coefficient(qq)->expression();
     }
   } // ... report(...)
 
