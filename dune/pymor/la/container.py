@@ -82,6 +82,12 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_method('has_equal_shape',
                      'bool',
                      [param('const ' + ThisType + ' &', 'other')],
+                     is_const=True,
+                     throw=[exceptions['Exception']])
+    Class.add_method('valid',
+                     'bool',
+                     [],
+                     is_const=True,
                      throw=[exceptions['Exception']])
     # what we want from ProvidesData interface
     if provides_data:
