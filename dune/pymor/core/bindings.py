@@ -101,7 +101,7 @@ def inject_lib_dune_pymor(module):
             Traits={'ThisType': EigenDenseVector,
                     'ScalarType': 'double'},
             template_parameters='double',
-            provides_data=True)
+            provides_data=False)
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
             exceptions,
