@@ -73,7 +73,7 @@ public:
     return nonparametric_->name();
   }
 
-  virtual std::shared_ptr< const NonparametricType > affine_part() const DS_OVERRIDE
+  virtual const std::shared_ptr< const NonparametricType >& affine_part() const DS_OVERRIDE
   {
     return nonparametric_;
   }
@@ -366,7 +366,7 @@ public:
     return hasAffinePart_;
   }
 
-  virtual std::shared_ptr< const NonparametricType > affine_part() const DS_OVERRIDE
+  virtual const std::shared_ptr< const NonparametricType >& affine_part() const DS_OVERRIDE
   {
     if (!hasAffinePart_)
       DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
@@ -379,7 +379,7 @@ public:
     return num_components_;
   }
 
-  virtual std::shared_ptr< const NonparametricType > component(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
+  virtual const std::shared_ptr< const NonparametricType >& component(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
   {
     if (num_components_ == 0)
       DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
@@ -391,7 +391,7 @@ public:
     return components_[qq];
   }
 
-  virtual std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
+  virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
   {
     if (num_components_ == 0)
       DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
