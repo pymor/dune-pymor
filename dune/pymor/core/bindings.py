@@ -102,6 +102,7 @@ def inject_lib_dune_pymor(module):
                     'ScalarType': 'double'},
             template_parameters='double',
             provides_data=False)
+        module.add_container('std::vector< Dune::Stuff::LA::EigenDenseVector< double > >', 'Dune::Stuff::LA::EigenDenseVector< double >', 'list')
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
             exceptions,
