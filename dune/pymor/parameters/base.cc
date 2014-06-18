@@ -489,30 +489,32 @@ Parameter Parametric::map_parameter(const Parameter& mu, const std::string id) c
     DUNE_THROW(Stuff::Exceptions::wrong_input_given, "there is nothing to map!");
   const auto result = inherits_map_.find(id);
   if (result == inherits_map_.end()) {
-    std::stringstream msg;
-    msg << "id has to be one of {";
-    size_t count = 0;
-    const auto itEnd = inherits_map_.end();
-    auto it = inherits_map_.begin();
-    if (inherits_map_.size() > 1) {
-      for (; it != itEnd; ++it) {
-        if (count < inherits_map_.size() - 1) {
-          msg << "'" << it->first << "', ";
-          ++count;
-        } else {
-          ++it;
-          break;
-        }
-      }
-    }
-    msg << "'" << it->first << "'} (is '" << id << "')!";
-    DUNE_THROW(Stuff::Exceptions::wrong_input_given, msg.str());
+    return Parameter();
+//    std::stringstream msg;
+//    msg << "id has to be one of {";
+//    size_t count = 0;
+//    const auto itEnd = inherits_map_.end();
+//    auto it = inherits_map_.begin();
+//    if (inherits_map_.size() > 1) {
+//      for (; it != itEnd; ++it) {
+//        if (count < inherits_map_.size() - 1) {
+//          msg << "'" << it->first << "', ";
+//          ++count;
+//        } else {
+//          ++it;
+//          break;
+//        }
+//      }
+//    }
+//    msg << "'" << it->first << "'} (is '" << id << "')!";
+//    DUNE_THROW(Stuff::Exceptions::wrong_input_given, msg.str());
+  } else {
+    const ParameterType& localType = result->second;
+    Parameter muLocal;
+    for (auto key : localType.keys())
+      muLocal.set(key, mu.get(key));
+    return muLocal;
   }
-  const ParameterType& localType = result->second;
-  Parameter muLocal;
-  for (auto key : localType.keys())
-    muLocal.set(key, mu.get(key));
-  return muLocal;
 }
 
 const ParameterType& Parametric::map_parameter_type(const std::string id) const
