@@ -60,10 +60,14 @@ public:
 
   AffinelyDecomposableFunctionInterface(const ParameterType tt = ParameterType())
     : Parametric(tt)
+    , nullptr_1_(nullptr)
+    , nullptr_2_(nullptr)
   {}
 
   AffinelyDecomposableFunctionInterface(const Parametric& other)
     : Parametric(other)
+    , nullptr_1_(nullptr)
+    , nullptr_2_(nullptr)
   {}
 
   virtual ~AffinelyDecomposableFunctionInterface() {}
@@ -104,7 +108,7 @@ public:
     else
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
                        "Do not call affine_part() if has_affine_part() == false!");
-    return nullptr;
+    return nullptr_1_;
   } // ... affine_part(...)
 
   virtual DUNE_STUFF_SSIZE_T num_components() const
@@ -128,7 +132,7 @@ public:
     else
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
                        "Do not call component(" << qq << ") if num_components() == 0!");
-    return nullptr;
+    return nullptr_1_;
   } // ... component(...)
 
   virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const
@@ -142,7 +146,7 @@ public:
     else
       DUNE_PYMOR_THROW(Exception::requirements_not_met,
                        "Do not call coefficient(" << qq << ") if num_coefficients() == 0!");
-    return nullptr;
+    return nullptr_2_;
   } // ... coefficient(...)
 
   virtual void report(std::ostream& out, const std::string prefix = "") const
@@ -227,6 +231,9 @@ public:
 private:
   template< class T >
   friend std::ostream& operator<<(std::ostream& /*out*/, const ThisType& /*function*/);
+
+  const std::shared_ptr< const NonparametricType > nullptr_1_;
+  const std::shared_ptr< const ParameterFunctional > nullptr_2_;
 }; // class AffinelyDecomposableFunctionInterface
 
 
