@@ -158,7 +158,7 @@ public:
       out << "\n";
       affine_part()->report(out, prefix + "  affine_part: ");
     }
-    for (size_t qq = 0; qq < num_components(); ++qq) {
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
       out << "\n";
       component(qq)->report(out, prefix + "  component " + Stuff::Common::toString(qq) + ": ");
       out << "\n" << prefix << "  coefficient " << qq << ": " << coefficient(qq)->expression();
@@ -192,7 +192,7 @@ public:
       else {
         double ret = std::numeric_limits< double >::min();
         assert(num_components() > 0);
-        for (size_t qq = 0; qq < num_components(); ++qq) {
+        for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
           const double theta_mu_1 = coefficient(qq)->evaluate(mu_1);
           const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
           ret = std::max(ret, theta_mu_1 / theta_mu_2);
@@ -217,7 +217,7 @@ public:
       else {
         double ret = std::numeric_limits< double >::max();
         assert(num_components() > 0);
-        for (size_t qq = 0; qq < num_components(); ++qq) {
+        for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
           const double theta_mu_1 = coefficient(qq)->evaluate(mu_1);
           const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
           ret = std::min(ret, theta_mu_1 / theta_mu_2);
@@ -284,7 +284,7 @@ class FunctionWithParameter
       , tmp_range_(0)
       , tmp_jacobian_range_(0)
     {
-      for (size_t qq = 0; qq < function.num_components(); ++qq) {
+      for (DUNE_STUFF_SSIZE_T qq = 0; qq < function.num_components(); ++qq) {
         local_components_[qq] = function.component(qq)->local_function(entity);
         order_ = std::max(order_, local_components_[qq]->order());
       }
@@ -352,7 +352,7 @@ public:
   {
     assert(parametric_function_.parametric());
     assert(mu.type() == parametric_function_.parameter_type());
-    for (size_t qq = 0; qq < parametric_function_.num_components(); ++qq)
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < parametric_function_.num_components(); ++qq)
       coefficients_[qq] = parametric_function_.coefficient(qq)->evaluate(mu);
   }
 
