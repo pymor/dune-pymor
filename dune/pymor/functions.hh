@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
 #include <dune/stuff/functions.hh>
 
@@ -34,7 +34,7 @@ public:
     return availableFunctions;
   } // ... available(...)
 
-  static Stuff::Common::ConfigTree default_config(const std::string type = available()[0])
+  static Stuff::Common::Configuration default_config(const std::string type = available()[0])
   {
     if (type == Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::static_id())
       return Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::default_config();
@@ -45,7 +45,7 @@ public:
   } // ... default_config(...)
 
       static std::unique_ptr< AffinelyDecomposableFunctionInterface< E, D, d, R, r, rC > >
-  create(const std::string type = available()[0], const Stuff::Common::ConfigTree config = default_config())
+  create(const std::string type = available()[0], const Stuff::Common::Configuration config = default_config())
   {
     if (type == Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::static_id())
       return Function::AffinelyDecomposableDefault< E, D, d, R, r, rC >::create(config);

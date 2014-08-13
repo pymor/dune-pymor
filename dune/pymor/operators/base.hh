@@ -94,7 +94,7 @@ public:
     , options_(LinearSolverType::options(type))
   {}
 
-  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const Stuff::Common::ConfigTree& options)
+  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const Stuff::Common::Configuration& options)
     : matrix_(matrix_ptr)
     , options_(options)
   {}
@@ -106,7 +106,7 @@ public:
   {}
 
   MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr,
-                            const Stuff::Common::ConfigTree& options)
+                            const Stuff::Common::Configuration& options)
     : matrix_(matrix_ptr)
     , options_(options)
   {}
@@ -148,14 +148,14 @@ public:
     return { "exact" };
   }
 
-  static Stuff::Common::ConfigTree invert_options(const std::string& type)
+  static Stuff::Common::Configuration invert_options(const std::string& type)
   {
     Stuff::LA::SolverUtils::check_given(type, invert_options());
-    Stuff::Common::ConfigTree options("type", type);
+    Stuff::Common::Configuration options("type", type);
     return options;
   } // invert_options(...)
 
-  InverseType invert(const Stuff::Common::ConfigTree& options, const Parameter mu = Parameter()) const
+  InverseType invert(const Stuff::Common::Configuration& options, const Parameter mu = Parameter()) const
   {
     if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                       "mu has to be empty if parametric() == false (is " << mu << ")!");
@@ -179,7 +179,7 @@ public:
 
 private:
   std::shared_ptr< const MatrixType > matrix_;
-  const Stuff::Common::ConfigTree options_;
+  const Stuff::Common::Configuration options_;
 }; // class MatrixBasedInverseDefault
 
 
@@ -255,12 +255,12 @@ public:
     return LinearSolverType::options();
   }
 
-  static Stuff::Common::ConfigTree invert_options(const std::string& type)
+  static Stuff::Common::Configuration invert_options(const std::string& type)
   {
     return LinearSolverType::options(type);
   }
 
-  InverseType invert(const Stuff::Common::ConfigTree& options, const Parameter mu = Parameter()) const
+  InverseType invert(const Stuff::Common::Configuration& options, const Parameter mu = Parameter()) const
   {
     if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                       "mu has to be empty if parametric() == false (is " << mu << ")!");

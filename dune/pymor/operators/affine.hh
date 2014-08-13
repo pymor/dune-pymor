@@ -130,12 +130,12 @@ public:
     return ComponentType::invert_options();
   }
 
-  static Stuff::Common::ConfigTree invert_options(const std::string& type)
+  static Stuff::Common::Configuration invert_options(const std::string& type)
   {
     return ComponentType::invert_options(type);
   }
 
-  InverseType invert(const Stuff::Common::ConfigTree& option, const Parameter mu = Parameter()) const
+  InverseType invert(const Stuff::Common::Configuration& option, const Parameter mu = Parameter()) const
   {
     return freeze_parameter(mu).invert(option);
   }

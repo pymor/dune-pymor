@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <dune/stuff/functions/checkerboard.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
 
 #include <dune/pymor/common/exceptions.hh>
@@ -50,9 +50,9 @@ public:
     return BaseType::BaseType::static_id() + ".checkerboard";
   }
 
-  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
+  static Stuff::Common::Configuration default_config(const std::string sub_name = "")
   {
-    Stuff::Common::ConfigTree config;
+    Stuff::Common::Configuration config;
     config["lower_left"] = "[0.0 0.0 0.0]";
     config["upper_right"] = "[1.0 1.0 1.0]";
     config["num_elements"] = "[2 2 2]";
@@ -61,19 +61,19 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Stuff::Common::ConfigTree tmp;
+      Stuff::Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
+  static std::unique_ptr< ThisType > create(const Stuff::Common::Configuration config = default_config(),
                                             const std::string sub_name = static_id())
 
   {
     // get correct config
-    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
-    const Stuff::Common::ConfigTree default_cfg = default_config();
+    const Stuff::Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Stuff::Common::Configuration default_cfg = default_config();
     // create
     return Stuff::Common::make_unique< ThisType >(
           cfg.get("lower_left",     default_cfg.get< std::vector< DomainFieldType > >("lower_left")),

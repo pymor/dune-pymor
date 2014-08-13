@@ -10,7 +10,7 @@
 
 #include <dune/stuff/functions/interfaces.hh>
 #include <dune/stuff/functions/expression.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/functions/expression.hh>
 #include <dune/stuff/functions.hh>
@@ -117,9 +117,9 @@ public:
     return BaseType::static_id() + ".affinelydecomposabledefault";
   }
 
-  static Stuff::Common::ConfigTree default_config(const std::string sub_name = "")
+  static Stuff::Common::Configuration default_config(const std::string sub_name = "")
   {
-    Stuff::Common::ConfigTree config;
+    Stuff::Common::Configuration config;
     typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
         NonparametricFunctions;
     const std::string nonparametricType = NonparametricFunctions::available()[0];
@@ -140,17 +140,17 @@ public:
     if (sub_name.empty())
       return config;
     else {
-      Stuff::Common::ConfigTree tmp;
+      Stuff::Common::Configuration tmp;
       tmp.add(config, sub_name);
       return tmp;
     }
   } // ... default_config(...)
 
-  static std::unique_ptr< ThisType > create(const Stuff::Common::ConfigTree config = default_config(),
+  static std::unique_ptr< ThisType > create(const Stuff::Common::Configuration config = default_config(),
                                             const std::string sub_name = static_id())
 
   {
-    const Stuff::Common::ConfigTree cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
+    const Stuff::Common::Configuration cfg = config.has_sub(sub_name) ? config.sub(sub_name) : config;
     typedef Stuff::FunctionsProvider< EntityType, DomainFieldType, dimDomain, RangeFieldType, dimRange, dimRangeCols >
         NonparametricFunctions;
     const std::string name = cfg.get< std::string >("name", static_id());

@@ -10,7 +10,7 @@
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/la/solver.hh>
 #include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/configtree.hh>
+#include <dune/stuff/common/configuration.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -128,7 +128,7 @@ public:
     return derived_type::invert_options();
   }
 
-  static Stuff::Common::ConfigTree invert_options(const std::string& type)
+  static Stuff::Common::Configuration invert_options(const std::string& type)
   {
     return derived_type::invert_options(type);
   }
@@ -138,7 +138,7 @@ public:
     return invert(invert_options(type), mu);
   }
 
-  InverseType invert(const Stuff::Common::ConfigTree& option, const Parameter mu = Parameter()) const
+  InverseType invert(const Stuff::Common::Configuration& option, const Parameter mu = Parameter()) const
   {
     CHECK_CRTP(this->as_imp(*this).invert(option, mu));
     return this->as_imp(*this).invert(option, mu);
@@ -150,7 +150,7 @@ public:
     return new InverseType(invert(type, mu));
   }
 
-  InverseType* invert_and_return_ptr(const Stuff::Common::ConfigTree& option,
+  InverseType* invert_and_return_ptr(const Stuff::Common::Configuration& option,
                                      const Parameter mu = Parameter()) const
   {
     return new InverseType(invert(option, mu));
@@ -166,7 +166,7 @@ public:
 
   void apply_inverse(const RangeType& range,
                      SourceType& source,
-                     const Stuff::Common::ConfigTree& option,
+                     const Stuff::Common::Configuration& option,
                      const Parameter mu = Parameter()) const
   {
     invert(option, mu).apply(range, source);
@@ -182,7 +182,7 @@ public:
   }
 
   SourceType apply_inverse(const RangeType& range,
-                           const Stuff::Common::ConfigTree& option,
+                           const Stuff::Common::Configuration& option,
                            const Parameter mu = Parameter()) const
   {
     SourceType source(dim_source());
@@ -198,7 +198,7 @@ public:
   }
 
   SourceType* apply_inverse_and_return_ptr(const RangeType& range,
-                                           const Stuff::Common::ConfigTree& option,
+                                           const Stuff::Common::Configuration& option,
                                            const Parameter mu = Parameter()) const
   {
     return new SourceType(apply_inverse(range, option, mu));
