@@ -11,6 +11,7 @@
 #include <dune/common/float_cmp.hh>
 
 #include <dune/stuff/la/container.hh>
+#include <dune/stuff/test/la_container.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -76,8 +77,8 @@ struct MatrixBasedOperatorTests
                   "OperatorType has to be derived from Stuff::LA::ProvidesConstContainer!");
     // dynamic tests
     // * of the class itself (aka the derived type)
-    OperatorType d_from_ptr(new D_ContainerType(Stuff::LA::Container< D_ContainerType >::create(test_dim)));
-    OperatorType d_from_shared_ptr(std::make_shared< D_ContainerType >(Stuff::LA::Container< D_ContainerType >::create(test_dim)));
+    OperatorType d_from_ptr(new D_ContainerType(ContainerFactory< D_ContainerType >::create(test_dim)));
+    OperatorType d_from_shared_ptr(std::make_shared< D_ContainerType >(ContainerFactory< D_ContainerType >::create(test_dim)));
     d_from_shared_ptr = d_from_ptr;
     OperatorType DUNE_UNUSED(d_copy_constructor)(d_from_ptr); // <- at this point, all operators share the same matrix!
     const bool d_linear = d_from_ptr.linear();
