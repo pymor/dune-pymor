@@ -93,22 +93,20 @@ public:
   {
     // check input
     if (numElements.size() < dimDomain)
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "numElements has to be at least of size " << dimDomain << " is(" << numElements.size()
-                       << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "numElements has to be at least of size " << dimDomain << " is(" << numElements.size() << ")!");
     size_t parameterSize = 1;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
       if (lowerLeft[dd] >= upperRight[dd])
-        DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense,
-                         "lowerLeft[" << dd << "] = " << lowerLeft[dd] << " has to be smaller than upperRight["
-                         << dd << "]!");
+        DUNE_THROW(Stuff::Exceptions::wrong_input_given,
+                   "lowerLeft[" << dd << "] = " << lowerLeft[dd] << " has to be smaller than upperRight[" << dd << "]!");
       if (numElements[dd] <= 0)
-        DUNE_PYMOR_THROW(Exception::index_out_of_range,
-                         "numElements[" << dd << "] has to be positive (is " << numElements[dd] << ")!");
+        DUNE_THROW(Stuff::Exceptions::wrong_input_given,
+                   "numElements[" << dd << "] has to be positive (is " << numElements[dd] << ")!");
       parameterSize *= numElements[dd];
     }
     if (parameterName.empty())
-      DUNE_PYMOR_THROW(Exception::wrong_input, "parameterName must not be empty!");
+      DUNE_THROW(Stuff::Exceptions::wrong_input_given, "parameterName must not be empty!");
     // build parameter
     const ParameterType parameterType(parameterName, parameterSize);
     // create the coefficients and components

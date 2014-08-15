@@ -58,7 +58,7 @@ public:
     , affinelyDecomposedVector_(affinelyDecomposedVector)
   {
     if (!affinelyDecomposedVector_.has_affine_part() && affinelyDecomposedVector_.num_components() == 0)
-      DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "affinelyDecomposedVector must not be empty!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met, "affinelyDecomposedVector must not be empty!");
     if (affinelyDecomposedVector_.has_affine_part())
       dim_ = affinelyDecomposedVector_.affine_part()->dim();
     else
@@ -118,8 +118,8 @@ public:
   ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
     if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
-                       << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
+      DUNE_THROW(Exceptions::wrong_parameter_type, "the type of mu (" << mu.type()
+                 << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
     if (!Parametric::parametric())
       return affinelyDecomposedVector_.affine_part()->dot(source);
     else
@@ -129,11 +129,12 @@ public:
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
     if (!Parametric::parametric())
-      DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
-                       << "if parametric() == false!");
+      DUNE_THROW(Exceptions::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
+                 << "if parametric() == false!");
     if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
-                       << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
+                 << Parametric::parameter_type() << ")!");
     return FrozenType(new VectorType(affinelyDecomposedVector_.freeze_parameter(mu)));
   }
 

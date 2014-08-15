@@ -20,7 +20,7 @@ AnalyticalProblem::AnalyticalProblem(const DUNE_STUFF_SSIZE_T dd)
   , dim_(dd)
 {
   if (dd < 1)
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::index_out_of_range, "dd has to be positive (is " << dd << ")!");
+    DUNE_THROW(Dune::Stuff::Exceptions::index_out_of_range, "dd has to be positive (is " << dd << ")!");
   // build the data functions
   // * diffusion
   const Dune::Pymor::ParameterType muDiffusion = {"diffusion", dim_};
@@ -222,8 +222,8 @@ std::vector< std::string > SimpleDiscretization::available_products() const
 
 typename SimpleDiscretization::ProductType SimpleDiscretization::get_product(const std::string /*id*/) const
 {
-  DUNE_PYMOR_THROW(Dune::Pymor::Exception::this_does_not_make_any_sense,
-                   "This discretizaiton does not have any products!");
+  DUNE_THROW(Dune::Stuff::Exceptions::you_are_using_this_wrong,
+             "This discretizaiton does not have any products!");
 }
 
 typename SimpleDiscretization::VectorType SimpleDiscretization::create_vector() const
@@ -239,20 +239,20 @@ typename SimpleDiscretization::VectorType SimpleDiscretization::create_vector() 
 //std::string SimpleDiscretization::solver_options(const std::string context) const
 //{
 //  if (context != solver_options()[0])
-//    DUNE_PYMOR_THROW(Dune::Pymor::Exception::key_is_not_valid,
-//                     "context has to be '" << solver_options()[0] << "' (is '" << context << "')!");
+//    DUNE_THROW(Dune::Stuff::Exceptions::configuration_error,
+//               "context has to be '" << solver_options()[0] << "' (is '" << context << "')!");
 //  return OperatorType::invert_options()[0];
 //}
 
 void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Parameter mu) const
 {
   if (mu.type() != parameter_type())
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_parameter_type,
-                     "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
+    DUNE_THROW(Dune::Pymor::Exceptions::wrong_parameter_type,
+               "type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                      << parameter_type() << ")!");
   if ((DUNE_STUFF_SSIZE_T)(vector.dim()) != dim_)
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
-                     "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
+    DUNE_THROW(Dune::Stuff::Exceptions::shapes_do_not_match,
+               "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   // freeze lhs and rhs
   const Dune::Pymor::Parameter mu_lhs = map_parameter(mu, "lhs");
   const auto lhs = op_->freeze_parameter(mu_lhs);
@@ -268,14 +268,14 @@ void SimpleDiscretization::visualize(const VectorType& vector,
                                      const std::string name) const
 {
   if ((DUNE_STUFF_SSIZE_T)(vector.dim()) != dim_)
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::sizes_do_not_match,
-                     "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
+    DUNE_THROW(Dune::Stuff::Exceptions::shapes_do_not_match,
+               "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
   if (filename.empty())
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::wrong_input, "filename must not be empty!");
+    DUNE_THROW(Dune::Stuff::Exceptions::wrong_input_given, "filename must not be empty!");
   std::ofstream file;
   file.open(filename);
   if (!file.is_open())
-    DUNE_PYMOR_THROW(Dune::Pymor::Exception::io_error, "could not open '" << filename << "' for writing!");
+    DUNE_THROW(Dune::IOError, "could not open '" << filename << "' for writing!");
   file << name << " = [";
   for (size_t ii = 0; ii < vector.dim() - 1; ++ii)
     file << vector.get_entry(ii) << ", ";

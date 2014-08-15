@@ -103,11 +103,9 @@ public:
   virtual const std::shared_ptr< const NonparametricType >& affine_part() const
   {
     if (has_affine_part())
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since has_affine_part() == true, you really do!");
+      DUNE_THROW(Stuff::Exceptions::you_have_to_implement_this, "since has_affine_part() == true, you really do!");
     else
-      DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                       "Do not call affine_part() if has_affine_part() == false!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met, "Do not call affine_part() if has_affine_part() == false!");
     return nullptr_1_;
   } // ... affine_part(...)
 
@@ -116,36 +114,35 @@ public:
     if (!has_affine_part())
       return 0;
     else
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since affinely_decomposable() == true and has_affine_part() == false, you really do!");
+      DUNE_THROW(Stuff::Exceptions::you_have_to_implement_this,
+                 "since affinely_decomposable() == true and has_affine_part() == false, you really do!");
     return false;
   } // ... num_components(...)
 
   virtual const std::shared_ptr< const NonparametricType >& component(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (!parametric())
-      DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                       "Do not call component(" << qq << ") if parametric() == false!");
+      DUNE_THROW(Exceptions::this_is_not_parametric, "Do not call component(" << qq << ") if parametric() == false!");
     if (num_components() > 0)
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since num_components() (= " << num_components() << ") > 0, you really do!");
+      DUNE_THROW(Stuff::Exceptions::you_have_to_implement_this,
+                 "since num_components() (= " << num_components() << ") > 0, you really do!");
     else
-      DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                       "Do not call component(" << qq << ") if num_components() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "Do not call component(" << qq << ") if num_components() == 0!");
     return nullptr_1_;
   } // ... component(...)
 
   virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (!parametric())
-      DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                       "Do not call coefficient(" << qq << ") if parametric() == false!");
+      DUNE_THROW(Exceptions::this_is_not_parametric,
+                 "Do not call coefficient(" << qq << ") if parametric() == false!");
     if (num_components() > 0)
-      DUNE_PYMOR_THROW(Exception::you_have_to_implement_this,
-                       "since num_coefficients() (= " << num_components() << ") > 0, you really do!");
+      DUNE_THROW(Stuff::Exceptions::you_have_to_implement_this,
+                 "since num_coefficients() (= " << num_components() << ") > 0, you really do!");
     else
-      DUNE_PYMOR_THROW(Exception::requirements_not_met,
-                       "Do not call coefficient(" << qq << ") if num_coefficients() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "Do not call coefficient(" << qq << ") if num_coefficients() == 0!");
     return nullptr_2_;
   } // ... coefficient(...)
 

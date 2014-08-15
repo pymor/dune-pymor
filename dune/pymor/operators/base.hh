@@ -128,16 +128,17 @@ public:
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
-    if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                                      "mu has to be empty if parametric() == false (is " << mu << ")!");
+    if (!mu.empty())
+      DUNE_THROW(Exceptions::this_is_not_parametric,
+                 "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (source.pb_dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "the dim of source (" << source.pb_dim() << ") does not match the dim_source of this ("
-                       << dim_source() << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "the dim of source (" << source.pb_dim() << ") does not match the dim_source of this ("
+                 << dim_source() << ")!");
     if (range.pb_dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
-                       << dim_range() << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
+                 << dim_range() << ")!");
     LinearSolverType(*matrix_).apply(source, range, options_);
   } // ... apply(...)
 
@@ -157,8 +158,8 @@ public:
 
   InverseType invert(const Stuff::Common::Configuration& options, const Parameter mu = Parameter()) const
   {
-    if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                                      "mu has to be empty if parametric() == false (is " << mu << ")!");
+    if (!mu.empty())
+      DUNE_THROW(Exceptions::this_is_not_parametric, "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (!options.has_key("type"))
       DUNE_THROW(Stuff::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
@@ -172,8 +173,8 @@ public:
   {
     if (!mu.empty())
       DUNE_THROW(Stuff::Exceptions::internal_error, "This must not happen");
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "do not call freeze_parameter(" << mu << ") if parametric() == false!");
+    DUNE_THROW(Exceptions::this_is_not_parametric,
+               "do not call freeze_parameter(" << mu << ") if parametric() == false!");
     return FrozenType(nullptr, invert_options()[0]);
   } // ... freeze_parameter(...)
 
@@ -235,16 +236,16 @@ public:
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
-    if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                                      "mu has to be empty if parametric() == false (is " << mu << ")!");
+    if (!mu.empty()) DUNE_THROW(Exceptions::this_is_not_parametric,
+                                "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (source.pb_dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "the dim of source (" << source.pb_dim() << ") does not match the dim_source of this ("
-                       << dim_source() << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "the dim of source (" << source.pb_dim() << ") does not match the dim_source of this ("
+                 << dim_source() << ")!");
     if (range.pb_dim() != dim_range())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
-                       << dim_range() << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
+                 << dim_range() << ")!");
     matrix_->mv(source, range);
   } // ... apply(...)
 
@@ -262,8 +263,8 @@ public:
 
   InverseType invert(const Stuff::Common::Configuration& options, const Parameter mu = Parameter()) const
   {
-    if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                                      "mu has to be empty if parametric() == false (is " << mu << ")!");
+    if (!mu.empty()) DUNE_THROW(Exceptions::this_is_not_parametric,
+                                "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (!options.has_key("type"))
       DUNE_THROW(Stuff::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
@@ -277,8 +278,8 @@ public:
   {
     if (!mu.empty())
       DUNE_THROW(Stuff::Exceptions::internal_error, "This must not happen");
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                     "do not call freeze_parameter(" << mu << ") if parametric() == false!");
+    DUNE_THROW(Exceptions::this_is_not_parametric,
+               "do not call freeze_parameter(" << mu << ") if parametric() == false!");
     return FrozenType(nullptr);
   } // ... freeze_parameter(...)
 

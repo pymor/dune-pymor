@@ -183,7 +183,7 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 //    try {
 //      d_inverse.apply(d_range, d_source);
 //      d_operator.apply_inverse(d_source, d_range, d_invert_options[0], mu);
-//    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
+//    } catch (Dune::Stuff::Exceptions::linear_solver_failed) {}
 //    // * of the class as the interface
 //    InterfaceType& i_operator = static_cast< InterfaceType& >(d_operator);
 //    if (!i_operator.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
@@ -212,7 +212,7 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 //    try {
 //      i_inverse.apply(i_range, i_source);
 //      i_operator.apply_inverse(i_source, i_range, i_invert_options[0], mu);
-//    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
+//    } catch (Dune::Stuff::Exceptions::linear_solver_failed) {}
 //  }
 //}; // struct LinearAffinelyDecomposedContainerBasedOperatorTest
 

@@ -62,7 +62,7 @@ public:
     , affinelyDecomposedContainer_(affinelyDecomposedContainer)
   {
     if (!affinelyDecomposedContainer_.has_affine_part() && affinelyDecomposedContainer_.num_components() == 0)
-      DUNE_PYMOR_THROW(Exception::this_does_not_make_any_sense, "affinelyDecomposedContainer must not be empty!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met, "affinelyDecomposedContainer must not be empty!");
     if (affinelyDecomposedContainer_.has_affine_part()) {
       dim_source_ = affinelyDecomposedContainer_.affine_part()->cols();
       dim_range_ = affinelyDecomposedContainer_.affine_part()->rows();
@@ -115,8 +115,8 @@ public:
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
     if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
-                       << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
+      DUNE_THROW(Exceptions::wrong_parameter_type, "the type of mu (" << mu.type()
+                 << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
     if (!Parametric::parametric())
       ComponentType(affinelyDecomposedContainer_.affine_part()).apply(source, range);
     else
@@ -143,11 +143,12 @@ public:
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
     if (!Parametric::parametric())
-      DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
-                       << " if parametric() == false!");
+      DUNE_THROW(Exceptions::this_is_not_parametric,
+                 "do not call freeze_parameter(" << mu << ")" << " if parametric() == false!");
     if (mu.type() != Parametric::parameter_type())
-      DUNE_PYMOR_THROW(Exception::wrong_parameter_type, "the type of mu (" << mu.type()
-                       << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
+                 << Parametric::parameter_type() << ")!");
     return FrozenType(new MatrixImp(affinelyDecomposedContainer_.freeze_parameter(mu)));
   }
 

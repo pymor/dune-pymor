@@ -71,19 +71,19 @@ public:
 
   ScalarType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
-    if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
-                                      "mu has to be empty if parametric() == false (is " << mu << ")!");
+    if (!mu.empty())
+      DUNE_THROW(Exceptions::this_is_not_parametric, "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (source.dim() != dim_source())
-      DUNE_PYMOR_THROW(Exception::sizes_do_not_match,
-                       "the dim of source (" << source.dim() << ") does not match the dim_source of this ("
-                       << dim_source() << ")!");
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                 "the dim of source (" << source.dim() << ") does not match the dim_source of this (" << dim_source()
+                 << ")!");
     return vector_->dot(source);
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
-    DUNE_PYMOR_THROW(Exception::this_is_not_parametric, "do not call freeze_parameter(" << mu << ")"
-                     << "if parametric() == false!");
+    DUNE_THROW(Exceptions::this_is_not_parametric,
+               "do not call freeze_parameter(" << mu << ")" << "if parametric() == false!");
     return FrozenType(new ContainerType());
   }
 

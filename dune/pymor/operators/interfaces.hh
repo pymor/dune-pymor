@@ -85,19 +85,11 @@ public:
     return this->as_imp(*this).dim_range();
   }
 
-  /**
-   * \note  May throw one of Exception::sizes_do_not_match, Exception::wrong_parameter_type,
-   *        Exception::requirements_not_met, Exception::linear_solver_failed, Exception::this_does_not_make_any_sense.
-   */
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
     CHECK_AND_CALL_CRTP(this->as_imp(*this).apply(source, range, mu));
   }
 
-  /**
-   * \note  May throw one of Exception::sizes_do_not_match, Exception::wrong_parameter_type,
-   *        Exception::requirements_not_met, Exception::linear_solver_failed, Exception::this_does_not_make_any_sense.
-   */
   RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
     RangeType range(dim_range());
@@ -113,8 +105,6 @@ public:
   /**
    * \note  This default implementation of apply2 creates a temporary vector. Any derived class which can do better
    *        should implement this method!
-   * \note  May throw one of Exception::sizes_do_not_match, Exception::wrong_parameter_type,
-   *        Exception::requirements_not_met, Exception::linear_solver_failed, Exception::this_does_not_make_any_sense.
    */
   ScalarType apply2(const RangeType& range, const SourceType& source, const Parameter mu = Parameter()) const
   {
@@ -205,7 +195,7 @@ public:
   }
 
   /**
-   * \note  May throw Exception::this_is_not_parametric.
+   * \note  May throw Exceptions::this_is_not_parametric.
    */
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
@@ -247,7 +237,7 @@ public:
   }
 
   /**
-   * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
+   * \note  May throw one of Stuff::Exceptions::requirements_not_met, Stuff::Exceptions::index_out_of_range.
    */
   ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
@@ -261,7 +251,7 @@ public:
   }
 
   /**
-   * \note  May throw one of Exception::requirements_not_met, Exception::index_out_of_range.
+   * \note  May throw one of Stuff::Exceptions::requirements_not_met, Stuff::Exceptions::index_out_of_range.
    */
   ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
@@ -281,7 +271,7 @@ public:
   }
 
   /**
-   * \note  May throw Exception::requirements_not_met.
+   * \note  May throw Stuff::Exceptions::requirements_not_met.
    */
   ComponentType affine_part() const
   {
