@@ -191,16 +191,4 @@ TYPED_TEST(LinearAffinelyDecomposedVectorBasedTest, FUNCTIONALS) {
 }
 
 
-int main(int argc, char** argv)
-{
-  try {
-    test_init(argc, argv);
-    return RUN_ALL_TESTS();
-  } catch (Dune::PymorException &e) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("dune-pymor reported: ") << e << std::endl;
-  } catch (Dune::Exception &e) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("Dune reported error: ") << e << std::endl;
-  } catch (...) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("Unknown exception thrown!") << std::endl;
-  }
-}
+#include <dune/stuff/test/test_main.hh>
