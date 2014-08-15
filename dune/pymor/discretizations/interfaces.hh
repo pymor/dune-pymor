@@ -109,7 +109,7 @@ public:
   {
     auto vec = get_vector(id);
     if (vec.parametric())
-      DUNE_THROW_COLORFULLY(NotImplemented, "Not implemented yet for parametric vectors!");
+      DUNE_THROW(NotImplemented, "Not implemented yet for parametric vectors!");
     return new VectorType(*(vec.affine_part()));
   }
 

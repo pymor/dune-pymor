@@ -160,8 +160,8 @@ public:
     if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                       "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (!options.has_key("type"))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                            "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
+      DUNE_THROW(Stuff::Exceptions::configuration_error,
+                 "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
     Stuff::LA::SolverUtils::check_given(options.get< std::string >("type"), invert_options());
     return InverseType(matrix_);
   } // ... invert(...)
@@ -171,7 +171,7 @@ public:
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
     if (!mu.empty())
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error, "This must not happen");
+      DUNE_THROW(Stuff::Exceptions::internal_error, "This must not happen");
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                      "do not call freeze_parameter(" << mu << ") if parametric() == false!");
     return FrozenType(nullptr, invert_options()[0]);
@@ -265,8 +265,8 @@ public:
     if (!mu.empty()) DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                                       "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (!options.has_key("type"))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                            "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
+      DUNE_THROW(Stuff::Exceptions::configuration_error,
+                 "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
     Stuff::LA::SolverUtils::check_given(options.get< std::string >("type"), invert_options());
     return InverseType(matrix_, options);
   } // ... invert(...)
@@ -276,7 +276,7 @@ public:
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
     if (!mu.empty())
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error, "This must not happen");
+      DUNE_THROW(Stuff::Exceptions::internal_error, "This must not happen");
     DUNE_PYMOR_THROW(Exception::this_is_not_parametric,
                      "do not call freeze_parameter(" << mu << ") if parametric() == false!");
     return FrozenType(nullptr);

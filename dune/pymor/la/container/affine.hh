@@ -121,10 +121,10 @@ public:
   void register_affine_part(const std::shared_ptr< const ContainerType > aff_ptr)
   {
     if (hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
-                            "do not call register_affine_part(aff_ptr) if has_affine_part() == true!");
+      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong,
+                 "do not call register_affine_part(aff_ptr) if has_affine_part() == true!");
     if (num_components_ > 0 && !components_[0]->has_equal_shape(*aff_ptr))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::shapes_do_not_match,
+      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                             "the shape of aff_ptr does not match the shape of the existing containers!");
     affinePart_ = aff_ptr;
     hasAffinePart_ = true;
@@ -163,12 +163,12 @@ public:
   {
     if (hasAffinePart_) {
       if (!affinePart_->has_equal_shape(*comp_ptr))
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::shapes_do_not_match,
-                              "the shape of comp_ptr does not match the shape of the existing containers!");
+        DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                   "the shape of comp_ptr does not match the shape of the existing containers!");
     } else if (num_components_ > 0)
       if (!components_[0]->has_equal_shape(*comp_ptr))
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::shapes_do_not_match,
-                              "the shape of aff_ptr does not match the shape of the existing components!");
+        DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+                   "the shape of aff_ptr does not match the shape of the existing components!");
     components_.push_back(comp_ptr);
     coefficients_.push_back(coeff_ptr);
     inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_" + Dune::Stuff::Common::toString(num_components_));
@@ -179,19 +179,19 @@ public:
   std::shared_ptr< const ContainerType > affine_part() const
   {
     if (!hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call affine_part() if has_affine_part() == false!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call affine_part() if has_affine_part() == false!");
     return affinePart_;
   }
 
   std::shared_ptr< const ContainerType > component(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (num_components_ == 0)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call component(" << qq << ") if num_components() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call component(" << qq << ") if num_components() == 0!");
     if (qq < 0 || qq >= int(num_components_))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::index_out_of_range,
-                            "the condition 0 < " << qq << " < num_components() = " << num_components_
+      DUNE_THROW(Stuff::Exceptions::index_out_of_range,
+                 "the condition 0 < " << qq << " < num_components() = " << num_components_
                        << " is not satisfied!");
     return components_[qq];
   }
@@ -199,11 +199,11 @@ public:
   std::shared_ptr< const ParameterFunctional > coefficient(const DUNE_STUFF_SSIZE_T qq) const
   {
     if (num_components_ == 0)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call coefficient(" << qq << ") if num_components() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call coefficient(" << qq << ") if num_components() == 0!");
     if (qq < 0 || qq >= int(num_components_))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::index_out_of_range,
-                            "the condition 0 < " << qq << " < num_components() = " << num_components_
+      DUNE_THROW(Stuff::Exceptions::index_out_of_range,
+                 "the condition 0 < " << qq << " < num_components() = " << num_components_
                        << " is not satisfied!");
     return coefficients_[qq];
   }
@@ -211,16 +211,16 @@ public:
   ContainerType freeze_parameter(const Parameter mu = Parameter()) const
   {
     if (mu.type() != parameter_type())
-      DUNE_THROW_COLORFULLY(Exceptions::wrong_parameter_type,
-                            "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                        << parameter_type() << ")!");
     if (num_components_ == 0 && !hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
                  "do not call freeze_parameter() if num_components() == 0 and has_affine_part() == false!");
     if (components_.size() != num_components_)
-     DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error, "");
+     DUNE_THROW(Stuff::Exceptions::internal_error, "");
     if (coefficients_.size() != num_components_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::internal_error, "");
+      DUNE_THROW(Stuff::Exceptions::internal_error, "");
     if (hasAffinePart_) {
       ContainerType result = affinePart_->copy();
       if (num_components_ > 0)
@@ -425,8 +425,8 @@ public:
   std::shared_ptr< ContainerType > affine_part() const
   {
     if (!BaseType::has_affine_part())
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call affine_part() if has_affine_part() == false!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call affine_part() if has_affine_part() == false!");
     return affinePart_;
   }
 
@@ -435,11 +435,11 @@ public:
   std::shared_ptr< ContainerType > component(const DUNE_STUFF_SSIZE_T qq)
   {
     if (BaseType::num_components() == 0)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call component(" << qq << ") if num_components() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call component(" << qq << ") if num_components() == 0!");
     if (qq < 0 || qq >= int(BaseType::num_components()))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::index_out_of_range,
-                            "the condition 0 < " << qq << " < num_components() = " << BaseType::num_components()
+      DUNE_THROW(Stuff::Exceptions::index_out_of_range,
+                 "the condition 0 < " << qq << " < num_components() = " << BaseType::num_components()
                             << " is not satisfied!");
     return components_[qq];
   }

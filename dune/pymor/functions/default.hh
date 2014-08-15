@@ -158,8 +158,8 @@ public:
     if (cfg.has_sub("affine_part")) {
       auto affinePartCfg = cfg.sub("affine_part");
       if (!affinePartCfg.has_key("type"))
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                              "no 'type' given in the following 'affine_part' config:\n\n" << affinePartCfg);
+        DUNE_THROW(Stuff::Exceptions::configuration_error,
+                   "no 'type' given in the following 'affine_part' config:\n\n" << affinePartCfg);
       if (!affinePartCfg.has_key("name"))
         affinePartCfg["name"] = name + ", affine part";
       const std::string type = affinePartCfg.get< std::string >("type");
@@ -170,17 +170,16 @@ public:
            && cfg.has_sub("coefficient." + Stuff::Common::toString(pp))) {
       auto componentCfg = cfg.sub("component." + Stuff::Common::toString(pp));
       if (!componentCfg.has_key("type"))
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                              "no 'type' given in the following 'component." << pp << "' config:\n\n"
-                              << componentCfg);
+        DUNE_THROW(Stuff::Exceptions::configuration_error,
+                   "no 'type' given in the following 'component." << pp << "' config:\n\n" << componentCfg);
       if (!componentCfg.has_key("name"))
         componentCfg["name"] = name + ", component " + Stuff::Common::toString(pp);
       const std::string componentType = componentCfg.get< std::string >("type");
       const auto coefficientCfg = cfg.sub("coefficient." + Stuff::Common::toString(pp));
       if (!coefficientCfg.has_key("expression"))
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                              "no 'expression' given in the following 'coefficient." << pp << "' config:\n\n"
-                              << coefficientCfg);
+        DUNE_THROW(Stuff::Exceptions::configuration_error,
+                   "no 'expression' given in the following 'coefficient." << pp << "' config:\n\n"
+                   << coefficientCfg);
       const std::string coefficientExpression = coefficientCfg.get< std::string >("expression");
       ParameterType coefficientMu;
       for (std::string key : coefficientCfg.getValueKeys()) {
@@ -188,23 +187,23 @@ public:
           coefficientMu.set(key, coefficientCfg.get< int >(key));
       }
       if (coefficientMu.empty())
-        DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                              "no 'key = size' pair given in the following 'coefficient." << pp << "' config:\n\n"
-                              << coefficientCfg);
+        DUNE_THROW(Stuff::Exceptions::configuration_error,
+                   "no 'key = size' pair given in the following 'coefficient." << pp << "' config:\n\n"
+                   << coefficientCfg);
       ret->register_component(NonparametricFunctions::create(componentType, componentCfg),
                               new ParameterFunctional(coefficientMu, coefficientExpression));
       ++pp;
     }
     if (cfg.has_sub("component." + Stuff::Common::toString(pp))
         && !cfg.has_sub("coefficient." + Stuff::Common::toString(pp)))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                            "missing 'coefficient." << pp << "' to match 'component." << pp
-                            << "' in the following config:\n\n" << cfg);
+      DUNE_THROW(Stuff::Exceptions::configuration_error,
+                 "missing 'coefficient." << pp << "' to match 'component." << pp
+                 << "' in the following config:\n\n" << cfg);
     if (!cfg.has_sub("component." + Stuff::Common::toString(pp))
         && cfg.has_sub("coefficient." + Stuff::Common::toString(pp)))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::configuration_error,
-                            "missing 'component." << pp << "' to match 'coefficient." << pp
-                            << "' in the following config:\n\n" << cfg);
+      DUNE_THROW(Stuff::Exceptions::configuration_error,
+                 "missing 'component." << pp << "' to match 'coefficient." << pp
+                 << "' in the following config:\n\n" << cfg);
     return ret;
   } // ... create(...)
 
@@ -313,8 +312,8 @@ public:
   void register_affine_part(const std::shared_ptr< const NonparametricType > aff_ptr)
   {
     if (hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
-                            "do not call register_affine_part() if has_affine_part() == true!");
+      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong,
+                 "do not call register_affine_part() if has_affine_part() == true!");
     affinePart_ = aff_ptr;
     hasAffinePart_ = true;
   } // ... register_component(...)
@@ -369,8 +368,8 @@ public:
   virtual const std::shared_ptr< const NonparametricType >& affine_part() const DS_OVERRIDE
   {
     if (!hasAffinePart_)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::you_are_using_this_wrong,
-                            "do not call affine_part() if has_affine_part() == false!");
+      DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong,
+                 "do not call affine_part() if has_affine_part() == false!");
     return affinePart_;
   }
 
@@ -382,24 +381,24 @@ public:
   virtual const std::shared_ptr< const NonparametricType >& component(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
   {
     if (num_components_ == 0)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call component(qq) if num_components() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call component(qq) if num_components() == 0!");
     if (qq < 0 || qq >= int(num_components_))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::index_out_of_range,
-                            "the condition 0 < " << qq << " < num_components() = " << num_components_
-                            << " is not satisfied!");
+      DUNE_THROW(Stuff::Exceptions::index_out_of_range,
+                 "the condition 0 < " << qq << " < num_components() = " << num_components_
+                 << " is not satisfied!");
     return components_[qq];
   }
 
   virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
   {
     if (num_components_ == 0)
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::requirements_not_met,
-                            "do not call coefficient(qq) if size() == 0!");
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met,
+                 "do not call coefficient(qq) if size() == 0!");
     if (qq < 0 || qq >= int(num_components_))
-      DUNE_THROW_COLORFULLY(Stuff::Exceptions::index_out_of_range,
-                            "the condition 0 < " << qq << " < num_components() = " << num_components_
-                            << " is not satisfied!");
+      DUNE_THROW(Stuff::Exceptions::index_out_of_range,
+                 "the condition 0 < " << qq << " < num_components() = " << num_components_
+                 << " is not satisfied!");
     return coefficients_[qq];
   }
 
