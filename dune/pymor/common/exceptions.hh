@@ -12,10 +12,13 @@ namespace Dune {
 namespace Pymor {
 namespace Exceptions {
 
+class parameter_related_error : public Dune::Exception {};
 
-class wrong_parameter_type : public Exception {};
+class wrong_parameter_type : public parameter_related_error {};
 
-class wrong_parameter : public Exception {};
+class wrong_parameter : public parameter_related_error {};
+
+class this_is_not_parametric : public parameter_related_error {};
 
 
 } // namespace Exceptions
