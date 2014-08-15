@@ -12,8 +12,8 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/la/container/common.hh>
 #include <dune/stuff/la/container/eigen.hh>
+#include <dune/stuff/common/exceptions.hh>
 
-#include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/functionals/interfaces.hh>
@@ -70,20 +70,22 @@ struct VectorBasedTest
     d_from_shared_ptr = d_from_ptr;
     FunctionalType DUNE_UNUSED(d_copy_constructor)(d_from_ptr); // <- at this point, all functionals share the same vector!
     const bool d_linear = d_from_ptr.linear();
-    if (!d_linear) DUNE_PYMOR_THROW(PymorException, "");
+    if (!d_linear) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     const DUNE_STUFF_SSIZE_T d_dim_source = d_from_ptr.dim_source();
-    if (d_dim_source != dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
+    if (d_dim_source != dim) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, d_dim_source);
     const VectorType source(dim, D_ScalarType(1));
     const D_ScalarType d_apply = d_from_ptr.apply(source);
-    if (Stuff::Common::FloatCmp::ne(d_apply, D_ScalarType(dim))) DUNE_PYMOR_THROW(PymorException, d_apply);
+    if (Stuff::Common::FloatCmp::ne(d_apply, D_ScalarType(dim)))
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, d_apply);
     // * of the class as the interface
     const InterfaceType& i_from_ptr = static_cast< const InterfaceType& >(d_from_ptr);
     const bool i_linear = i_from_ptr.linear();
-    if (!i_linear) DUNE_PYMOR_THROW(PymorException, "");
+    if (!i_linear) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     const DUNE_STUFF_SSIZE_T i_dim_source = i_from_ptr.dim_source();
-    if (i_dim_source != dim) DUNE_PYMOR_THROW(PymorException, i_dim_source);
+    if (i_dim_source != dim) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, i_dim_source);
     const I_ScalarType i_apply = i_from_ptr.apply(source);
-    if (Stuff::Common::FloatCmp::ne(i_apply, I_ScalarType(dim))) DUNE_PYMOR_THROW(PymorException, i_apply);
+    if (Stuff::Common::FloatCmp::ne(i_apply, I_ScalarType(dim)))
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, i_apply);
   }
 }; // struct VectorBasedTest
 
@@ -131,56 +133,58 @@ struct LinearAffinelyDecomposedVectorBasedTest
     const Parameter mu = {{"diffusion", "force"},
                           {{1.0}, {1.0, 1.0}}};
     if (affinelyDecomposedVector.parameter_type() != mu.type())
-      DUNE_PYMOR_THROW(PymorException,
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
                        "\nmu.type()                                 = " << mu.type()
                        << "\naffinelyDecomposedVector.parameter_type() = "
                        << affinelyDecomposedVector.parameter_type());
     FunctionalType d_functional(affinelyDecomposedVector);
-    if (!d_functional.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!d_functional.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     if (d_functional.parameter_type() != mu.type())
-      DUNE_PYMOR_THROW(PymorException,
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
                        "\nmu.type()         = " << mu.type()
                        << "\n.parameter_type() = " << d_functional.parameter_type());
     const DUNE_STUFF_SSIZE_T d_num_components = d_functional.num_components();
-    if (d_num_components != 2) DUNE_PYMOR_THROW(PymorException, d_num_components);
+    if (d_num_components != 2) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, d_num_components);
     for (DUNE_STUFF_SSIZE_T qq = 0; qq < d_num_components; ++qq) {
       D_ComponentType component = d_functional.component(qq);
-      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+      if (component.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
       ParameterFunctional DUNE_UNUSED(coefficient) = d_functional.coefficient(qq);
     }
-    if (!d_functional.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!d_functional.has_affine_part()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     D_ComponentType d_affine_part = d_functional.affine_part();
-    if (d_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (d_affine_part.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     D_FrozenType d_frozen = d_functional.freeze_parameter(mu);
-    if (d_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (d_frozen.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     VectorType source(dim, D_ScalarType(1));
     D_ScalarType d_apply = d_functional.apply(source, mu);
     D_ScalarType d_frozen_apply = d_frozen.apply(source);
     if (Stuff::Common::FloatCmp::ne(d_apply, d_frozen_apply))
-      DUNE_PYMOR_THROW(PymorException, "\nd_apply        = " << d_apply << "\nd_frozen_apply = " << d_frozen_apply);
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
+                 "\nd_apply        = " << d_apply << "\nd_frozen_apply = " << d_frozen_apply);
     // * of the class as the interface
     InterfaceType& i_functional = static_cast< InterfaceType& >(d_functional);
-    if (!i_functional.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!i_functional.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     if (i_functional.parameter_type() != mu.type())
-      DUNE_PYMOR_THROW(PymorException,
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
                        "\nmu.type()         = " << mu.type()
                        << "\n.parameter_type() = " << i_functional.parameter_type());
     const DUNE_STUFF_SSIZE_T i_num_components = i_functional.num_components();
-    if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
+    if (i_num_components != 2) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, i_num_components);
     for (int qq = 0; qq < i_num_components; ++qq) {
       I_ComponentType component = i_functional.component(qq);
-      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+      if (component.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
       ParameterFunctional DUNE_UNUSED(coefficient) = i_functional.coefficient(qq);
     }
-    if (!i_functional.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!i_functional.has_affine_part()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     I_ComponentType i_affine_part = d_functional.affine_part();
-    if (i_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (i_affine_part.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     I_FrozenType i_frozen = i_functional.freeze_parameter(mu);
-    if (i_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (i_frozen.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     I_ScalarType i_apply = i_functional.apply(source, mu);
     I_ScalarType i_frozen_apply = i_frozen.apply(source);
     if (Stuff::Common::FloatCmp::ne(i_apply, i_frozen_apply))
-      DUNE_PYMOR_THROW(PymorException, "\ni_apply        = " << i_apply << "\ni_frozen_apply = " << i_frozen_apply);
+      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
+                 "\ni_apply        = " << i_apply << "\ni_frozen_apply = " << i_frozen_apply);
   }
 }; // struct LinearAffinelyDecomposedVectorBasedTest
 

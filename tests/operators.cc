@@ -11,9 +11,9 @@
 #include <dune/common/float_cmp.hh>
 
 #include <dune/stuff/la/container.hh>
+#include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/test/la_container.hh>
 
-#include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 #include <dune/pymor/operators/interfaces.hh>
@@ -82,13 +82,13 @@ struct MatrixBasedOperatorTests
     d_from_shared_ptr = d_from_ptr;
     OperatorType DUNE_UNUSED(d_copy_constructor)(d_from_ptr); // <- at this point, all operators share the same matrix!
     const bool d_linear = d_from_ptr.linear();
-    if (!d_linear) DUNE_PYMOR_THROW(PymorException, "");
-    if (d_from_ptr.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+    if (!d_linear) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
+    if (d_from_ptr.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
     const DUNE_STUFF_SSIZE_T d_dim_source = d_from_ptr.dim_source();
-    if (d_dim_source != test_dim) DUNE_PYMOR_THROW(PymorException, d_dim_source);
+    if (d_dim_source != test_dim) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, d_dim_source);
     const DUNE_STUFF_SSIZE_T d_dim_range = d_from_ptr.dim_range();
-    if (d_dim_range != test_dim) DUNE_PYMOR_THROW(PymorException, d_dim_range);
-    D_SourceType source = Stuff::LA::Container< D_SourceType >::create(test_dim);
+    if (d_dim_range != test_dim) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, d_dim_range);
+    D_SourceType source(test_dim);
     D_SourceType range = d_from_ptr.apply(source);
     d_from_ptr.apply(source, range);
     D_ScalarType DUNE_UNUSED(d_apply2) = d_from_ptr.apply2(range, source);
@@ -97,7 +97,7 @@ struct MatrixBasedOperatorTests
     try {
       d_inverse.apply(range, source);
       d_from_ptr.apply_inverse(source, range, d_invert_options[0]);
-    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
+    } catch (Stuff::Exceptions::linear_solver_failed) {}
   } // ... fulfills_interface(...)
 }; // struct MatrixBasedOperatorTests
 
@@ -152,32 +152,32 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 //    const Parameter mu = {{"diffusion", "force"},
 //                          {{1.0}, {1.0, 1.0}}};
 //    if (affinelyDecomposedMatrix.parameter_type() != mu.type())
-//      DUNE_PYMOR_THROW(PymorException,
+//      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
 //                       "\nmu.type()                                 = " << mu.type()
 //                       << "\naffinelyDecomposedMatrix.parameter_type() = "
 //                       << affinelyDecomposedMatrix.parameter_type());
 //    OperatorType d_operator(affinelyDecomposedMatrix);
-//    if (!d_operator.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (!d_operator.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    if (d_operator.parameter_type() != mu.type())
-//      DUNE_PYMOR_THROW(PymorException,
+//      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
 //                       "\nmu.type()                   = " << mu.type()
 //                       << "\nd_operator.parameter_type() = " << d_operator.parameter_type());
 //    const DUNE_STUFF_SSIZE_T d_num_components = d_operator.num_components();
-//    if (d_num_components != 2) DUNE_PYMOR_THROW(PymorException, d_num_components);
+//    if (d_num_components != 2) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, d_num_components);
 //    for (unsigned int qq = 0; qq < d_num_components; ++qq) {
 //      D_ComponentType component = d_operator.component(qq);
-//      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//      if (component.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //      ParameterFunctional DUNE_UNUSED(coefficient) = d_operator.coefficient(qq);
 //    }
-//    if (!d_operator.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (!d_operator.has_affine_part()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    D_ComponentType d_affine_part = d_operator.affine_part();
-//    if (d_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (d_affine_part.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    D_FrozenType d_frozen = d_operator.freeze_parameter(mu);
-//    if (d_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (d_frozen.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    D_SourceType d_source(dim, D_ScalarType(1));
 //    D_RangeType d_range = d_operator.apply(d_source, mu);
 //    D_RangeType d_frozen_apply = d_frozen.apply(d_source);
-//    if (!d_range.almost_equal(d_frozen_apply)) DUNE_PYMOR_THROW(PymorException, "");
+//    if (!d_range.almost_equal(d_frozen_apply)) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    std::vector< std::string > d_invert_options = d_operator.invert_options();
 //    D_InverseType d_inverse = d_operator.invert(d_invert_options[0], mu);
 //    try {
@@ -186,27 +186,27 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 //    } catch (Dune::Pymor::Exception::linear_solver_failed) {}
 //    // * of the class as the interface
 //    InterfaceType& i_operator = static_cast< InterfaceType& >(d_operator);
-//    if (!i_operator.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (!i_operator.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    if (i_operator.parameter_type() != mu.type())
-//      DUNE_PYMOR_THROW(PymorException,
+//      DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected,
 //                       "\nmu.type()                   = " << mu.type()
 //                       << "\ni_operator.parameter_type() = " << i_operator.parameter_type());
 //    const DUNE_STUFF_SSIZE_T i_num_components = i_operator.num_components();
-//    if (i_num_components != 2) DUNE_PYMOR_THROW(PymorException, i_num_components);
+//    if (i_num_components != 2) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, i_num_components);
 //    for (DUNE_STUFF_SSIZE_T qq = 0; qq < i_num_components; ++qq) {
 //      I_ComponentType component = i_operator.component(qq);
-//      if (component.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//      if (component.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //      ParameterFunctional DUNE_UNUSED(coefficient) = i_operator.coefficient(qq);
 //    }
-//    if (!i_operator.has_affine_part()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (!i_operator.has_affine_part()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    I_ComponentType i_affine_part = i_operator.affine_part();
-//    if (i_affine_part.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (i_affine_part.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    I_FrozenType i_frozen = i_operator.freeze_parameter(mu);
-//    if (i_frozen.parametric()) DUNE_PYMOR_THROW(PymorException, "");
+//    if (i_frozen.parametric()) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    I_SourceType i_source(dim, I_ScalarType(1));
 //    I_RangeType i_range = i_operator.apply(i_source, mu);
 //    I_RangeType i_frozen_apply = i_frozen.apply(i_source);
-//    if (!i_range.almost_equal(i_frozen_apply)) DUNE_PYMOR_THROW(PymorException, "");
+//    if (!i_range.almost_equal(i_frozen_apply)) DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 //    std::vector< std::string > i_invert_options = i_operator.invert_options();
 //    I_InverseType i_inverse = i_operator.invert(i_invert_options[0], mu);
 //    try {
