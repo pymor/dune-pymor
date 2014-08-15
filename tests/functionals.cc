@@ -125,7 +125,7 @@ struct LinearAffinelyDecomposedVectorBasedTest
     // * of the class itself (aka the derived type)
     D_AffinelyDecomposedVectorType affinelyDecomposedVector(new VectorType(dim, 1));
     affinelyDecomposedVector.register_component(new VectorType(dim, 1),
-                                                new ParameterFunctional("diffusion", 1, "diffusion[0]"));
+                                                new ParameterFunctional("diffusion", 1, "diffusion"));
     affinelyDecomposedVector.register_component(new VectorType(dim, 1),
                                                 new ParameterFunctional("force", 2, "force[0]"));
     const Parameter mu = {{"diffusion", "force"},
