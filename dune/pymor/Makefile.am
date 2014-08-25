@@ -6,7 +6,7 @@
 pymorincludedir = $(includedir)/dune/pymor/
 pymorinclude_HEADERS = 
 
-SUBDIRDS = . common discretizations functionals functions la operators parameters
+SUBDIRDS = .
 
 noinst_LTLIBRARIES = libpymor.la
 
