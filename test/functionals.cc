@@ -195,4 +195,4 @@ TYPED_TEST(LinearAffinelyDecomposedVectorBasedTest, FUNCTIONALS) {
 }
 
 
-#include <dune/stuff/test/test_main.hh>
+#include <dune/stuff/test/test_main.cxx>
