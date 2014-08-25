@@ -16,25 +16,23 @@ import dune.pymor.operators
 
 
 def prepare_python_bindings(argv):
-    if (len(argv) < 5):
-        raise IndexError('argv is expected to be at least of length 5!')
-    # I do not remember, why we need 4 arguments if we do not use the 3rd and 4th one
+    if (len(argv) < 4):
+        raise IndexError('argv is expected to be at least of length 4!')
     module_name = argv[0]
     cpp_header = argv[1]
-    #input_dir = argv[2]
+    config_h_filename = argv[2]
     output_dir = argv[3]
-    #include_dirs = argv[4:][0].split(';')
     pybindgen_filename = join(output_dir, module_name + '_bindings_generator.cc')
     module = pybindgen.Module(module_name)
     module.add_include('"' + cpp_header + '"')
-    return module, pybindgen_filename
+    return module, pybindgen_filename, config_h_filename
 
 
-def inject_lib_dune_pymor(module):
+def inject_lib_dune_pymor(module, config_h_filename):
     assert(isinstance(module, pybindgen.module.Module))
     interfaces = dict()
     # get config.h
-    CONFIG_H = dune.pymor.CONFIG_H
+    CONFIG_H = dune.pymor.config_h(config_h_filename)
 
     def inject_Class(module, name, parent=None):
         namespace = module

@@ -11,13 +11,14 @@ from os.path import abspath, join
 from collections import defaultdict
 
 
-def parse_config_h():
-    this_path = abspath(__file__)
-    if '__init__.pyc' in this_path:
-        this_path = this_path.rstrip('__init__.pyc')
-    elif '__init__.py' in this_path:
-        this_path = this_path.rstrip('__init__.py')
-    config_h_filename = join(this_path, '..', '..', 'config.h')
+def config_h(config_h_filename = None):
+    if config_h_filename is None:
+        this_path = abspath(__file__)
+        if '__init__.pyc' in this_path:
+            this_path = this_path.rstrip('__init__.pyc')
+        elif '__init__.py' in this_path:
+            this_path = this_path.rstrip('__init__.py')
+        config_h_filename = join(this_path, '..', '..', 'config.h')
     CONFIG_H = defaultdict(bool)
     try:
         with open(config_h_filename) as config_h_file:
@@ -37,6 +38,3 @@ def parse_config_h():
     except:
         print('Did you configure dune-pymor? Could not find this config.h:\n  \'{}\''.format(config_h_filename))
         return None
-
-
-CONFIG_H = parse_config_h()
