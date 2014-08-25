@@ -127,7 +127,7 @@ else(CMAKE_WITH_AUTOTOOLS)
       ${DUNE_DEFAULT_LIBS}
   )
 
-  add_subdirectory(examples)
+  add_subdirectory(examples EXCLUDE_FROM_ALL)
   add_subdirectory(test EXCLUDE_FROM_ALL)
   
   #disable most warnings from dependent modules
