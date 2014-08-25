@@ -34,3 +34,4 @@ demos
 *.dirstamp
 .kateproject.d
 *.kdev4
+build-*
