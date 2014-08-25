@@ -12,23 +12,43 @@ MACRO(add_python_bindings target_name generator_filename header_filename libname
         set(pythonWrapperCpp       "${CMAKE_CURRENT_BINARY_DIR}/${target_name}_bindings_generator.cc")
         set_source_files_properties("${pythonWrapperCpp}" PROPERTIES GENERATED TRUE)
 
-        add_custom_command(
-            OUTPUT
-                "${pythonWrapperCpp}"
-            COMMAND
-                "${PYTHON_EXECUTABLE}"
-                "${pythonWrapperGenerator}"
-                "${target_name}"
-                "${header_filename}"
-                "${CMAKE_BINARY_DIR}/config.h"
-                "${CMAKE_CURRENT_BINARY_DIR}"
-            DEPENDS
-                "${pythonWrapperGenerator}"
-            WORKING_DIRECTORY
-                "${CMAKE_CURRENT_BINARY_DIR}"
-            COMMENT
-                "${pythonTarget}: generating bindings" VERBATIM
-        )
+        if(CMAKE_WITH_AUTOTOOLS)
+          add_custom_command(
+              OUTPUT
+                  "${pythonWrapperCpp}"
+              COMMAND
+                  "${PYTHON_EXECUTABLE}"
+                  "${pythonWrapperGenerator}"
+                  "${target_name}"
+                  "${header_filename}"
+                  "${PROJECT_BINARY_DIR}/config.h"
+                  "${CMAKE_CURRENT_BINARY_DIR}"
+              DEPENDS
+                  "${pythonWrapperGenerator}"
+              WORKING_DIRECTORY
+                  "${CMAKE_CURRENT_BINARY_DIR}"
+              COMMENT
+                  "${pythonTarget}: generating bindings" VERBATIM
+          )
+        else(CMAKE_WITH_AUTOTOOLS)
+          add_custom_command(
+              OUTPUT
+                  "${pythonWrapperCpp}"
+              COMMAND
+                  "${PYTHON_EXECUTABLE}"
+                  "${pythonWrapperGenerator}"
+                  "${target_name}"
+                  "${header_filename}"
+                  "${PROJECT_SOURCE_DIR}/config.h"
+                  "${CMAKE_CURRENT_BINARY_DIR}"
+              DEPENDS
+                  "${pythonWrapperGenerator}"
+              WORKING_DIRECTORY
+                  "${CMAKE_CURRENT_BINARY_DIR}"
+              COMMENT
+                  "${pythonTarget}: generating bindings" VERBATIM
+          )
+        endif(CMAKE_WITH_AUTOTOOLS)
 
         include_directories( ${PYTHON_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}")
         add_library( ${pythonTarget} MODULE "${pythonWrapperCpp}" )
