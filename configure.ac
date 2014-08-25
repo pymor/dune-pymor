@@ -27,9 +27,6 @@ AC_DEFINE([HAVE_DUNE_PYMOR], [1], [We are always here.])
 
 AC_CONFIG_FILES([
   Makefile
-  doc/Makefile
-  doc/doxygen/Makefile
-  doc/doxygen/Doxyfile
   dune/Makefile
   dune/pymor/Makefile
   lib/Makefile

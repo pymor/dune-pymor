@@ -78,7 +78,6 @@ if(CMAKE_WITH_AUTOTOOLS)
 
   include(PymorUtils)
 
-  add_subdirectory(doc)
   add_subdirectory(examples)
   add_subdirectory(test)
   
