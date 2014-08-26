@@ -10,6 +10,8 @@
 #include <vector>
 #include <type_traits>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -217,9 +219,9 @@ public:
     if (num_components_ == 0 && !hasAffinePart_)
       DUNE_THROW(Stuff::Exceptions::requirements_not_met,
                  "do not call freeze_parameter() if num_components() == 0 and has_affine_part() == false!");
-    if (components_.size() != num_components_)
+    if (components_.size() != boost::numeric_cast< size_t >(num_components_))
      DUNE_THROW(Stuff::Exceptions::internal_error, "");
-    if (coefficients_.size() != num_components_)
+    if (coefficients_.size() != boost::numeric_cast< size_t >(num_components_))
       DUNE_THROW(Stuff::Exceptions::internal_error, "");
     if (hasAffinePart_) {
       ContainerType result = affinePart_->copy();
