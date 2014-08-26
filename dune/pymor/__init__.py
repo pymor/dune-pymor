@@ -32,6 +32,8 @@ def config_h(config_h_filename = None):
                             value = ' '.join(words[1:])
                             if value == '/**/':
                                 value = 1
+                            elif value == '0':
+                                value = 0
                             if not ('(' in key or ')' in key):
                                 CONFIG_H[key] = value
         return CONFIG_H
