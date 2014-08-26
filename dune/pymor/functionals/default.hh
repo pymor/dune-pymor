@@ -6,7 +6,10 @@
 #ifndef DUNE_PYMOR_FUNCTIONALS_DEFAULT_HH
 #define DUNE_PYMOR_FUNCTIONALS_DEFAULT_HH
 
+#include <type_traits>
+
 #include <dune/common/typetraits.hh>
+
 #include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/parameters/functional.hh>
@@ -73,7 +76,7 @@ public:
   {
     if (!mu.empty())
       DUNE_THROW(Exceptions::this_is_not_parametric, "mu has to be empty if parametric() == false (is " << mu << ")!");
-    if (source.dim() != dim_source())
+    if ((std::make_signed< size_t >::type)(source.dim()) != dim_source())
       DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                  "the dim of source (" << source.dim() << ") does not match the dim_source of this (" << dim_source()
                  << ")!");
