@@ -21,7 +21,7 @@ MACRO(add_python_bindings target_name generator_filename header_filename libname
                   "${pythonWrapperGenerator}"
                   "${target_name}"
                   "${header_filename}"
-                  "${PROJECT_BINARY_DIR}/config.h"
+                  "${PROJECT_SOURCE_DIR}/config.h"
                   "${CMAKE_CURRENT_BINARY_DIR}"
               DEPENDS
                   "${pythonWrapperGenerator}"
@@ -39,7 +39,7 @@ MACRO(add_python_bindings target_name generator_filename header_filename libname
                   "${pythonWrapperGenerator}"
                   "${target_name}"
                   "${header_filename}"
-                  "${PROJECT_SOURCE_DIR}/config.h"
+                  "${PROJECT_BINARY_DIR}/config.h"
                   "${CMAKE_CURRENT_BINARY_DIR}"
               DEPENDS
                   "${pythonWrapperGenerator}"
