@@ -63,7 +63,7 @@ public:
     return CRTP::as_imp(*this).linear();
   }
 
-  unsigned int dim_source() const
+  DUNE_STUFF_SSIZE_T dim_source() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).dim_source());
     return CRTP::as_imp(*this).dim_source();
@@ -105,7 +105,7 @@ public:
     : BaseType(other)
   {}
 
-  unsigned int num_components() const
+  DUNE_STUFF_SSIZE_T num_components() const
   {
     CHECK_INTERFACE_IMPLEMENTATION(CRTP::as_imp(*this).num_components());
     return CRTP::as_imp(*this).num_components();
