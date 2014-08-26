@@ -5,6 +5,8 @@
 
 #include "config.h"
 
+#include <type_traits>
+
 #include <dune/stuff/common/exceptions.hh>
 
 #include "base.hh"
@@ -258,7 +260,7 @@ Parameter::Parameter(const ParameterType& tt, const ValueType& vv)
   if (tt.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "tt is empty!");
   if (tt.size() != 1) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                                  "tt should be of size 1 (is " << tt.size() << ")!");
-  if (tt.values()[0] != vv.size())
+  if (tt.values()[0] != (std::make_signed< size_t >::type)(vv.size()))
     DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                "vv should be of size " << tt.values()[0] << " (is " << vv.size() << ")!");
 }
@@ -285,13 +287,13 @@ Parameter::Parameter(const ParameterType& tt,
   : BaseType(tt.keys(), vv)
   , type_(tt)
 {
-  if (tt.size() != vv.size())
+  if (tt.size() != (std::make_signed< size_t >::type)(vv.size()))
     DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                "the size of t (" << tt.size() << ") has to equal the size of vv (" << vv.size() << ")!");
   if (tt.size() == 0) DUNE_THROW(Stuff::Exceptions::shapes_do_not_match, "tt and vv are empty!");
   const auto& valueSizes = type_.values();
   for (size_t ii = 0; ii < vv.size(); ++ii) {
-    if (vv[ii].size() != valueSizes[ii])
+    if ((std::make_signed< size_t >::type)(vv[ii].size()) != valueSizes[ii])
       DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                  "vv[" << ii << "] has to be of size " << valueSizes[ii] << " (is " << vv[ii].size() << ")!");
   }
