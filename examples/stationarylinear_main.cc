@@ -46,8 +46,6 @@ int main(int /*argc*/, char** /*argv*/)
 
     // if we came that far, we can as well be happy about it
     return 0;
-  } catch (Dune::PymorException& e) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("dune-pymor reported: ") << e << std::endl;
   } catch (Dune::Exception& e) {
     std::cerr << Dune::Stuff::Common::colorStringRed("Dune reported error: ") << e << std::endl;
   } catch (...) {
