@@ -6,7 +6,10 @@
 #ifndef DUNE_PYMOR_FUNCTIONALS_AFFINE_HH
 #define DUNE_PYMOR_FUNCTIONALS_AFFINE_HH
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <dune/common/typetraits.hh>
+
 #include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/parameters/functional.hh>
@@ -60,9 +63,9 @@ public:
     if (!affinelyDecomposedVector_.has_affine_part() && affinelyDecomposedVector_.num_components() == 0)
       DUNE_THROW(Stuff::Exceptions::requirements_not_met, "affinelyDecomposedVector must not be empty!");
     if (affinelyDecomposedVector_.has_affine_part())
-      dim_ = affinelyDecomposedVector_.affine_part()->dim();
+      dim_ = boost::numeric_cast< unsigned int >(affinelyDecomposedVector_.affine_part()->dim());
     else
-      dim_ = affinelyDecomposedVector_.component(0)->dim();
+      dim_ = boost::numeric_cast< unsigned int >(affinelyDecomposedVector_.component(0)->dim());
   }
 
   DUNE_STUFF_SSIZE_T num_components() const
