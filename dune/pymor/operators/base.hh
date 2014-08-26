@@ -8,6 +8,7 @@
 
 #include <type_traits>
 
+#include <dune/stuff/la/container.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/la/solver.hh>
 #include <dune/stuff/common/exceptions.hh>
@@ -291,6 +292,41 @@ public:
 private:
   std::shared_ptr< const ContainerType > matrix_;
 }; // class MatrixBasedDefault
+
+
+extern template class MatrixBasedDefault< Stuff::LA::CommonDenseMatrix< double >, Stuff::LA::CommonDenseVector< double > >;
+extern template class MatrixBasedInverseDefault< Stuff::LA::CommonDenseMatrix< double >,
+                                                 Stuff::LA::CommonDenseVector< double > >;
+
+#if HAVE_EIGEN
+
+extern template class MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< double >, Stuff::LA::EigenDenseVector< double > >;
+extern template class MatrixBasedInverseDefault< Stuff::LA::EigenDenseMatrix< double >,
+                                                 Stuff::LA::EigenDenseVector< double > >;
+
+extern template class MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< double >, Stuff::LA::EigenMappedDenseVector< double > >;
+extern template class MatrixBasedInverseDefault< Stuff::LA::EigenDenseMatrix< double >,
+                                                 Stuff::LA::EigenMappedDenseVector< double > >;
+
+extern template class MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                          Stuff::LA::EigenDenseVector< double > >;
+extern template class MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                 Stuff::LA::EigenDenseVector< double > >;
+
+extern template class MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                          Stuff::LA::EigenMappedDenseVector< double > >;
+extern template class MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                 Stuff::LA::EigenMappedDenseVector< double > >;
+
+#endif // HAVE_EIGEN
+#if HAVE_DUNE_ISTL
+
+extern template class MatrixBasedDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
+                                          Stuff::LA::IstlDenseVector< double > >;
+extern template class MatrixBasedInverseDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
+                                                 Stuff::LA::IstlDenseVector< double > >;
+
+#endif // HAVE_DUNE_ISTL
 
 
 } // namespace Operators

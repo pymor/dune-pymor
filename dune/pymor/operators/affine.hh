@@ -8,6 +8,7 @@
 
 #include <type_traits>
 
+#include <dune/stuff/la/container.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 
 #include <dune/pymor/la/container/affine.hh>
@@ -158,6 +159,31 @@ private:
   DUNE_STUFF_SSIZE_T dim_range_;
 }; // class LinearAffinelyDecomposedContainerBased
 
+
+extern template class LinearAffinelyDecomposedContainerBased< Stuff::LA::CommonDenseMatrix< double >,
+                                                              Stuff::LA::CommonDenseVector< double > >;
+
+#if HAVE_EIGEN
+
+extern template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenDenseMatrix< double >,
+                                                              Stuff::LA::EigenDenseVector< double > >;
+
+extern template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenDenseMatrix< double >,
+                                                              Stuff::LA::EigenMappedDenseVector< double > >;
+
+extern template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                              Stuff::LA::EigenDenseVector< double > >;
+
+extern template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenRowMajorSparseMatrix< double >,
+                                                              Stuff::LA::EigenMappedDenseVector< double > >;
+
+#endif // HAVE_EIGEN
+#if HAVE_DUNE_ISTL
+
+extern template class LinearAffinelyDecomposedContainerBased< Stuff::LA::IstlRowMajorSparseMatrix< double >,
+                                                              Stuff::LA::IstlDenseVector< double > >;
+
+#endif // HAVE_DUNE_ISTL
 
 } // namespace Operators
 } // namespace Pymor

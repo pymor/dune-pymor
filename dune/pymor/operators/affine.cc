@@ -5,8 +5,6 @@
 
 #include "config.h"
 
-#include <dune/stuff/la/container.hh>
-
 #include "affine.hh"
 
 namespace Dune {
@@ -32,12 +30,12 @@ template class LinearAffinelyDecomposedContainerBased< Stuff::LA::EigenRowMajorS
                                                        Stuff::LA::EigenMappedDenseVector< double > >;
 
 #endif // HAVE_EIGEN
-#if HAVE_ISTL
+#if HAVE_DUNE_ISTL
 
 template class LinearAffinelyDecomposedContainerBased< Stuff::LA::IstlRowMajorSparseMatrix< double >,
                                                        Stuff::LA::IstlDenseVector< double > >;
 
-#endif // HAVE_ISTL
+#endif // HAVE_DUNE_ISTL
 
 
 } // namespace Operators

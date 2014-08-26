@@ -5,8 +5,6 @@
 
 #include "config.h"
 
-#include <dune/stuff/la/container.hh>
-
 #include "base.hh"
 
 namespace Dune {
@@ -39,14 +37,14 @@ template class MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< 
                                           Stuff::LA::EigenMappedDenseVector< double > >;
 
 #endif // HAVE_EIGEN
-#if HAVE_ISTL
+#if HAVE_DUNE_ISTL
 
 template class MatrixBasedDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
                                    Stuff::LA::IstlDenseVector< double > >;
 template class MatrixBasedInverseDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
                                           Stuff::LA::IstlDenseVector< double > >;
 
-#endif // HAVE_ISTL
+#endif // HAVE_DUNE_ISTL
 
 
 } // namespace Operators
