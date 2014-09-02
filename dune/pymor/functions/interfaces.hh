@@ -164,7 +164,7 @@ public:
     }
   } // ... report(...)
 
-  virtual std::shared_ptr< const NonparametricType > with_mu(const Parameter& mu) const
+  virtual std::shared_ptr< const NonparametricType > with_mu(const Parameter mu = Parameter()) const
   {
     if (this->parametric()) {
       if (mu.type() != this->parameter_type())
