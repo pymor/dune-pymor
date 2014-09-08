@@ -11,8 +11,6 @@ SUBDIRDS = .
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
-  operators/base.cc \
-  operators/affine.cc \
   parameters/base.cc \
   parameters/functional.cc
 

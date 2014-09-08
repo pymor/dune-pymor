@@ -4,8 +4,6 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 set(lib_dune_pymor_sources
-    operators/base.cc
-    operators/affine.cc
     parameters/base.cc
     parameters/functional.cc
 )

@@ -294,41 +294,6 @@ private:
 }; // class MatrixBasedDefault
 
 
-extern template class MatrixBasedDefault< Stuff::LA::CommonDenseMatrix< double >, Stuff::LA::CommonDenseVector< double > >;
-extern template class MatrixBasedInverseDefault< Stuff::LA::CommonDenseMatrix< double >,
-                                                 Stuff::LA::CommonDenseVector< double > >;
-
-#if HAVE_EIGEN
-
-extern template class MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< double >, Stuff::LA::EigenDenseVector< double > >;
-extern template class MatrixBasedInverseDefault< Stuff::LA::EigenDenseMatrix< double >,
-                                                 Stuff::LA::EigenDenseVector< double > >;
-
-extern template class MatrixBasedDefault< Stuff::LA::EigenDenseMatrix< double >, Stuff::LA::EigenMappedDenseVector< double > >;
-extern template class MatrixBasedInverseDefault< Stuff::LA::EigenDenseMatrix< double >,
-                                                 Stuff::LA::EigenMappedDenseVector< double > >;
-
-extern template class MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
-                                          Stuff::LA::EigenDenseVector< double > >;
-extern template class MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
-                                                 Stuff::LA::EigenDenseVector< double > >;
-
-extern template class MatrixBasedDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
-                                          Stuff::LA::EigenMappedDenseVector< double > >;
-extern template class MatrixBasedInverseDefault< Stuff::LA::EigenRowMajorSparseMatrix< double >,
-                                                 Stuff::LA::EigenMappedDenseVector< double > >;
-
-#endif // HAVE_EIGEN
-#if HAVE_DUNE_ISTL
-
-extern template class MatrixBasedDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
-                                          Stuff::LA::IstlDenseVector< double > >;
-extern template class MatrixBasedInverseDefault< Stuff::LA::IstlRowMajorSparseMatrix< double >,
-                                                 Stuff::LA::IstlDenseVector< double > >;
-
-#endif // HAVE_DUNE_ISTL
-
-
 } // namespace Operators
 } // namespace Pymor
 } // namespace Dune
