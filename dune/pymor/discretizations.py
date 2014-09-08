@@ -338,25 +338,25 @@ try:
                                       param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
                                      is_const=True, throw=[exceptions['Exception']],
                                      custom_name='localize_vector')
-        Class.add_method('estimate_local',
-                         retval('std::vector< double >'),
-                         [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
-                          param('const Dune::Pymor::Parameter', 'mu'),
-                          param('const Dune::Pymor::Parameter', 'mu_fixed')],
-                         is_const=True, throw=[exceptions['Exception']])
-        Class.add_method('visualize_information',
-                         None,
-                         [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
-                          param('const std::string&', 'filename'),
-                          param('const Dune::Pymor::Parameter', 'mu'),
-                          param('const Dune::Pymor::Parameter', 'mu_fixed')],
-                         is_const=True, throw=[exceptions['Exception']])
-        Class.add_method('solve_for_local_correction',
-                         retval(VectorType),
-                         [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
-                          param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'subdomain'),
-                          param('const Dune::Pymor::Parameter', 'mu')],
-                         is_const=True, throw=[exceptions['Exception']])
+        #Class.add_method('estimate_local',
+        #                 retval('std::vector< double >'),
+        #                 [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
+        #                  param('const Dune::Pymor::Parameter', 'mu'),
+        #                  param('const Dune::Pymor::Parameter', 'mu_fixed')],
+        #                 is_const=True, throw=[exceptions['Exception']])
+        #Class.add_method('visualize_information',
+        #                 None,
+        #                 [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
+        #                  param('const std::string&', 'filename'),
+        #                  param('const Dune::Pymor::Parameter', 'mu'),
+        #                  param('const Dune::Pymor::Parameter', 'mu_fixed')],
+        #                 is_const=True, throw=[exceptions['Exception']])
+        #Class.add_method('solve_for_local_correction',
+        #                 retval(VectorType),
+        #                 [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
+        #                  param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'subdomain'),
+        #                  param('const Dune::Pymor::Parameter', 'mu')],
+        #                 is_const=True, throw=[exceptions['Exception']])
         return Class
 
     def wrap_multiscale_discretization(cls, wrapper):
