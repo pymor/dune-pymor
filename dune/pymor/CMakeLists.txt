@@ -4,10 +4,6 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 set(lib_dune_pymor_sources
-    functions.cc
-    functions/checkerboard.cc
-    functions/default.cc
-    functions/interfaces.cc
     operators/base.cc
     operators/affine.cc
     parameters/base.cc

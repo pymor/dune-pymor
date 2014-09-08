@@ -11,10 +11,6 @@ SUBDIRDS = .
 noinst_LTLIBRARIES = libpymor.la
 
 libpymor_la_SOURCES = \
-  functions.cc \
-  functions/checkerboard.cc \
-  functions/default.cc \
-  functions/interfaces.cc \
   operators/base.cc \
   operators/affine.cc \
   parameters/base.cc \
