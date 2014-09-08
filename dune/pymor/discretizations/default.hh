@@ -8,6 +8,8 @@
 
 #include <map>
 
+#include <dune/stuff/common/crtp.hh>
+
 #include "interfaces.hh"
 
 namespace Dune {
@@ -47,7 +49,7 @@ public:
 protected:
   void uncached_solve(VectorType& vector, const Parameter mu = Parameter()) const
   {
-    CHECK_AND_CALL_INTERFACE_IMPLEMENTATION(this->as_imp(*this).uncached_solve(vector, mu));
+    CHECK_AND_CALL_CRTP(this->as_imp(*this).uncached_solve(vector, mu));
   }
 
 private:
