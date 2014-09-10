@@ -12,6 +12,7 @@
 #include <dune/stuff/functions/checkerboard.hh>
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/memory.hh>
+#include <dune/stuff/common/fvector.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/functional.hh>
@@ -76,25 +77,21 @@ public:
     const Stuff::Common::Configuration default_cfg = default_config();
     // create
     return Stuff::Common::make_unique< ThisType >(
-          cfg.get("lower_left",     default_cfg.get< std::vector< DomainFieldType > >("lower_left")),
-          cfg.get("upper_right",    default_cfg.get< std::vector< DomainFieldType > >("upper_right")),
-          cfg.get("num_elements",   default_cfg.get< std::vector< size_t > >("num_elements")),
+          cfg.get("lower_left",     default_cfg.get< DomainType >("lower_left")),
+          cfg.get("upper_right",    default_cfg.get< DomainType >("upper_right")),
+          cfg.get("num_elements",   default_cfg.get< Dune::FieldVector< size_t, dimDomain > >("num_elements")),
           cfg.get("parameter_name", default_cfg.get< std::string >("parameter_name")),
           cfg.get("name",           default_cfg.get< std::string >("name"))
     );
   } // ... create(...)
 
-  Checkerboard(const std::vector< DomainFieldType >& lowerLeft,
-               const std::vector< DomainFieldType >& upperRight,
-               const std::vector< size_t >& numElements,
+  Checkerboard(const Stuff::Common::FieldVector< DomainFieldType, dimDomain >& lowerLeft,
+               const Stuff::Common::FieldVector< DomainFieldType, dimDomain >& upperRight,
+               const Stuff::Common::FieldVector< size_t, dimDomain  >& numElements,
                const std::string parameterName = "value",
                const std::string name = static_id())
     : BaseType(name)
   {
-    // check input
-    if (numElements.size() < dimDomain)
-      DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
-                 "numElements has to be at least of size " << dimDomain << " is(" << numElements.size() << ")!");
     size_t parameterSize = 1;
     for (size_t dd = 0; dd < dimDomain; ++dd) {
       if (lowerLeft[dd] >= upperRight[dd])
@@ -116,9 +113,9 @@ public:
     for (size_t ii = 0; ii < parameterSize; ++ii) {
       std::vector< RangeType > indicator(parameterSize, RangeType(0));
       indicator[ii] = RangeType(1);
-      BaseType::register_component(new NonparametricCheckerboardType(std::vector< DomainFieldType >(lowerLeft),
-                                                                     std::vector< DomainFieldType >(upperRight),
-                                                                     std::vector< size_t >(numElements),
+      BaseType::register_component(new NonparametricCheckerboardType(lowerLeft,
+                                                                     upperRight,
+                                                                     numElements,
                                                                      std::move(indicator),
                                                                      name + "_component_" + DSC::toString(ii)),
                                    new ParameterFunctional(parameterType,
