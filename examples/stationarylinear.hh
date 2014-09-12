@@ -29,10 +29,10 @@ class AnalyticalProblem
   : public Dune::Pymor::Parametric
 {
 public:
-  typedef Dune::Stuff::Functions::Constant< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
-    ConstantFunctionType;
-  typedef Dune::Pymor::Function::AffinelyDecomposableDefault< Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 >
-    FunctionType;
+  typedef Dune::Stuff::Functions::Constant
+      < Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 > ConstantFunctionType;
+  typedef Dune::Pymor::Functions::AffinelyDecomposableDefault
+      < Dune::Stuff::Grid::FakeEntity< 1 >, double, 1, double, 1 > FunctionType;
 
   AnalyticalProblem(const DUNE_STUFF_SSIZE_T dd = 4);
 
