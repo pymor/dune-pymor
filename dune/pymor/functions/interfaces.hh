@@ -60,6 +60,13 @@ public:
 
   typedef typename NonparametricType::JacobianRangeType JacobianRangeType;
 
+  static const bool available = false;
+
+  static std::string static_id()
+  {
+    return "pymor.function";
+  }
+
   AffinelyDecomposableFunctionInterface(const ParameterType tt = ParameterType())
     : Parametric(tt)
     , nullptr_1_(nullptr)
@@ -73,11 +80,6 @@ public:
   {}
 
   virtual ~AffinelyDecomposableFunctionInterface() {}
-
-  static std::string static_id()
-  {
-    return "pymor.function";
-  }
 
   virtual std::string type() const
   {
@@ -345,8 +347,8 @@ public:
                         const Parameter mu,
                         const std::string nm = "")
     : parametric_function_(parametric_function)
-    , name_(nm.empty() ? parametric_function_.name() /*+ " (with mu = " + mu.report() + ")"*/ : nm)
-    , type_(parametric_function_.type() /*+ " (with mu = " + mu.report() + ")"*/)
+    , name_(nm.empty() ? parametric_function_.name() : nm)
+    , type_(parametric_function_.type())
     , coefficients_(parametric_function_.num_components())
   {
     assert(parametric_function_.parametric());

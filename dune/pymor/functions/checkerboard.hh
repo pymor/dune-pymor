@@ -22,17 +22,16 @@
 
 namespace Dune {
 namespace Pymor {
-namespace Function {
+namespace Functions {
 
 
 template< class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1 >
 class Checkerboard
-  : public Function::AffinelyDecomposableDefault
-        < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >
+  : public AffinelyDecomposableDefault < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >
 {
   typedef Checkerboard< EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > ThisType;
-  typedef Function::AffinelyDecomposableDefault
-      < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols > BaseType;
+  typedef AffinelyDecomposableDefault
+      < EntityImp, DomainFieldImp, domainDim, RangeFieldImp, rangeDim, rangeDimCols >                 BaseType;
 public:
   typedef typename BaseType::NonparametricType  NonparametricType;
   typedef typename BaseType::EntityType         EntityType;
@@ -45,6 +44,8 @@ public:
   static const unsigned int                 dimRange = BaseType::dimRange;
   static const unsigned int                 dimRangeCols = BaseType::dimRangeCols;
   typedef typename BaseType::RangeType      RangeType;
+
+  static const bool available = true;
 
   static std::string static_id()
   {
@@ -130,7 +131,7 @@ public:
 }; // class Checkerboard
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Pymor
 } // namespace Dune
 

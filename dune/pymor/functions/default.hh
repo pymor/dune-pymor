@@ -24,7 +24,7 @@
 
 namespace Dune {
 namespace Pymor {
-namespace Function {
+namespace Functions {
 
 
 template< class EntityImp, class DomainFieldImp, int domainDim, class RangeFieldImp, int rangeDim, int rangeDimCols = 1 >
@@ -111,6 +111,8 @@ public:
   typedef typename BaseType::RangeType      RangeType;
 
   typedef typename BaseType::JacobianRangeType JacobianRangeType;
+
+  static const bool available = true;
 
   static std::string static_id()
   {
@@ -412,7 +414,7 @@ public:
 }; // class AffinelyDecomposableDefault
 
 
-} // namespace Function
+} // namespace Functions
 } // namespace Pymor
 } // namespace Dune
 
