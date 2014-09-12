@@ -116,10 +116,9 @@ void KeyValueBase< KeyType, ValueType >::update()
   if (dict_.size() > 0) {
     keys_ = std::vector< KeyType >();
     values_ = std::vector< ValueType >();
-    const auto dict_end = dict_.end();
-    for (auto dict_it = dict_.begin(); dict_it != dict_end; ++dict_it) {
-      keys_.push_back(dict_it->first);
-      values_.push_back(dict_it->second);
+    for (const auto& element : dict_) {
+      keys_.push_back(element.first);
+      values_.push_back(element.second);
     }
   }
 } // void update()
@@ -175,7 +174,7 @@ void ParameterType::set(const KeyType& key, const ValueType& value)
 std::string ParameterType::report() const
 {
   std::ostringstream ret;
-  ret << "Dune::Pymor::ParameterType(";
+  ret << "(";
   if (dict_.size() == 1) {
     const auto element = dict_.begin();
     ret << "\"" << element->first << "\", " << element->second;
@@ -316,7 +315,7 @@ void Parameter::set(const KeyType& key, const ValueType& value)
 std::string Parameter::report() const
 {
   std::ostringstream ret;
-  ret << "Dune::Pymor::Parameter(";
+  ret << "(";
   if (dict_.size() == 1) {
     const auto element = dict_.begin();
     ret << "\"" << element->first << "\", ";
