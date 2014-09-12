@@ -88,7 +88,7 @@ const std::string& ParameterFunctional::expression() const
 
 std::string ParameterFunctional::report(const std::string name) const
 {
-  return name + "(" + Parametric::parameter_type().report() + ") = \"" + expression_ + "\"";
+  return name + ": " + Parametric::parameter_type().report() + " -> \"" + expression_ + "\"";
 }
 
 void ParameterFunctional::evaluate(const Parameter& mu, double& ret) const
