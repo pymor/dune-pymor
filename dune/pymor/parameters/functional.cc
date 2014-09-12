@@ -133,13 +133,6 @@ void ParameterFunctional::setup()
   for (auto variable_prefix : type.keys()) {
     const size_t variable_size = type.get(variable_prefix);
     if (variable_size == 1) {
-      if (expression_.find(variable_prefix + "[") != std::string::npos)
-        DUNE_THROW(Stuff::Exceptions::wrong_input_given,
-                   "There was a problem setting up this parameter functional:\n"
-                   << "At least one part of the parameter is scalar and the expression you gave indicates"
-                   << " that you expect it to be vector valued!\n"
-                   << "The parameter_type you provided is:\n  " << parameter_type() << "\n"
-                   << "The expression you provided is:\n  " << expression_ << "\n");
       variables_.push_back(variable_prefix);
     } else {
       for (size_t ii = 0; ii < variable_size; ++ii) {
