@@ -148,6 +148,14 @@ public:
 
   ValueType serialize() const;
 
+  bool operator==(const double& value) const;
+
+  bool operator==(const ValueType& values) const;
+
+  bool operator!=(const double& value) const;
+
+  bool operator!=(const ValueType& values) const;
+
   using BaseType::keys;
   using BaseType::values;
   using BaseType::hasKey;

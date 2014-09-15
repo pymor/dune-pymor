@@ -9,6 +9,8 @@
 
 #include <dune/stuff/common/exceptions.hh>
 
+#include <dune/pymor/common/exceptions.hh>
+
 #include "base.hh"
 
 namespace Dune {
@@ -409,6 +411,37 @@ Parameter::ValueType Parameter::serialize() const
   }
   return ret;
 } // ValueType serialize() const
+
+bool Parameter::operator==(const double& val) const
+{
+  if (keys().size() != 1 || values().size() != 1 || values()[0].size() != 1)
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "You are trying to compare a parameter " << *this << " with a scalar value " << val << "!");
+  return !(values()[0][0] < val) && !(values()[0][0] > val);
+} // ... operator==(...)
+
+bool Parameter::operator==(const ValueType& vals) const
+{
+  const auto serialized = serialize();
+  if (vals.size() != serialized.size())
+    DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
+               "You are trying to compare a parameter " << *this << " with a vector of length " << vals.size()
+               << "!");
+  for (size_t ii = 0; ii < vals.size(); ++ii)
+    if (vals[ii] < serialized[ii] || vals[ii] > serialized[ii])
+      return false;
+  return true;
+} // ... operator==(...)
+
+bool Parameter::operator!=(const double& value) const
+{
+  return !operator==(value);
+}
+
+bool Parameter::operator!=(const ValueType& values) const
+{
+  return !operator==(values);
+}
 
 std::ostream& operator<<(std::ostream& oo, const Parameter& pp)
 {
