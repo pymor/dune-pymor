@@ -29,7 +29,7 @@ class AffinelyDecomposedFunctionalInterface : public FunctionalInterface {};
 
 template< class Traits >
 class FunctionalInterface
-  : CRTPInterface< FunctionalInterface< Traits >, Traits >
+  : public CRTPInterface< FunctionalInterface< Traits >, Traits >
   , public Parametric
   , public Tags::FunctionalInterface
 {
