@@ -56,8 +56,8 @@ public:
 
   OperatorType get_operator() const
   {
-    CHECK_CRTP(this->as_imp(*this).get_operator());
-    return this->as_imp(*this).get_operator();
+    CHECK_CRTP(this->as_imp().get_operator());
+    return this->as_imp().get_operator();
   }
 
   OperatorType* get_operator_and_return_ptr() const
@@ -67,8 +67,8 @@ public:
 
   FunctionalType get_rhs() const
   {
-    CHECK_CRTP(this->as_imp(*this).get_rhs());
-    return this->as_imp(*this).get_rhs();
+    CHECK_CRTP(this->as_imp().get_rhs());
+    return this->as_imp().get_rhs();
   }
 
   FunctionalType* get_rhs_and_return_ptr() const
@@ -78,14 +78,14 @@ public:
 
   std::vector< std::string > available_products() const
   {
-    CHECK_CRTP(this->as_imp(*this).available_products());
-    return this->as_imp(*this).available_products();
+    CHECK_CRTP(this->as_imp().available_products());
+    return this->as_imp().available_products();
   }
 
   ProductType get_product(const std::string id) const
   {
-    CHECK_CRTP(this->as_imp(*this).get_product(id));
-    return this->as_imp(*this).get_product(id);
+    CHECK_CRTP(this->as_imp().get_product(id));
+    return this->as_imp().get_product(id);
   }
 
   ProductType* get_product_and_return_ptr(const std::string id) const
@@ -95,14 +95,14 @@ public:
 
   std::vector< std::string > available_vectors() const
   {
-    CHECK_CRTP(this->as_imp(*this).available_vectors());
-    return this->as_imp(*this).available_vectors();
+    CHECK_CRTP(this->as_imp().available_vectors());
+    return this->as_imp().available_vectors();
   }
 
   AffinelyDecomposedVectorType get_vector(const std::string id) const
   {
-    CHECK_CRTP(this->as_imp(*this).get_vector(id));
-    return this->as_imp(*this).get_vector(id);
+    CHECK_CRTP(this->as_imp().get_vector(id));
+    return this->as_imp().get_vector(id);
   }
 
   VectorType* get_vector_and_return_ptr(const std::string id) const
@@ -115,8 +115,8 @@ public:
 
   VectorType create_vector() const
   {
-    CHECK_CRTP(this->as_imp(*this).create_vector());
-    return this->as_imp(*this).create_vector();
+    CHECK_CRTP(this->as_imp().create_vector());
+    return this->as_imp().create_vector();
   }
 
   VectorType* create_vector_and_return_ptr() const
@@ -126,19 +126,19 @@ public:
 
 //  std::vector< std::string > solver_options() const
 //  {
-//    CHECK_CRTP(this->as_imp(*this).solver_options());
-//    return this->as_imp(*this).solver_options();
+//    CHECK_CRTP(this->as_imp().solver_options());
+//    return this->as_imp().solver_options();
 //  }
 
 //  std::string solver_options(const std::string context) const
 //  {
-//    CHECK_CRTP(this->as_imp(*this).solver_options(context));
-//    return this->as_imp(*this).solver_options(context);
+//    CHECK_CRTP(this->as_imp().solver_options(context));
+//    return this->as_imp().solver_options(context);
 //  }
 
   void solve(VectorType& vector, const Parameter mu = Parameter()) const
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).solve(vector, mu));
+    CHECK_AND_CALL_CRTP(this->as_imp().solve(vector, mu));
   }
 
   VectorType solve(const Parameter mu = Parameter()) const
@@ -155,7 +155,7 @@ public:
 
   void visualize(const VectorType& vector, const std::string filename, const std::string name) const
   {
-    CHECK_AND_CALL_CRTP(this->as_imp(*this).visualize(vector, filename, name));
+    CHECK_AND_CALL_CRTP(this->as_imp().visualize(vector, filename, name));
   }
 }; // class StationaryDiscretizationInterface
 
