@@ -99,10 +99,10 @@ def wrap_module(mod):
                     continue
                 add_to_module(k, wrapped_class, mod)
                 wrapper.add_class(v, wrapped_class)
-                if HAVE_MULTISCALE and issubclass(v, StationaryMultiscaleDiscretiztionInterface):
-                    wrapped_class = wrap_multiscale_discretization(v, wrapper)
-                    add_to_module(k, wrapped_class, mod)
-                    wrapper.add_class(v, wrapped_class)
+                #if HAVE_MULTISCALE and issubclass(v, StationaryMultiscaleDiscretiztionInterface):
+                #    wrapped_class = wrap_multiscale_discretization(v, wrapper)
+                #    add_to_module(k, wrapped_class, mod)
+                #    wrapper.add_class(v, wrapped_class)
 
     create_modules(mod)
     wrap_vectors(mod)
