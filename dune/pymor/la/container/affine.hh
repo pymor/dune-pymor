@@ -15,6 +15,7 @@
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/logging.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -33,6 +34,8 @@ class AffinelyDecomposedConstContainer
                 "ContainerType must be derived from ContainerInterface");
 public:
   typedef ContainerImp ContainerType;
+
+  static const std::string static_id() { return "pymor.la.affinelydecomposedcontainer"; }
 
   AffinelyDecomposedConstContainer()
     : hasAffinePart_(false)
@@ -212,6 +215,9 @@ public:
 
   ContainerType freeze_parameter(const Parameter mu = Parameter()) const
   {
+#ifndef NDEBUG
+    auto logger = DSC::TimedLogger().get(static_id() + ".with_mu");
+#endif
     if (mu.type() != parameter_type())
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
@@ -225,13 +231,26 @@ public:
       DUNE_THROW(Stuff::Exceptions::internal_error, "");
     if (hasAffinePart_) {
       ContainerType result = affinePart_->copy();
-      if (num_components_ > 0)
+      if (num_components_ > 0) {
+#ifndef NDEBUG
+        logger.debug() << "combining affine_part and " << num_components_ << " component"
+                       << (num_components_ == 1 ? "" : "s") << "..." << std::endl;
+#endif
         for (DUNE_STUFF_SSIZE_T ii = 0; ii < num_components_; ++ii) {
           const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
           result.axpy(coefficients_[ii]->evaluate(muCoefficient), *(components_[ii]));
         }
+      } else {
+#ifndef NDEBUG
+        logger.debug() << "returning affine_part" << std::endl;
+#endif
+      }
       return result;
     } else {
+#ifndef NDEBUG
+      logger.debug() << "combining " << num_components_ << " component"
+                     << (num_components_ == 1 ? "" : "s") << "..." << std::endl;
+#endif
       ContainerType result = components_[0]->copy();
       const Parameter muCoefficient0 = map_parameter(mu, "coefficient_0");
       result.scal(coefficients_[0]->evaluate(muCoefficient0));
