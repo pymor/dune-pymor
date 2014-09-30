@@ -288,16 +288,16 @@ public:
    */
   AffinelyDecomposedContainer(ContainerType* aff_ptr)
     : BaseType()
-    , affinePart_(aff_ptr)
+    , writableAffinePart_(aff_ptr)
   {
-    BaseType::register_affine_part(affinePart_);
+    BaseType::register_affine_part(writableAffinePart_);
   }
 
   AffinelyDecomposedContainer(std::shared_ptr< ContainerType > aff_ptr)
     : BaseType()
-    , affinePart_(aff_ptr)
+    , writableAffinePart_(aff_ptr)
   {
-    BaseType::register_affine_part(affinePart_);
+    BaseType::register_affine_part(writableAffinePart_);
   }
 
   /**
@@ -306,30 +306,30 @@ public:
   AffinelyDecomposedContainer(ContainerType* comp_ptr, const ParameterFunctional* coeff_ptr)
     : BaseType()
   {
-    components_.emplace_back(comp_ptr);
-    BaseType::register_component(components_[0], std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    writableComponents_.emplace_back(comp_ptr);
+    BaseType::register_component(writableComponents_[0], std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
   AffinelyDecomposedContainer(std::shared_ptr< ContainerType > comp_ptr, const ParameterFunctional* coeff_ptr)
     : BaseType()
   {
-    components_.push_back(comp_ptr);
-    BaseType::register_component(components_[0], std::shared_ptr< const ParameterFunctional >(coeff_ptr));
+    writableComponents_.push_back(comp_ptr);
+    BaseType::register_component(writableComponents_[0], std::shared_ptr< const ParameterFunctional >(coeff_ptr));
   }
 
   AffinelyDecomposedContainer(ContainerType* comp_ptr, const std::shared_ptr< const ParameterFunctional > coeff_ptr)
     : BaseType()
   {
-    components_.emplace_back(comp_ptr);
-    BaseType::register_component(components_[0], coeff_ptr);
+    writableComponents_.emplace_back(comp_ptr);
+    BaseType::register_component(writableComponents_[0], coeff_ptr);
   }
 
   AffinelyDecomposedContainer(std::shared_ptr< ContainerType > comp_ptr,
                               const std::shared_ptr< const ParameterFunctional > coeff_ptr)
     : BaseType()
   {
-    components_.push_back(comp_ptr);
-    BaseType::register_component(components_[0], coeff_ptr);
+    writableComponents_.push_back(comp_ptr);
+    BaseType::register_component(writableComponents_[0], coeff_ptr);
   }
 
   template< class... Args >
@@ -345,14 +345,14 @@ public:
    */
   void register_affine_part(ContainerType* aff_ptr)
   {
-    affinePart_ = std::shared_ptr< ContainerType >(aff_ptr);
-    BaseType::register_affine_part(affinePart_);
+    writableAffinePart_ = std::shared_ptr< ContainerType >(aff_ptr);
+    BaseType::register_affine_part(writableAffinePart_);
   }
 
   void register_affine_part(std::shared_ptr< ContainerType > aff_ptr)
   {
-    affinePart_ = aff_ptr;
-    BaseType::register_affine_part(affinePart_);
+    writableAffinePart_ = aff_ptr;
+    BaseType::register_affine_part(writableAffinePart_);
   }
 
   template< class... Args >
@@ -439,7 +439,7 @@ public:
   DUNE_STUFF_SSIZE_T register_component(std::shared_ptr< ContainerType > comp_ptr,
                                         const std::shared_ptr< const ParameterFunctional > coeff_ptr)
   {
-    components_.push_back(comp_ptr);
+    writableComponents_.push_back(comp_ptr);
     return BaseType::register_component(comp_ptr, coeff_ptr);
   }
 
@@ -448,7 +448,7 @@ public:
     if (!BaseType::has_affine_part())
       DUNE_THROW(Stuff::Exceptions::requirements_not_met,
                  "do not call affine_part() if has_affine_part() == false!");
-    return affinePart_;
+    return writableAffinePart_;
   }
 
   using BaseType::component;
@@ -462,12 +462,12 @@ public:
       DUNE_THROW(Stuff::Exceptions::index_out_of_range,
                  "the condition 0 < " << qq << " < num_components() = " << BaseType::num_components()
                             << " is not satisfied!");
-    return components_[qq];
+    return writableComponents_[qq];
   }
 
 private:
-  std::vector< std::shared_ptr< ContainerType > > components_;
-  std::shared_ptr< ContainerType > affinePart_;
+  std::vector< std::shared_ptr< ContainerType > > writableComponents_;
+  std::shared_ptr< ContainerType > writableAffinePart_;
 }; // class AffinelyDecomposedContainer
 
 
