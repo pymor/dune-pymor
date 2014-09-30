@@ -32,6 +32,8 @@ class AffinelyDecomposedConstContainer
 {
   static_assert(std::is_base_of< Stuff::LA::ContainerInterface< typename ContainerImp::Traits >, ContainerImp >::value,
                 "ContainerType must be derived from ContainerInterface");
+
+  typedef AffinelyDecomposedConstContainer< ContainerImp > ThisType;
 public:
   typedef ContainerImp ContainerType;
 
@@ -41,6 +43,14 @@ public:
     : hasAffinePart_(false)
     , num_components_(0)
   {}
+
+  AffinelyDecomposedConstContainer(const ThisType& other) = default;
+
+  AffinelyDecomposedConstContainer(ThisType&& source) = default;
+
+  ThisType& operator=(const ThisType& other) = default;
+
+  ThisType& operator=(ThisType&& source) = default;
 
   /**
    * \attention This class takes ownership of aff_ptr (in the sense, that you must not delete it manually)!
@@ -262,7 +272,18 @@ public:
     }
   }
 
-private:
+  ThisType copy()
+  {
+    ThisType ret;
+    if (hasAffinePart_)
+      ret.register_affine_part(new ContainerType(affinePart_->copy()));
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components_; ++qq)
+      ret.register_component(new ContainerType(components_[qq]->copy()),
+                             new ParameterFunctional(*coefficients_[qq]));
+    return ret;
+  } // ... copy(...)
+
+protected:
   bool hasAffinePart_;
   DUNE_STUFF_SSIZE_T num_components_;
   std::vector< std::shared_ptr< const ContainerType > > components_;
@@ -276,12 +297,21 @@ class AffinelyDecomposedContainer
   : public AffinelyDecomposedConstContainer< ContainerImp >
 {
   typedef AffinelyDecomposedConstContainer< ContainerImp > BaseType;
+  typedef AffinelyDecomposedContainer< ContainerImp >      ThisType;
 public:
   typedef ContainerImp ContainerType;
 
   AffinelyDecomposedContainer()
     : BaseType()
   {}
+
+  AffinelyDecomposedContainer(const ThisType& other) = default;
+
+  AffinelyDecomposedContainer(ThisType&& source) = default;
+
+  ThisType& operator=(const ThisType& other) = default;
+
+  ThisType& operator=(ThisType&& source) = default;
 
   /**
    * \attention This class takes ownership of aff_ptr!
@@ -464,6 +494,17 @@ public:
                             << " is not satisfied!");
     return writableComponents_[qq];
   }
+
+  ThisType copy()
+  {
+    ThisType ret;
+    if (this->hasAffinePart_)
+      ret.register_affine_part(new ContainerType(writableAffinePart_->copy()));
+    for (DUNE_STUFF_SSIZE_T qq = 0; qq < this->num_components_; ++qq)
+      ret.register_component(new ContainerType(writableComponents_[qq]->copy()),
+                             new ParameterFunctional(*(this->coefficients_[qq])));
+    return ret;
+  } // ... copy(...)
 
 private:
   std::vector< std::shared_ptr< ContainerType > > writableComponents_;
