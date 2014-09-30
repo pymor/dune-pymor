@@ -8,7 +8,7 @@ import pybindgen
 from pybindgen import retval, param
 import numpy as np
 
-from pymor import defaults
+from pymor.core.defaults import defaults
 from pymor.la.listvectorarray import VectorInterface, ListVectorArray
 
 # ReturnValue for converting a raw C pointer to a PyBuffer object
@@ -296,8 +296,13 @@ def wrap_vector(cls):
         def __init__(self, v):
             self._impl = v
 
-        def zeros(cls, dim):
-            return cls(cls.wrapped_type(dim))
+        @classmethod
+        def make_zeros(cls, subtype):
+            return cls(cls.wrapped_type(subtype))
+
+        @property
+        def subtype(self):
+            return self._impl.dim()
 
         @property
         def dim(self):
@@ -306,11 +311,14 @@ def wrap_vector(cls):
         def copy(self):
             return type(self)(self._impl.copy())
 
-        def almost_equal(self, other, rtol=None, atol=0):
-            assert atol is None or atol == 0, 'Not supported'
+        # @defaults('atol', 'rtol', qualname='dune.pymor.WrappedVector.almost_equal')
+        def almost_equal(self, other,
+                         rtol=2**4 * np.finfo(np.zeros(1.).dtype).eps,
+                         atol=0.):
+            # assert atol == 0., 'Not supported'
             assert type(other) == type(self)
-            rtol = defaults.float_cmp_tol if rtol is None else rtol
-            return self._impl.almost_equal(other._impl, rtol)
+            return self._impl.almost_equal(other._impl,
+                                           rtol if rtol is not None else 2**4 *np.finfo(np.zeros(1.).dtype).eps)
 
         def scal(self, alpha):
             self._impl.scal(alpha)

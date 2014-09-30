@@ -9,7 +9,8 @@ from collections import OrderedDict
 import pybindgen
 from pybindgen import retval, param
 
-from pymor.operators.basic import OperatorBase, LincombOperatorBase
+from pymor.la import VectorSpace
+from pymor.operators.basic import OperatorBase, LincombOperator
 
 
 def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONFIG_H,
@@ -302,8 +303,8 @@ class WrappedOperatorBase(OperatorBase):
     def __init__(self, op):
         assert isinstance(op, self.wrapped_type)
         self._impl = op
-        self.dim_source = int(op.dim_source())
-        self.dim_range = int(op.dim_range())
+        self.source = VectorSpace(self.type_source, int(op.dim_source()))
+        self.range = VectorSpace(self.type_range, int(op.dim_range()))
         self.linear = op.linear()
         if hasattr(op, 'parametric') and op.parametric():
             pt = self._wrapper[op.parameter_type()]
@@ -314,19 +315,18 @@ class WrappedOperatorBase(OperatorBase):
         return OrderedDict([(k, {'type': k}) for k in list(self._impl.invert_options())])
 
     def apply(self, U, ind=None, mu=None):
-        assert isinstance(U, self.type_source)
+        assert U in self.source
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             return self.type_range([self.vec_type_range(self._impl.apply(v._impl, mu)) for v in vectors],
-                                   dim=self.dim_range)
+                                   subtype=self.range.subtype)
         else:
-            assert self.check_parameter(mu)
             return self.type_range([self.vec_type_range(self._impl.apply(v._impl)) for v in vectors],
-                                   dim=self.dim_range)
+                                   subtype=self.range.subtype)
 
     def apply_inverse(self, U, ind=None, mu=None, options=None):
-        assert isinstance(U, self.type_range)
+        assert U in self.range
         assert options is None or isinstance(options, str) \
             or (isinstance(options, dict) and options.keys() == ['type'] and
                 options['type'] in self.invert_options.keys())
@@ -338,11 +338,11 @@ class WrappedOperatorBase(OperatorBase):
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
-                                     for v in vectors], dim=self.dim_source)
+                                     for v in vectors], subtype=self.source.subtype)
         else:
             assert self.check_parameter(mu)
             return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options))
-                                     for v in vectors], dim=self.dim_source)
+                                     for v in vectors], subtype=self.source.subtype)
 
 
 def wrap_operator(cls, wrapper):
@@ -409,7 +409,7 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
     Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['Exception']])
     Class.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
+                 throw=[exceptions['Exception']])
     Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
                      throw=[exceptions['Exception']])
     Class.add_method('type_inverse', retval('std::string'), [], is_const=True, is_static=True,
@@ -526,7 +526,7 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
 
 def wrap_affinely_decomposed_operator(cls, wrapper):
 
-    class WrappedOperator(WrappedOperatorBase, LincombOperatorBase):
+    class WrappedOperator(WrappedOperatorBase):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
         vec_type_range = wrapper[cls.type_range()]
@@ -536,15 +536,18 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
 
         def __init__(self, op):
             WrappedOperatorBase.__init__(self, op)
-            operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
-            coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
+            self.operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
+            self.coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
             if op.has_affine_part():
-                operators.append(self._wrapper[op.affine_part()])
-                coefficients.append(1.)
+                self.operators.append(self._wrapper[op.affine_part()])
+                self.coefficients.append(1.)
                 self.affine_part = True
             else:
                 self.affine_part = False
-            LincombOperatorBase.__init__(self, operators, coefficients)
+
+        def projected(self, source_basis, range_basis, product=None, name=None):
+            return (LincombOperator(self.operators, self.coefficients)
+                    .projected(source_basis, range_basis, product=product, name=name))
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator
