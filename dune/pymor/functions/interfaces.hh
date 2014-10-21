@@ -297,12 +297,12 @@ class FunctionWithParameter
 
     LocalFunction& operator=(const LocalFunction& /*other*/) = delete;
 
-    virtual size_t order() const DS_OVERRIDE
+    virtual size_t order() const override
     {
       return order_;
     }
 
-    virtual void evaluate(const DomainType& xx, RangeType& ret) const DS_OVERRIDE
+    virtual void evaluate(const DomainType& xx, RangeType& ret) const override
     {
       ret *= 0.0;
       for (size_t qq = 0; qq < local_components_.size(); ++qq) {
@@ -316,7 +316,7 @@ class FunctionWithParameter
       }
     } // ... evaluate(...)
 
-    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const DS_OVERRIDE
+    virtual void jacobian(const DomainType& xx, JacobianRangeType& ret) const override
     {
       ret *= 0.0;
       for (size_t qq = 0; qq < local_components_.size(); ++qq) {
@@ -366,22 +366,22 @@ public:
 
   ThisType& operator=(const ThisType& other) = delete;
 
-  virtual std::unique_ptr< LocalfunctionType > local_function(const EntityType& entity) const DS_OVERRIDE
+  virtual std::unique_ptr< LocalfunctionType > local_function(const EntityType& entity) const override
   {
     return Stuff::Common::make_unique< LocalFunction >(entity, parametric_function_, coefficients_);
   }
 
-  virtual ThisType* copy() const DS_OVERRIDE
+  virtual ThisType* copy() const override
   {
     DUNE_THROW(NotImplemented, "Implement me!");
   }
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const override
   {
     return type_;
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return name_;
   }

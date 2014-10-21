@@ -97,9 +97,9 @@ public:
 
   ParameterType(const std::vector< KeyType >& kk, const std::vector< ValueType >& vv);
 
-  virtual void set(const KeyType& key, const ValueType& value) DS_OVERRIDE;
+  virtual void set(const KeyType& key, const ValueType& value) override;
 
-  virtual std::string report() const DS_OVERRIDE;
+  virtual std::string report() const override;
 
   std::string report_for_filename() const;
 
@@ -140,9 +140,9 @@ public:
 
   const ParameterType& type() const;
 
-  virtual void set(const KeyType& key, const ValueType& value) DS_OVERRIDE;
+  virtual void set(const KeyType& key, const ValueType& value) override;
 
-  virtual std::string report() const DS_OVERRIDE;
+  virtual std::string report() const override;
 
   std::string report_for_filename() const;
 

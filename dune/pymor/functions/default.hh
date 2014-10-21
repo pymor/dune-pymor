@@ -63,22 +63,22 @@ public:
     , nonparametric_(nonparametric_ptr)
   {}
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const override
   {
     return BaseType::static_id() + ".nonparametricdefault";
   }
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return nonparametric_->name();
   }
 
-  virtual const std::shared_ptr< const NonparametricType >& affine_part() const DS_OVERRIDE
+  virtual const std::shared_ptr< const NonparametricType >& affine_part() const override
   {
     return nonparametric_;
   }
 
-  virtual DUNE_STUFF_SSIZE_T num_components() const DS_OVERRIDE
+  virtual DUNE_STUFF_SSIZE_T num_components() const override
   {
     return 0;
   }
@@ -298,7 +298,7 @@ public:
     this->inherit_parameter_type(coeff_ptr->parameter_type(), "coefficient_0");
   }
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const override
   {
     return BaseType::static_id() + ".affinelydecomposabledefault";
   }
@@ -357,17 +357,17 @@ public:
     ++num_components_;
   } // ... register_component(...)
 
-  virtual std::string name() const DS_OVERRIDE
+  virtual std::string name() const override
   {
     return name_;
   }
 
-  virtual bool has_affine_part() const DS_OVERRIDE
+  virtual bool has_affine_part() const override
   {
     return hasAffinePart_;
   }
 
-  virtual const std::shared_ptr< const NonparametricType >& affine_part() const DS_OVERRIDE
+  virtual const std::shared_ptr< const NonparametricType >& affine_part() const override
   {
     if (!hasAffinePart_)
       DUNE_THROW(Stuff::Exceptions::you_are_using_this_wrong,
@@ -375,12 +375,12 @@ public:
     return affinePart_;
   }
 
-  virtual DUNE_STUFF_SSIZE_T num_components() const DS_OVERRIDE
+  virtual DUNE_STUFF_SSIZE_T num_components() const override
   {
     return num_components_;
   }
 
-  virtual const std::shared_ptr< const NonparametricType >& component(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
+  virtual const std::shared_ptr< const NonparametricType >& component(const DUNE_STUFF_SSIZE_T qq) const override
   {
     if (num_components_ == 0)
       DUNE_THROW(Stuff::Exceptions::requirements_not_met,
@@ -392,7 +392,7 @@ public:
     return components_[qq];
   }
 
-  virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const DS_OVERRIDE
+  virtual const std::shared_ptr< const ParameterFunctional >& coefficient(const DUNE_STUFF_SSIZE_T qq) const override
   {
     if (num_components_ == 0)
       DUNE_THROW(Stuff::Exceptions::requirements_not_met,

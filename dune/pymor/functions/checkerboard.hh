@@ -124,7 +124,7 @@ public:
     } // create the coefficients and components
   } // Checkerboard()
 
-  virtual std::string type() const DS_OVERRIDE
+  virtual std::string type() const override
   {
     return BaseType::BaseType::static_id() + ".checkerboard";
   }
