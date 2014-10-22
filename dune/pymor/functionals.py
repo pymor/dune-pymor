@@ -9,8 +9,8 @@ from pybindgen import retval, param
 
 import numpy as np
 
-from pymor.la import NumpyVectorArray
-from pymor.operators.basic import OperatorBase, LincombOperatorBase
+from pymor.la import NumpyVectorArray, NumpyVectorSpace, VectorSpace
+from pymor.operators.basic import OperatorBase, LincombOperator
 
 def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
@@ -80,30 +80,27 @@ class WrappedFunctionalBase(OperatorBase):
     vec_type_source = None
 
     type_source = None
-    type_range = NumpyVectorArray
-
-    dim_range = 1
+    range = NumpyVectorSpace(1)
 
     _wrapper = None
 
     def __init__(self, op):
         assert isinstance(op, self.wrapped_type)
         self._impl = op
-        self.dim_source = op.dim_source()
+        self.source = VectorSpace(self.type_source, op.dim_source())
         self.linear = op.linear()
         if hasattr(op, 'parametric') and op.parametric():
             pt = self._wrapper[op.parameter_type()]
             self.build_parameter_type(pt, local_global=True)
 
     def apply(self, U, ind=None, mu=None):
-        assert isinstance(U, self.type_source)
+        assert U in self.source
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             R = np.array([self._impl.apply(v._impl, mu) for v in vectors])[..., np.newaxis]
             return NumpyVectorArray(R, copy=False)
         else:
-            assert self.check_parameter(mu)
             R = np.array([self._impl.apply(v._impl) for v in vectors])[..., np.newaxis]
             return NumpyVectorArray(R, copy=False)
 
@@ -232,7 +229,7 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
 
 def wrap_affinely_decomposed_functional(cls, wrapper):
 
-    class WrappedFunctional(WrappedFunctionalBase, LincombOperatorBase):
+    class WrappedFunctional(WrappedFunctionalBase):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
         type_source = wrapper.vector_array(vec_type_source)
@@ -240,15 +237,18 @@ def wrap_affinely_decomposed_functional(cls, wrapper):
 
         def __init__(self, op):
             WrappedFunctionalBase.__init__(self, op)
-            operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
-            coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
+            self.operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
+            self.coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
             if op.has_affine_part():
-                operators.append(self._wrapper[op.affine_part()])
-                coefficients.append(1.)
+                self.operators.append(self._wrapper[op.affine_part()])
+                self.coefficients.append(1.)
                 self.affine_part = True
             else:
                 self.affine_part = False
-            LincombOperatorBase.__init__(self, operators, coefficients)
+
+        def projected(self, source_basis, range_basis, product=None, name=None):
+            return (LincombOperator(self.operators, self.coefficients)
+                    .projected(source_basis, range_basis, product=product, name=name))
 
     WrappedFunctional.__name__ = cls.__name__
     return WrappedFunctional
