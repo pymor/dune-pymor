@@ -53,6 +53,16 @@ file( GLOB_RECURSE pymor "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
 set( COMMON_HEADER ${pymor} ${DUNE_HEADERS} )
 set_source_files_properties( ${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1 )
 
+#disable most warnings from dependent modules
+foreach(_mod ${ALL_DEPENDENCIES})
+  dune_module_to_uppercase(_upper_case "${_mod}")
+  if(${_mod}_INCLUDE_DIRS)
+    foreach( _idir ${${_mod}_INCLUDE_DIRS} )
+      add_definitions("-isystem ${_idir}")
+    endforeach( _idir )
+  endif(${_mod}_INCLUDE_DIRS)
+endforeach(_mod DEPENDENCIES)
+
 add_subdirectory(dune)
 
 # libs
@@ -63,15 +73,5 @@ set(COMMON_LIBS
 
 add_subdirectory(examples EXCLUDE_FROM_ALL)
 add_subdirectory(test EXCLUDE_FROM_ALL)
-
-#disable most warnings from dependent modules
-foreach(_mod ${ALL_DEPENDENCIES})
-    dune_module_to_uppercase(_upper_case "${_mod}")
-    if(${_mod}_INCLUDE_DIRS)
-        foreach( _idir ${${_mod}_INCLUDE_DIRS} )
-            add_definitions("-isystem ${_idir}")
-        endforeach( _idir )
-    endif(${_mod}_INCLUDE_DIRS)
-endforeach(_mod DEPENDENCIES)
 
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)
