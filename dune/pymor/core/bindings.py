@@ -6,6 +6,7 @@
 
 from os.path import join
 import pybindgen
+from pybindgen import param, retval
 
 import dune.pymor
 import dune.pymor.common
@@ -13,6 +14,19 @@ import dune.pymor.parameters
 import dune.pymor.la.container
 import dune.pymor.functionals
 import dune.pymor.operators
+
+
+def inject_Class(module, name, parent=None):
+    namespace = module
+    namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
+    name = name.split('::')[-1].strip()
+    if len(namespaces) > 0:
+        for nspace in namespaces:
+            namespace = namespace.add_cpp_namespace(nspace)
+    if parent is not None:
+        return module, namespace.add_class(name, parent=parent)
+    else:
+        return module, namespace.add_class(name)
 
 
 def prepare_python_bindings(argv):
@@ -28,33 +42,143 @@ def prepare_python_bindings(argv):
     return module, pybindgen_filename, config_h_filename
 
 
-def inject_lib_dune_pymor(module, config_h_filename):
+def basic_types(CONFIG_H):
+    return [CONFIG_H['DUNE_STUFF_SSIZE_T'], 'std::string', 'bool', 'double']
+
+
+def inject_stl(module, config_h_filename):
     assert(isinstance(module, pybindgen.module.Module))
-    interfaces = dict()
     # get config.h
     CONFIG_H = dune.pymor.config_h(config_h_filename)
-
-    def inject_Class(module, name, parent=None):
-        namespace = module
-        namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
-        name = name.split('::')[-1].strip()
-        if len(namespaces) > 0:
-            for nspace in namespaces:
-                namespace = namespace.add_cpp_namespace(nspace)
-        if parent is not None:
-            return module, namespace.add_class(name, parent=parent)
-        else:
-            return module, namespace.add_class(name)
-
     # first of all, add all the stl containers
-    module.add_container('std::vector< std::string >', 'std::string', 'list')
-    module.add_container('std::vector< double >', 'double', 'list')
-    module.add_container('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >',
-                         CONFIG_H['DUNE_STUFF_SSIZE_T'],
-                         'list')
-    module.add_container('std::vector< std::vector< double > >', 'std::vector< double >', 'list')
-    # then of dune-pymor we need the exceptions first
+    for T in basic_types(CONFIG_H):
+        module.add_container('std::vector< ' + T + ' >', T, 'list')
+        module.add_container('std::vector< std::vector< ' + T + ' > >', 'std::vector< ' + T + ' >', 'list')
+    return module, CONFIG_H
+
+
+def inject_lib_dune_stuff(module, config_h_filename):
+    mpdule, CONFIG_H = inject_stl(module, config_h_filename)
+    # of dune we need the exceptions first
     module, exceptions = dune.pymor.common.inject_exceptions(module, CONFIG_H)
+    # exception = exceptions['Exception']
+    BASIC_TYPES = basic_types(CONFIG_H)
+
+    module, Configuration = inject_Class(module, 'Dune::Stuff::Common::Configuration')
+    Configuration.add_constructor([])
+    Configuration.add_copy_constructor()
+    # Configuration.add_constructor([param('const std::string', 'filename')], throw=exceptions)
+    for T in BASIC_TYPES:
+        Configuration.add_constructor([param('const std::string', 'key'),
+                                       param(T, 'value')],
+                                       throw=exceptions)
+        Configuration.add_constructor([param('const std::string', 'key'),
+                                       param('const std::vector< ' + T + ' >', 'value')],
+                                       throw=exceptions)
+        Configuration.add_constructor([param('const std::vector< std::string >', 'keys'),
+                                       param('const std::vector< ' + T + ' >', 'values')],
+                                       throw=exceptions)
+        Configuration.add_constructor([param('const std::vector< std::string >', 'keys'),
+                                       param('const std::vector< std::vector< ' + T + ' > >', 'values')],
+                                       throw=exceptions)
+    Configuration.add_method('has_key',
+                             retval('bool'),
+                             [param('const std::string&', 'key')],
+                             is_const=True)
+    Configuration.add_method('report', None, [], is_const=True)
+    Configuration.add_method('pb_get',
+                             retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
+                             [param('const std::string', 'key')],
+                             template_parameters=[CONFIG_H['DUNE_STUFF_SSIZE_T']],
+                             throw=exceptions,
+                             custom_name='get_int')
+    Configuration.add_method('pb_get',
+                             retval('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >'),
+                             [param('const std::string', 'key'),
+                              param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'size')],
+                             template_parameters=['std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >'],
+                             throw=exceptions,
+                             custom_name='get_int')
+    Configuration.add_method('pb_get',
+                             retval('std::string'),
+                             [param('const std::string', 'key')],
+                             template_parameters=['std::string'],
+                             throw=exceptions,
+                             custom_name='get_str')
+    Configuration.add_method('pb_get',
+                             retval('std::vector< std::string >'),
+                             [param('const std::string', 'key'),
+                              param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'size')],
+                             template_parameters=['std::vector< std::string >'],
+                             throw=exceptions,
+                             custom_name='get_str')
+    Configuration.add_method('pb_get',
+                             retval('bool'),
+                             [param('const std::string', 'key')],
+                             template_parameters=['bool'],
+                             throw=exceptions,
+                             custom_name='get_boolean')
+    Configuration.add_method('pb_get',
+                             retval('std::vector< bool >'),
+                             [param('const std::string', 'key'),
+                              param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'size')],
+                             template_parameters=['std::vector< bool >'],
+                             throw=exceptions,
+                             custom_name='get_boolean')
+    Configuration.add_method('pb_get',
+                             retval('double'),
+                             [param('const std::string', 'key')],
+                             template_parameters=['double'],
+                             throw=exceptions,
+                             custom_name='get_float')
+    Configuration.add_method('pb_get',
+                             retval('std::vector< double >'),
+                             [param('const std::string', 'key'),
+                              param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'size')],
+                             template_parameters=['std::vector< double >'],
+                             throw=exceptions,
+                             custom_name='get_float')
+    for T in BASIC_TYPES:
+        Configuration.add_method('set',
+                                 None,
+                                 [param('const std::string&', 'key'),
+                                  param(T, 'value'),
+                                  param('bool', 'overwrite')],
+                                 template_parameters=[T],
+                                 is_const=True,
+                                 throw=exceptions)
+        Configuration.add_method('set',
+                                 None,
+                                 [param('const std::string&', 'key'),
+                                  param(T, 'value')],
+                                 template_parameters=[T],
+                                 is_const=True,
+                                 throw=exceptions)
+        Configuration.add_method('set',
+                                 None,
+                                 [param('const std::string&', 'key'),
+                                  param('const std::vector< ' + T + ' >&', 'value'),
+                                  param('const bool', 'overwrite')],
+                                 template_parameters=['std::vector< ' + T + ' >'],
+                                 is_const=True,
+                                 throw=exceptions)
+        Configuration.add_method('set',
+                                 None,
+                                 [param('const std::string&', 'key'),
+                                  param('const std::vector< ' + T + ' >&', 'value')],
+                                 template_parameters=['std::vector< ' + T + ' >'],
+                                 is_const=True,
+                                 throw=exceptions)
+    Configuration.add_method('empty', 'bool', [], is_const=True)
+    Configuration.add_method('report_string', 'std::string', [], is_const=True)
+
+    return module, exceptions, CONFIG_H
+
+
+def inject_lib_dune_pymor(module, config_h_filename):
+    module, exceptions, CONFIG_H = inject_lib_dune_stuff(module, config_h_filename)
+    interfaces = dict()
+
     # then all of parameters
     (module, interfaces['Dune::Pymor::ParameterType']
      ) = dune.pymor.parameters.inject_ParameterType(module, exceptions, CONFIG_H)
