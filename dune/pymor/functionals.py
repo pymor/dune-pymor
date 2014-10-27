@@ -14,7 +14,7 @@ from pymor.operators.basic import OperatorBase, LincombOperator
 
 def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(interfaces, dict))
     for element in interfaces:
         assert(isinstance(element, str))
@@ -43,32 +43,28 @@ def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, T
                              parent=[interfaces['Dune::Pymor::Tags::FunctionalInterface'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
-    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
-    Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
-    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
-    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
+    Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
+    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
+    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Class.add_method('linear', retval('bool'), [], is_const=True)
     Class.add_method('dim_source', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
     Class.add_method('apply',
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source')],
                      is_const=True,
-                     throw=[exceptions['Exception']])
+                     throw=exceptions)
     Class.add_method('apply',
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source'),
                       param('const Dune::Pymor::Parameter', 'mu')],
                      is_const=True,
-                     throw=[exceptions['Exception']])
+                     throw=exceptions)
     Class.add_method('as_vector_and_return_ptr',
                      retval(ContainerType + ' *', caller_owns_return=True),
                      [],
                      is_const=True,
-                     throw=[exceptions['Exception']],
+                     throw=exceptions,
                      custom_name='as_vector')
     return Class
 
@@ -143,7 +139,7 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                                                              Traits,
                                                              template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(interfaces, dict))
     for element in interfaces:
         assert(isinstance(element, str))
@@ -174,55 +170,50 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                              parent=[interfaces['Dune::Pymor::Tags::AffinelyDecomposedFunctionalInterface'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
-    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
-    Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
-    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
-    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True,
-                     throw=[exceptions['Exception']])
+    Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
+    Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
+    Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
+    Class.add_method('type_frozen', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Class.add_method('num_components',
                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                     [], is_const=True, throw=[exceptions['Exception']])
+                     [], is_const=True, throw=exceptions)
     Class.add_method('component_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'qq')],
                      is_const=True,
-                     throw=[exceptions['Exception']],
+                     throw=exceptions,
                      custom_name='component')
     Class.add_method('coefficient_and_return_ptr',
                      retval('Dune::Pymor::ParameterFunctional *', caller_owns_return=True),
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'qq')],
                      is_const=True,
-                     throw=[exceptions['Exception']],
+                     throw=exceptions,
                      custom_name='coefficient')
-    Class.add_method('has_affine_part', retval('bool'), [], is_const=True, throw=[exceptions['Exception']])
+    Class.add_method('has_affine_part', retval('bool'), [], is_const=True, throw=exceptions)
     Class.add_method('affine_part_and_return_ptr',
                      retval(ComponentType + ' *', caller_owns_return=True),
                      [],
                      is_const=True,
-                     throw=[exceptions['Exception']],
+                     throw=exceptions,
                      custom_name='affine_part')
-    Class.add_method('linear', retval('bool'), [], is_const=True, throw=[exceptions['Exception']])
-    Class.add_method('dim_source',
-                     retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True, throw=[exceptions['Exception']])
+    Class.add_method('linear', retval('bool'), [], is_const=True, throw=exceptions)
+    Class.add_method('dim_source', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True, throw=exceptions)
     Class.add_method('apply',
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source')],
                      is_const=True,
-                     throw=[exceptions['Exception']])
+                     throw=exceptions)
     Class.add_method('apply',
                      retval(ScalarType),
                      [param('const ' + SourceType + ' &', 'source'),
                       param('const Dune::Pymor::Parameter', 'mu')],
                      is_const=True,
-                     throw=[exceptions['Exception']])
+                     throw=exceptions)
     Class.add_method('freeze_parameter_and_return_ptr',
                      retval(FrozenType + ' *', caller_owns_return=True),
                      [param('const Dune::Pymor::Parameter', 'mu')],
                      is_const=True,
-                     throw=[exceptions['Exception']],
+                     throw=exceptions,
                      custom_name='freeze_parameter')
     return Class
 

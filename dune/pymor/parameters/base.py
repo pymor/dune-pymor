@@ -10,17 +10,17 @@ from pybindgen import retval, param
 
 def inject_ParameterType(module, exceptions, CONFIG_H):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(CONFIG_H, dict))
     namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
     ParameterType = namespace.add_class('ParameterType')
     ParameterType.add_constructor([])
     ParameterType.add_constructor([param('std::string', 'kk'),
                                    param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'vv')],
-                                  throw=[exceptions['Exception']])
+                                  throw=exceptions)
     ParameterType.add_constructor([param('std::vector< std::string >', 'kk'),
                                    param('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >', 'vv')],
-                                  throw=[exceptions['Exception']])
+                                  throw=exceptions)
     ParameterType.add_method('empty', retval('bool'), [], is_const=True)
     ParameterType.add_method('keys',
                              retval('std::vector< std::string >'),
@@ -38,12 +38,12 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
                              None,
                              [param('std::string', 'key'),
                               param(CONFIG_H['DUNE_STUFF_SSIZE_T'], 'value')],
-                             throw=[exceptions['Exception']])
+                             throw=exceptions)
     ParameterType.add_method('get',
                              retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                              [param('std::string', 'key')],
                              is_const=True,
-                             throw=[exceptions['Exception']])
+                             throw=exceptions)
     ParameterType.add_binary_comparison_operator('==')
     ParameterType.add_binary_comparison_operator('!=')
     ParameterType.add_method('size', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
@@ -54,7 +54,7 @@ def inject_ParameterType(module, exceptions, CONFIG_H):
 
 def inject_Parameter(module, exceptions, CONFIG_H):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(CONFIG_H, dict))
     namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
     Parameter = namespace.add_class('Parameter')
@@ -63,19 +63,19 @@ def inject_Parameter(module, exceptions, CONFIG_H):
                                param('double', 'vv')])
     Parameter.add_constructor([param('Dune::Pymor::ParameterType', 'tt'),
                                param('double', 'vv')],
-                              throw=[exceptions['Exception']])
+                              throw=exceptions)
     Parameter.add_constructor([param('std::string', 'kk'),
                                param('std::vector< double >', 'vv')],
-                              throw=[exceptions['Exception']])
+                              throw=exceptions)
     Parameter.add_constructor([param('Dune::Pymor::ParameterType', 'tt'),
                                param('std::vector< double >', 'vv')],
-                              throw=[exceptions['Exception']])
+                              throw=exceptions)
     Parameter.add_constructor([param('std::vector< std::string >', 'kk'),
                                param('std::vector< std::vector< double > >', 'vv')],
-                              throw=[exceptions['Exception']])
+                              throw=exceptions)
     Parameter.add_constructor([param('Dune::Pymor::ParameterType', 'tt'),
                                param('std::vector< std::vector< double > >', 'vv')],
-                              throw=[exceptions['Exception']])
+                              throw=exceptions)
     Parameter.add_method('type', retval('Dune::Pymor::ParameterType'), [], is_const=True)
     Parameter.add_method('empty', retval('bool'), [], is_const=True)
     Parameter.add_method('keys',
@@ -94,12 +94,12 @@ def inject_Parameter(module, exceptions, CONFIG_H):
                          None,
                          [param('std::string', 'key'),
                           param('std::vector< double >', 'value')],
-                         throw=[exceptions['Exception']])
+                         throw=exceptions)
     Parameter.add_method('get',
                          retval('std::vector< double >'),
                          [param('std::string', 'key')],
                          is_const=True,
-                         throw=[exceptions['Exception']])
+                         throw=exceptions)
     Parameter.add_binary_comparison_operator('==')
     Parameter.add_binary_comparison_operator('!=')
     Parameter.add_method('size', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
@@ -110,7 +110,7 @@ def inject_Parameter(module, exceptions, CONFIG_H):
 
 def inject_Parametric(module, exceptions, CONFIG_H):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(CONFIG_H, dict))
     namespace = module.add_cpp_namespace('Dune').add_cpp_namespace('Pymor')
     Parametric = namespace.add_class('Parametric')

@@ -22,7 +22,7 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                                                   Traits,
                                                   template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(interfaces, dict))
     for element in interfaces:
         assert(isinstance(element, str))
@@ -67,24 +67,24 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
     Class.add_method('get_operator_and_return_ptr',
                      retval(OperatorType + ' *', caller_owns_return=True),
                      [],
-                     is_const=True, throw=[exceptions['Exception']],
+                     is_const=True, throw=exceptions,
                      custom_name='get_operator')
     Class.add_method('get_rhs_and_return_ptr',
                      retval(FunctionalType + ' *', caller_owns_return=True),
                      [],
-                     is_const=True, throw=[exceptions['Exception']],
+                     is_const=True, throw=exceptions,
                      custom_name='get_rhs')
     Class.add_method('available_products',
                      retval('std::vector< std::string >'),
-                     [], is_const=True, throw=[exceptions['Exception']])
+                     [], is_const=True, throw=exceptions)
     Class.add_method('get_product_and_return_ptr',
                      retval(ProductType + ' *', caller_owns_return=True),
                      [param('const std::string', 'id')],
-                     is_const=True, throw=[exceptions['Exception']],
+                     is_const=True, throw=exceptions,
                      custom_name='get_product')
     Class.add_method('create_vector_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
-                     [], is_const=True, throw=[exceptions['Exception']],
+                     [], is_const=True, throw=exceptions,
                      custom_name='create_vector')
     #Class.add_method('solver_options',
                      #retval('std::vector< std::string >'),
@@ -95,26 +95,48 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                      #is_const=True, throw=[exceptions['Exception']])
     Class.add_method('solve',
                      None,
-                     [param(VectorType + ' &', 'vector')],
-                     is_const=True, throw=[exceptions['Exception']])
+                     [param('const std::string&', 'type'),
+                      param(VectorType + ' &', 'vector'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=exceptions)
+    Class.add_method('solve',
+                     None,
+                     [param('const Dune::Stuff::Common::Configuration&', 'options'),
+                      param(VectorType + ' &', 'vector'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=exceptions)
     Class.add_method('solve',
                      None,
                      [param(VectorType + ' &', 'vector'),
                       param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['Exception']])
+                     is_const=True, throw=exceptions)
+    Class.add_method('solve',
+                     None,
+                     [param(VectorType + ' &', 'vector')],
+                     is_const=True, throw=exceptions)
     Class.add_method('solve_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
-                     [], is_const=True, throw=[exceptions['Exception']])
+                     [param('const std::string&', 'type'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=exceptions)
+    Class.add_method('solve_and_return_ptr',
+                     retval(VectorType + ' *', caller_owns_return=True),
+                     [param('const Dune::Stuff::Common::Configuration&', 'options'),
+                      param('Dune::Pymor::Parameter', 'mu')],
+                     is_const=True, throw=exceptions)
     Class.add_method('solve_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
                      [param('Dune::Pymor::Parameter', 'mu')],
-                     is_const=True, throw=[exceptions['Exception']])
+                     is_const=True, throw=exceptions)
+    Class.add_method('solve_and_return_ptr',
+                     retval(VectorType + ' *', caller_owns_return=True),
+                     [], is_const=True, throw=exceptions)
     Class.add_method('visualize',
                      None,
                      [param('const ' + VectorType + ' &', 'vector'),
                       param('const std::string', 'filename'),
                       param('const std::string', 'name')],
-                     is_const=True, throw=[exceptions['Exception']])
+                     is_const=True, throw=exceptions)
     return Class
 
 
@@ -202,7 +224,7 @@ try:
                                                                 Traits,
                                                                 template_parameters=None):
         assert(isinstance(module, pybindgen.module.Module))
-        assert(isinstance(exceptions, dict))
+        assert(isinstance(exceptions, list))
         assert(isinstance(interfaces, dict))
         for element in interfaces:
             assert(isinstance(element, str))
@@ -251,111 +273,111 @@ try:
         Class.add_method('get_operator_and_return_ptr',
                          retval(OperatorType + ' *', caller_owns_return=True),
                          [],
-                         is_const=True, throw=[exceptions['Exception']],
+                         is_const=True, throw=exceptions,
                          custom_name='get_operator')
         Class.add_method('get_rhs_and_return_ptr',
                          retval(FunctionalType + ' *', caller_owns_return=True),
                          [],
-                         is_const=True, throw=[exceptions['Exception']],
+                         is_const=True, throw=exceptions,
                          custom_name='get_rhs')
         Class.add_method('available_products',
                          retval('std::vector< std::string >'),
-                         [], is_const=True, throw=[exceptions['Exception']])
+                         [], is_const=True, throw=exceptions)
         Class.add_method('get_product_and_return_ptr',
                          retval(ProductType + ' *', caller_owns_return=True),
                          [param('const std::string', 'id')],
-                         is_const=True, throw=[exceptions['Exception']],
+                         is_const=True, throw=exceptions,
                          custom_name='get_product')
         Class.add_method('create_vector_and_return_ptr',
                          retval(VectorType + ' *', caller_owns_return=True),
-                         [], is_const=True, throw=[exceptions['Exception']],
+                         [], is_const=True, throw=exceptions,
                          custom_name='create_vector')
         Class.add_method('create_ones',
                          retval(VectorType + ' *', caller_owns_return=True),
-                         [], is_const=True, throw=[exceptions['Exception']])
+                         [], is_const=True, throw=exceptions)
         #Class.add_method('solver_options',
                          #retval('std::vector< std::string >'),
-                         #[], is_const=True, throw=[exceptions['Exception']])
+                         #[], is_const=True, throw=exceptions)
         #Class.add_method('solver_options',
                          #retval('std::string'),
                          #[param('const std::string', 'context')],
-                         #is_const=True, throw=[exceptions['Exception']])
+                         #is_const=True, throw=exceptions)
         Class.add_method('solve',
                          None,
                          [param(VectorType + ' &', 'vector')],
-                         is_const=True, throw=[exceptions['Exception']])
+                         is_const=True, throw=exceptions)
         Class.add_method('solve',
                          None,
                          [param(VectorType + ' &', 'vector'),
                           param('Dune::Pymor::Parameter', 'mu')],
-                         is_const=True, throw=[exceptions['Exception']])
+                         is_const=True, throw=exceptions)
         Class.add_method('solve_and_return_ptr',
                          retval(VectorType + ' *', caller_owns_return=True),
-                         [], is_const=True, throw=[exceptions['Exception']])
+                         [], is_const=True, throw=exceptions)
         Class.add_method('solve_and_return_ptr',
                          retval(VectorType + ' *', caller_owns_return=True),
                          [param('Dune::Pymor::Parameter', 'mu')],
-                         is_const=True, throw=[exceptions['Exception']])
+                         is_const=True, throw=exceptions)
         Class.add_method('visualize',
                          None,
                          [param('const ' + VectorType + ' &', 'vector'),
                           param('const std::string', 'filename'),
                           param('const std::string', 'name')],
-                         is_const=True, throw=[exceptions['Exception']])
+                         is_const=True, throw=exceptions)
         Class.add_method('num_subdomains',
                                      retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
-                                     [], is_const=True, throw=[exceptions['Exception']])
+                                     [], is_const=True, throw=exceptions)
         Class.add_method('neighbouring_subdomains',
                                      retval('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >'),
                                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
-                                     is_const=True, throw=[exceptions['Exception']])
+                                     is_const=True, throw=exceptions)
         Class.add_method('get_local_operator_and_return_ptr',
                                      retval(OperatorType + ' *', caller_owns_return=True),
                                      [param('const '+ CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
-                                     is_const=True, throw=[exceptions['Exception']],
+                                     is_const=True, throw=exceptions,
                                      custom_name='get_local_operator')
         Class.add_method('get_local_product_and_return_ptr',
                                      retval(ProductType + ' *', caller_owns_return=True),
                                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss'),
                                       param('const std::string', 'id')],
-                                     is_const=True, throw=[exceptions['Exception']],
+                                     is_const=True, throw=exceptions,
                                      custom_name='get_local_product')
         Class.add_method('get_coupling_operator_and_return_ptr',
                                      retval(OperatorType + ' *', caller_owns_return=True),
                                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss'),
                                       param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'nn')],
-                                     is_const=True, throw=[exceptions['Exception']],
+                                     is_const=True, throw=exceptions,
                                      custom_name='get_coupling_operator')
         Class.add_method('get_local_functional_and_return_ptr',
                                      retval(FunctionalType + ' *', caller_owns_return=True),
                                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
-                                     is_const=True, throw=[exceptions['Exception']],
+                                     is_const=True, throw=exceptions,
                                      custom_name='get_local_functional')
         Class.add_method('localize_vector_and_return_ptr',
                                      retval(VectorType + ' *', caller_owns_return=True),
                                      [param('const ' + VectorType + ' &',  'global_vector'),
                                       param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
-                                     is_const=True, throw=[exceptions['Exception']],
+                                     is_const=True, throw=exceptions,
                                      custom_name='localize_vector')
         #Class.add_method('estimate_local',
         #                 retval('std::vector< double >'),
         #                 [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
         #                  param('const Dune::Pymor::Parameter', 'mu'),
         #                  param('const Dune::Pymor::Parameter', 'mu_fixed')],
-        #                 is_const=True, throw=[exceptions['Exception']])
+        #                 is_const=True, throw=exceptions)
         #Class.add_method('visualize_information',
         #                 None,
         #                 [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
         #                  param('const std::string&', 'filename'),
         #                  param('const Dune::Pymor::Parameter', 'mu'),
         #                  param('const Dune::Pymor::Parameter', 'mu_fixed')],
-        #                 is_const=True, throw=[exceptions['Exception']])
+        #                 is_const=True, throw=exceptions)
         #Class.add_method('solve_for_local_correction',
         #                 retval(VectorType),
         #                 [param('const std::vector< ' + VectorType + ' >&', 'local_vectors'),
         #                  param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'subdomain'),
         #                  param('const Dune::Pymor::Parameter', 'mu')],
-        #                 is_const=True, throw=[exceptions['Exception']])
+        #                 is_const=True, throw=exceptions)
         return Class
 
     def wrap_multiscale_discretization(cls, wrapper):

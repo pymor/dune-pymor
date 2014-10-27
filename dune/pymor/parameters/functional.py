@@ -10,7 +10,7 @@ from pybindgen import retval, param
 
 def inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H):
     assert(isinstance(module, pybindgen.module.Module))
-    assert(isinstance(exceptions, dict))
+    assert(isinstance(exceptions, list))
     assert(isinstance(interfaces, dict))
     for element in interfaces:
         assert(isinstance(element, str))
@@ -21,7 +21,7 @@ def inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H):
     ParameterFunctional.add_copy_constructor()
     ParameterFunctional.add_constructor([param('const Dune::Pymor::ParameterType&', 'tt'),
                                          param('const std::string', 'exp')],
-                                        throw=[exceptions['Exception']])
+                                         throw=exceptions)
     ParameterFunctional.add_method('expression', retval('const std::string'), [], is_const=True)
     ParameterFunctional.add_method('report', retval('std::string'), [], is_const=True)
     ParameterFunctional.add_method('report',
@@ -31,7 +31,7 @@ def inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H):
     ParameterFunctional.add_method('evaluate',
                                    'double',
                                    [param('const Parameter&', 'mu')],
-                                   throw=[exceptions['Exception']],
+                                   throw=exceptions,
                                    is_const=True)
     ParameterFunctional.allow_subclassing = True
     return module, ParameterFunctional
