@@ -254,7 +254,7 @@ public:
 
   static std::vector< std::string > invert_options()
   {
-    return LinearSolverType::options();
+    return LinearSolverType::types();
   }
 
   static Stuff::Common::Configuration invert_options(const std::string& type)
