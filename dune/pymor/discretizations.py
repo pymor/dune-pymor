@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # This file is part of the dune-pymor project:
 #   https://github.com/pymor/dune-pymor
 # Copyright Holders: Stephan Rave, Felix Schindler
@@ -86,13 +85,16 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                      retval(VectorType + ' *', caller_owns_return=True),
                      [], is_const=True, throw=exceptions,
                      custom_name='create_vector')
-    #Class.add_method('solver_options',
-                     #retval('std::vector< std::string >'),
-                     #[], is_const=True, throw=[exceptions['Exception']])
-    #Class.add_method('solver_options',
-                     #retval('std::string'),
-                     #[param('const std::string', 'context')],
-                     #is_const=True, throw=[exceptions['Exception']])
+    Class.add_method('solver_types',
+                     retval('std::vector< std::string >'),
+                     [], is_const=True, throw=exceptions)
+    Class.add_method('solver_options',
+                     retval('Dune::Stuff::Common::Configuration'),
+                     [param('const std::string', 'type')],
+                     is_const=True, throw=exceptions)
+    Class.add_method('solver_options',
+                     retval('Dune::Stuff::Common::Configuration'),
+                     [], is_const=True, throw=exceptions)
     Class.add_method('solve',
                      None,
                      [param('const std::string&', 'type'),
