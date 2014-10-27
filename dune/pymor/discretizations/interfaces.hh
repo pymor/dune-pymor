@@ -9,9 +9,10 @@
 #include <vector>
 #include <string>
 
+#include <dune/stuff/common/crtp.hh>
+#include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/exceptions.hh>
 #include <dune/stuff/la/container/interfaces.hh>
-#include <dune/stuff/common/crtp.hh>
 
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/operators/interfaces.hh>
@@ -60,20 +61,10 @@ public:
     return this->as_imp().get_operator();
   }
 
-  OperatorType* get_operator_and_return_ptr() const
-  {
-    return new OperatorType(get_operator());
-  }
-
   FunctionalType get_rhs() const
   {
     CHECK_CRTP(this->as_imp().get_rhs());
     return this->as_imp().get_rhs();
-  }
-
-  FunctionalType* get_rhs_and_return_ptr() const
-  {
-    return new FunctionalType(get_rhs());
   }
 
   std::vector< std::string > available_products() const
@@ -88,11 +79,6 @@ public:
     return this->as_imp().get_product(id);
   }
 
-  ProductType* get_product_and_return_ptr(const std::string id) const
-  {
-    return new ProductType(get_product(id));
-  }
-
   std::vector< std::string > available_vectors() const
   {
     CHECK_CRTP(this->as_imp().available_vectors());
@@ -105,40 +91,38 @@ public:
     return this->as_imp().get_vector(id);
   }
 
-  VectorType* get_vector_and_return_ptr(const std::string id) const
-  {
-    auto vec = get_vector(id);
-    if (vec.parametric())
-      DUNE_THROW(NotImplemented, "Not implemented yet for parametric vectors!");
-    return new VectorType(*(vec.affine_part()));
-  }
-
   VectorType create_vector() const
   {
     CHECK_CRTP(this->as_imp().create_vector());
     return this->as_imp().create_vector();
   }
 
-  VectorType* create_vector_and_return_ptr() const
+  std::vector< std::string > solver_types() const
   {
-    return new VectorType(create_vector());
+    CHECK_CRTP(this->as_imp().solver_types());
+    return this->as_imp().solver_types();
   }
 
-//  std::vector< std::string > solver_options() const
-//  {
-//    CHECK_CRTP(this->as_imp().solver_options());
-//    return this->as_imp().solver_options();
-//  }
-
-//  std::string solver_options(const std::string context) const
-//  {
-//    CHECK_CRTP(this->as_imp().solver_options(context));
-//    return this->as_imp().solver_options(context);
-//  }
+  DSC::Configuration solver_options(const std::string type = "") const
+  {
+    const std::string tp = !type.empty() ? type : solver_types()[0];
+    CHECK_CRTP(this->as_imp().solver_options(tp));
+    return this->as_imp().solver_options(tp);
+  }
 
   void solve(VectorType& vector, const Parameter mu = Parameter()) const
   {
-    CHECK_AND_CALL_CRTP(this->as_imp().solve(vector, mu));
+    solve(solver_types()[0], vector, mu);
+  }
+
+  void solve(const std::string type, VectorType& vector, const Parameter mu = Parameter()) const
+  {
+    solve(solver_options(type), vector, mu);
+  }
+
+  void solve(const DSC::Configuration options, VectorType& vector, const Parameter mu = Parameter()) const
+  {
+    CHECK_AND_CALL_CRTP(this->as_imp().solve(options, vector, mu));
   }
 
   VectorType solve(const Parameter mu = Parameter()) const
@@ -148,14 +132,66 @@ public:
     return ret;
   }
 
-  VectorType* solve_and_return_ptr(const Parameter mu = Parameter()) const
+  VectorType solve(const std::string type, const Parameter mu = Parameter()) const
   {
-    return new VectorType(solve(mu));
+    VectorType ret = create_vector();
+    solve(type, ret, mu);
+    return ret;
+  }
+
+  VectorType solve(const DSC::Configuration options, const Parameter mu = Parameter()) const
+  {
+    VectorType ret = create_vector();
+    solve(options, ret, mu);
+    return ret;
   }
 
   void visualize(const VectorType& vector, const std::string filename, const std::string name) const
   {
     CHECK_AND_CALL_CRTP(this->as_imp().visualize(vector, filename, name));
+  }
+
+  OperatorType* get_operator_and_return_ptr() const
+  {
+    return new OperatorType(get_operator());
+  }
+
+  FunctionalType* get_rhs_and_return_ptr() const
+  {
+    return new FunctionalType(get_rhs());
+  }
+
+  ProductType* get_product_and_return_ptr(const std::string id) const
+  {
+    return new ProductType(get_product(id));
+  }
+
+  VectorType* get_vector_and_return_ptr(const std::string id) const
+  {
+    auto vec = get_vector(id);
+    if (vec.parametric())
+      DUNE_THROW(NotImplemented, "Not implemented yet for parametric vectors!");
+    return new VectorType(*(vec.affine_part()));
+  }
+
+  VectorType* create_vector_and_return_ptr() const
+  {
+    return new VectorType(create_vector());
+  }
+
+  VectorType* solve_and_return_ptr(const Parameter mu = Parameter()) const
+  {
+    return new VectorType(solve(mu));
+  }
+
+  VectorType* solve_and_return_ptr(const std::string type, const Parameter mu = Parameter()) const
+  {
+    return new VectorType(solve(type, mu));
+  }
+
+  VectorType* solve_and_return_ptr(const DSC::Configuration options, const Parameter mu = Parameter()) const
+  {
+    return new VectorType(solve(options, mu));
   }
 }; // class StationaryDiscretizationInterface
 
