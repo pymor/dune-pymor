@@ -169,13 +169,14 @@ def wrap_stationary_discretization(cls, wrapper):
             self.solution_space = self.operator.source
             self.build_parameter_type(inherits=operators.values())
             assert self.parameter_type == self._wrapper[d.parameter_type()]
+            self.solver_options = self._impl.solver_options()
 
-        with_arguments = StationaryDiscretization.with_arguments
+        with_arguments = StationaryDiscretization.with_arguments | frozenset('solver_options')
 
         def with_(self, **kwargs):
-            assert 'operators' in kwargs and 'functionals' in kwargs or kwargs.keys() == ['parameter_space']
             assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
-            if 'operators' in kwargs:
+            if 'operators' in kwargs and 'functionals' in kwargs:
+                assert 'operators' and 'functionals' in kwargs
                 operators = kwargs.pop('operators')
                 functionals = kwargs.pop('functionals')
                 assert set(operators.keys()) == {'operator'}
@@ -189,7 +190,14 @@ def wrap_stationary_discretization(cls, wrapper):
             else:
                 d = type(self)(self._impl)
                 d.unlock()
-                d.parameter_space = kwargs['parameter_space']
+                for attr in ('solver_options', 'parameter_space'):
+                    if attr in dir(self):
+                        setattr(d, attr, getattr(self, attr))
+                if 'parameter_space' in kwargs:
+                    d.parameter_space = kwargs.pop('parameter_space')
+                if 'solver_options' in kwargs:
+                    d.solver_options = kwargs.pop('solver_options')
+                assert len(kwargs) == 0
                 d.lock()
                 return d
 
@@ -198,7 +206,7 @@ def wrap_stationary_discretization(cls, wrapper):
             if not self.logging_disabled:
                 self.logger.info('Solving {} for {} ...'.format(self.name, mu))
             mu = self._wrapper.dune_parameter(mu)
-            return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(mu)])
+            return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(self.solver_options, mu)])
 
         _solve = solve
 
