@@ -61,7 +61,6 @@ def inject_lib_dune_stuff(module, config_h_filename):
     mpdule, CONFIG_H = inject_stl(module, config_h_filename)
     # of dune we need the exceptions first
     module, exceptions = dune.pymor.common.inject_exceptions(module, CONFIG_H)
-    # exception = exceptions['Exception']
     BASIC_TYPES = basic_types(CONFIG_H)
 
     module, Configuration = inject_Class(module, 'Dune::Stuff::Common::Configuration')
@@ -146,14 +145,16 @@ def inject_lib_dune_stuff(module, config_h_filename):
                                   param('bool', 'overwrite')],
                                  template_parameters=[T],
                                  is_const=True,
-                                 throw=exceptions)
+                                 throw=exceptions,
+                                 custom_name='set')
         Configuration.add_method('set',
                                  None,
                                  [param('const std::string&', 'key'),
                                   param(T, 'value')],
                                  template_parameters=[T],
                                  is_const=True,
-                                 throw=exceptions)
+                                 throw=exceptions,
+                                 custom_name='set')
         Configuration.add_method('set',
                                  None,
                                  [param('const std::string&', 'key'),
@@ -161,14 +162,16 @@ def inject_lib_dune_stuff(module, config_h_filename):
                                   param('const bool', 'overwrite')],
                                  template_parameters=['std::vector< ' + T + ' >'],
                                  is_const=True,
-                                 throw=exceptions)
+                                 throw=exceptions,
+                                 custom_name='set')
         Configuration.add_method('set',
                                  None,
                                  [param('const std::string&', 'key'),
                                   param('const std::vector< ' + T + ' >&', 'value')],
                                  template_parameters=['std::vector< ' + T + ' >'],
                                  is_const=True,
-                                 throw=exceptions)
+                                 throw=exceptions,
+                                 custom_name='set')
     Configuration.add_method('empty', 'bool', [], is_const=True)
     Configuration.add_method('report_string', 'std::string', [], is_const=True)
 
