@@ -143,9 +143,6 @@ public:
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
-    if (!Parametric::parametric())
-      DUNE_THROW(Exceptions::this_is_not_parametric,
-                 "do not call freeze_parameter(" << mu << ")" << " if parametric() == false!");
     if (mu.type() != Parametric::parameter_type())
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
