@@ -206,6 +206,9 @@ public:
       DUNE_THROW(Stuff::Exceptions::configuration_error,
                  "missing 'component." << pp << "' to match 'coefficient." << pp
                  << "' in the following config:\n\n" << cfg);
+    if (!ret->parametric() && !ret->has_affine_part())
+      DUNE_THROW(Stuff::Exceptions::configuration_error,
+                 "missing either 'affine_part' or 'component' and 'coefficient' in the following config:\n\n" << cfg);
     return ret;
   } // ... create(...)
 
