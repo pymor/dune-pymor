@@ -198,6 +198,8 @@ public:
           const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
           ret = std::max(ret, theta_mu_1 / theta_mu_2);
         }
+        if (has_affine_part())
+          ret = std::max(ret, 1.0);
         return ret;
       }
     } else
@@ -223,6 +225,8 @@ public:
           const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
           ret = std::min(ret, theta_mu_1 / theta_mu_2);
         }
+        if (has_affine_part())
+          ret = std::min(ret, 1.0);
         return ret;
       }
     } else
