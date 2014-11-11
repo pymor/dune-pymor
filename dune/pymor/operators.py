@@ -19,7 +19,8 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                                             inverse_name,
                                             inverse_Traits,
                                             operator_template_parameters=None,
-                                            inverse_template_parameters=None):
+                                            inverse_template_parameters=None,
+                                            container_based=False):
     assert(isinstance(module, pybindgen.module.Module))
     assert(isinstance(exceptions, list))
     assert(isinstance(interfaces, dict))
@@ -42,6 +43,8 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
     operator_InverseType = operator_Traits['InverseType']
     assert('FrozenType' in operator_Traits)
     operator_FrozenType = operator_Traits['FrozenType']
+    if container_based:
+        operator_ContainerType = operator_Traits['ContainerType']
     if operator_template_parameters is not None:
         if isinstance(operator_template_parameters, str):
             assert(len(operator_template_parameters.strip()) > 0)
@@ -183,6 +186,11 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                         retval(operator_FrozenType + ' *', caller_owns_return=True),
                         [param('Dune::Pymor::Parameter', 'mu')],
                         is_const=True, throw=exceptions, custom_name='freeze_parameter')
+    if container_based:
+        Operator.add_method('pb_container',
+                            retval(operator_ContainerType + '*', caller_owns_return=True),
+                            [], is_const=True, throw=exceptions,
+                            custom_name='container')
     # fill the inverse
     Inverse.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Inverse.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
