@@ -262,23 +262,23 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                       param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
                      is_const=True, throw=exceptions,
                      custom_name='set_entry')
+    Class.add_method('pb_clear_row',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
+                     throw=exceptions,
+                     custom_name='clear_row')
+    Class.add_method('pb_unit_col',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
+                     throw=exceptions,
+                     custom_name='unit_col')
+    Class.add_method('pb_clear_row',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
+                     throw=exceptions,
+                     custom_name='clear_row')
+    Class.add_method('pb_unit_col',
+                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
+                     throw=exceptions,
+                     custom_name='unit_col')
     return module, Class
-    Class.add_method('pb_clear_row',
-                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
-                     throw=exceptions,
-                     custom_name='clear_row')
-    Class.add_method('pb_unit_col',
-                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
-                     throw=exceptions,
-                     custom_name='unit_col')
-    Class.add_method('pb_clear_row',
-                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
-                     throw=exceptions,
-                     custom_name='clear_row')
-    Class.add_method('pb_unit_col',
-                     None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
-                     throw=exceptions,
-                     custom_name='unit_col')
 
 
 def wrap_vector(cls):
