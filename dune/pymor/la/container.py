@@ -261,7 +261,7 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii'),
                       param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
                      is_const=True, throw=exceptions,
-                     custom_name='set_entry')
+                     custom_name='get_entry')
     Class.add_method('pb_clear_row',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
                      throw=exceptions,
