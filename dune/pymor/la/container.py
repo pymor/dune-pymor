@@ -369,6 +369,9 @@ def wrap_vector(cls):
             self._impl.isub(other._impl)
             return self
 
+        def valid(self):
+            return self._impl.valid()
+
     WrappedVector.__name__ = cls.__name__
 
     class VectorArray(ListVectorArray):
