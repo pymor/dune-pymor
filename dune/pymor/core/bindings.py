@@ -256,6 +256,7 @@ def inject_lib_dune_pymor(module, config_h_filename):
         module, exceptions, interfaces, CONFIG_H,
         name='Dune::Stuff::LA::CommonDenseMatrix',
         Traits={'ThisType': CommonDenseMatrix,
+                'VectorType': CommonDenseVector,
                 'ScalarType': 'double'},
         template_parameters='double')
     if CONFIG_H['HAVE_EIGEN']:
@@ -265,12 +266,14 @@ def inject_lib_dune_pymor(module, config_h_filename):
             module, exceptions, interfaces, CONFIG_H,
             name='Dune::Stuff::LA::EigenDenseMatrix',
             Traits={'ThisType' : EigenDenseMatrix,
+                    'VectorType' : [EigenDenseVector, EigenMappedDenseVector],
                     'ScalarType' : 'double'},
             template_parameters='double')
         module, _ = dune.pymor.la.container.inject_MatrixImplementation(
             module, exceptions, interfaces, CONFIG_H,
             name='Dune::Stuff::LA::EigenRowMajorSparseMatrix',
             Traits={'ThisType' : EigenRowMajorSparseMatrix,
+                    'VectorType' : [EigenDenseVector, EigenMappedDenseVector],
                     'ScalarType' : 'double'},
             template_parameters='double')
     if CONFIG_H['HAVE_DUNE_ISTL']:
@@ -279,6 +282,7 @@ def inject_lib_dune_pymor(module, config_h_filename):
             module, exceptions, interfaces, CONFIG_H,
             name='Dune::Stuff::LA::IstlRowMajorSparseMatrix',
             Traits={'ThisType' : IstlRowMajorSparseMatrix,
+                    'VectorType': IstlDenseVector,
                     'ScalarType' : 'double'},
             template_parameters='double')
     # next we add what we need of the functionals
