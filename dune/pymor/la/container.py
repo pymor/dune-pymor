@@ -188,9 +188,9 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     assert(isinstance(CONFIG_H, dict))
     assert(len(name.strip()) > 0)
     assert(isinstance(Traits, dict))
-    for key in Traits.keys():
-        assert(isinstance(Traits[key], str))
-        assert(len(Traits[key].strip()) > 0)
+    # for key in Traits.keys():
+    #     assert(isinstance(Traits[key], str))
+    #     assert(len(Traits[key].strip()) > 0)
     assert('ThisType' in Traits)
     ThisType = Traits['ThisType']
     assert('ScalarType' in Traits)
@@ -281,6 +281,16 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'jj')],
                      throw=exceptions,
                      custom_name='unit_col')
+    if 'VectorType' in Traits:
+        VectorTypes = Traits['VectorType']
+        if not isinstance(VectorTypes, list):
+            VectorTypes = [VectorTypes]
+        for VectorType in VectorTypes:
+            Class.add_method('mv',
+                             None, [param('const ' + VectorType + '&', 'xx'),
+                                    param(VectorType + '&', 'yy')],
+                             is_const=True,
+                             throw=exceptions)
     return module, Class
 
 
