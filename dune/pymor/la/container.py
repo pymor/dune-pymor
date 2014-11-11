@@ -86,9 +86,7 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      throw=exceptions)
     Class.add_method('valid',
                      'bool',
-                     [],
-                     is_const=True,
-                     throw=exceptions)
+                     [], is_const=True, throw=exceptions)
     # what we want from ProvidesData interface
     if provides_data:
         Class.add_method('data', BufferReturn(ScalarType + ' *', 'self->obj->size()  * sizeof(' + ScalarType + ')'), [])
