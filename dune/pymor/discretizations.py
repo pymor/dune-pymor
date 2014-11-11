@@ -216,7 +216,9 @@ def wrap_stationary_discretization(cls, wrapper):
             if not self.logging_disabled:
                 self.logger.info('Solving {} for {} ...'.format(self.name, mu))
             mu = self._wrapper.dune_parameter(mu)
-            return self._wrapper.vector_array(self._wrapper[self._impl.solve_and_return_ptr(self.solver_options, mu)])
+            solution = self._impl.solve_and_return_ptr(self.solver_options, mu)
+            assert solution.valid()
+            return self._wrapper.vector_array(self._wrapper[solution])
 
         _solve = solve
 
