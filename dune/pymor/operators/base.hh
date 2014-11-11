@@ -289,6 +289,11 @@ public:
     return matrix_;
   }
 
+  ContainerType* pb_container() const
+  {
+    return new ContainerType(*matrix_);
+  }
+
 private:
   std::shared_ptr< const ContainerType > matrix_;
 }; // class MatrixBasedDefault
