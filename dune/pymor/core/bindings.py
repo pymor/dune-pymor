@@ -359,6 +359,7 @@ def inject_lib_dune_pymor(module, config_h_filename):
                              'RangeType': vector,
                              'ScalarType': 'double',
                              'FrozenType': BaseOperatorName + '< ' + matrix + ', ' + vector + ' >',
+                             'ContainerType': matrix,
                              'InverseType': BaseOperatorInverseName + '< ' + matrix + ', ' + vector + ' >'},
             inverse_name=BaseOperatorInverseName,
             inverse_Traits={'SourceType': vector,
@@ -367,7 +368,8 @@ def inject_lib_dune_pymor(module, config_h_filename):
                             'FrozenType': BaseOperatorInverseName + '< ' + matrix + ', ' + vector + ' >',
                             'InverseType': BaseOperatorName + '< ' + matrix + ', ' + vector + ' >'},
             operator_template_parameters=(matrix, vector),
-            inverse_template_parameters=(matrix, vector))
+            inverse_template_parameters=(matrix, vector),
+            container_based=True)
     def inject_affinelydecomposed_operator(matrix, vector):
         _ = dune.pymor.operators.inject_LinearAffinelyDecomposedContainerBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
