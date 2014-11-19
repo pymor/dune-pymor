@@ -248,6 +248,9 @@ def inject_StationaryMultiscaleDiscretizationImplementation(module, exceptions, 
     FunctionalType = Traits['FunctionalType']
     ProductType = Traits['ProductType']
     VectorType = Traits['VectorType']
+    LocalDiscretizationType = Traits['LocalDiscretizationType']
+    OversampledDiscretizationType = Traits['OversampledDiscretizationType']
+    ssize_t = CONFIG_H['DUNE_STUFF_SSIZE_T']
     Class.add_method('num_subdomains',
                                  retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                                  [], is_const=True, throw=exceptions)
@@ -255,6 +258,17 @@ def inject_StationaryMultiscaleDiscretizationImplementation(module, exceptions, 
                                  retval('std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + ' >'),
                                  [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
                                  is_const=True, throw=exceptions)
+    Class.add_method('pb_get_local_discretization',
+                     retval(LocalDiscretizationType + '*', caller_owns_return=True),
+                     [param('const ' + ssize_t, 'subdomain')],
+                     is_const=True, throw=exceptions,
+                     custom_name='get_local_discretization')
+    Class.add_method('pb_get_oversampled_discretization',
+                     retval(OversampledDiscretizationType + '*', caller_owns_return=True),
+                     [param('const ' + ssize_t, 'subdomain'),
+                      param('const std::string', 'boundary_value_type')],
+                     is_const=True, throw=exceptions,
+                     custom_name='get_oversampled_discretization')
     Class.add_method('get_local_operator_and_return_ptr',
                                  retval(OperatorType + ' *', caller_owns_return=True),
                                  [param('const '+ CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ss')],
@@ -411,6 +425,12 @@ def wrap_multiscale_discretization(cls, wrapper):
 
         def as_nonblocked(self):
             return wrap_stationary_discretization(self.wrapped_type, self._wrapper)(self._impl)
+
+        def get_local_discretization(self, subdomain):
+            return self._wrapper[self._impl.get_local_discretization(subdomain)]
+
+        def get_oversampled_discretization(self, subdomain, boundary_value_type):
+            return self._wrapper[self._impl.get_oversampled_discretization(subdomain, boundary_value_type)]
 
 
     WrappedDiscretization.__name__ = cls.__name__
