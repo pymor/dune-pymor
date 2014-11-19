@@ -97,6 +97,8 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                                           parent=interfaces['Dune::Pymor::Tags::OperatorInterface'],
                                           template_parameters=inverse_template_parameters)
     # fill the operator
+    if container_based:
+        Operator.add_constructor([param('const ' + operator_ContainerType + '&', 'matrix')], throw=exceptions)
     Operator.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Operator.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Operator.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)

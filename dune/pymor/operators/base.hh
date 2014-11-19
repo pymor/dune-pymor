@@ -220,6 +220,10 @@ public:
     : matrix_(matrix_ptr)
   {}
 
+  MatrixBasedDefault(const MatrixType& matrix)
+    : matrix_(new MatrixType(matrix))
+  {}
+
   bool linear() const
   {
     return true;
