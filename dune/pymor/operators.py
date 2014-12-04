@@ -10,7 +10,8 @@ import pybindgen
 from pybindgen import retval, param
 
 from pymor.la import VectorSpace
-from pymor.operators.basic import OperatorBase, LincombOperator
+from pymor.operators.basic import OperatorBase
+from pymor.operators.constructions import LincombOperator
 
 
 def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONFIG_H,

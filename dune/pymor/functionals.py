@@ -10,7 +10,8 @@ from pybindgen import retval, param
 import numpy as np
 
 from pymor.la import NumpyVectorArray, NumpyVectorSpace, VectorSpace
-from pymor.operators.basic import OperatorBase, LincombOperator
+from pymor.operators.basic import OperatorBase
+from pymor.operators.constructions import LincombOperator
 
 def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
