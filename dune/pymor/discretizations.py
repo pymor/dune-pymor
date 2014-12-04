@@ -376,7 +376,8 @@ def wrap_multiscale_discretization(cls, wrapper):
             assert global_solution.valid()
             global_solution = self._wrapper[global_solution]
             global_solution = self._wrapper.vector_array(global_solution)
-            return BlockVectorArray([self.localize_vector(global_solution, ss) for ss in np.arange(self._impl.num_subdomains())])
+            return BlockVectorArray([self.localize_vector(global_solution, ss)
+                                     for ss in np.arange(self._impl.num_subdomains())])
 
         _solve = solve
 
