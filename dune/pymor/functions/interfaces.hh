@@ -375,11 +375,6 @@ public:
     return Stuff::Common::make_unique< LocalFunction >(entity, parametric_function_, coefficients_);
   }
 
-  virtual ThisType* copy() const override
-  {
-    DUNE_THROW(NotImplemented, "Implement me!");
-  }
-
   virtual std::string type() const override
   {
     return type_;
