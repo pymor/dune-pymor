@@ -3,7 +3,8 @@
 // Copyright holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/test/main.hxx>
+
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/exceptions.hh>
 
@@ -34,6 +35,3 @@ TEST(Functional, Parameters_Functional)
   if (exp != "diffusion + sin(force[0]) + exp(force[1])")
     DUNE_THROW(Stuff::Exceptions::results_are_not_as_expected, "");
 }
-
-
-#include <dune/stuff/test/test_main.cxx>

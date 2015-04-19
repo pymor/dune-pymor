@@ -3,7 +3,7 @@
 // Copyright holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/test/main.hxx>
 
 #include <utility>
 
@@ -193,6 +193,3 @@ TYPED_TEST_CASE(LinearAffinelyDecomposedVectorBasedTest, VectorTypes);
 TYPED_TEST(LinearAffinelyDecomposedVectorBasedTest, FUNCTIONALS) {
   this->check();
 }
-
-
-#include <dune/stuff/test/test_main.cxx>

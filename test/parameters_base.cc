@@ -3,7 +3,8 @@
 // Copyright holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/test/main.hxx>
+
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/common/exceptions.hh>
 
@@ -125,6 +126,3 @@ TEST(Parametric, Parameters_Base)
 
   Foo DUNE_UNUSED(foo);
 }
-
-
-#include <dune/stuff/test/test_main.cxx>

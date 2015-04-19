@@ -3,7 +3,7 @@
 // Copyright holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#include <dune/stuff/test/test_common.hh>
+#include <dune/stuff/test/main.hxx>
 
 #include <utility>
 #include <type_traits>
@@ -221,6 +221,3 @@ TYPED_TEST(MatrixBasedOperatorTests, fulfills_interface) {
 //TYPED_TEST(LinearAffinelyDecomposedContainerBasedOperatorTest, OPERATORS) {
 //  this->check();
 //}
-
-
-#include <dune/stuff/test/test_main.cxx>
