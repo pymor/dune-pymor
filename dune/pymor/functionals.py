@@ -9,7 +9,8 @@ from pybindgen import retval, param
 
 import numpy as np
 
-from pymor.la import NumpyVectorArray, NumpyVectorSpace, VectorSpace
+from pymor.vectorarrays.numpy import NumpyVectorArray, NumpyVectorSpace
+from pymor.vectorarrays.interfaces import VectorSpace
 from pymor.operators.basic import OperatorBase
 from pymor.operators.constructions import LincombOperator
 

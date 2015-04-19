@@ -9,7 +9,7 @@ from collections import OrderedDict
 import pybindgen
 from pybindgen import retval, param
 
-from pymor.la import VectorSpace
+from pymor.vectorarrays.interfaces import VectorSpace
 from pymor.operators.basic import OperatorBase
 from pymor.operators.constructions import LincombOperator
 

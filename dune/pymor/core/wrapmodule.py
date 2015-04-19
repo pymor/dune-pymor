@@ -8,7 +8,12 @@ from types import ModuleType
 
 from dune.pymor.core.wrapper import Wrapper
 from dune.pymor.la.container import wrap_vector
-from dune.pymor.discretizations import wrap_stationary_discretization, wrap_multiscale_discretization
+from dune.pymor.discretizations import wrap_stationary_discretization
+try:
+    from dune.pymor.discretizations import wrap_multiscale_discretization
+    MULTISCALE_PRESENT=True
+except:
+    MULTISCALE_PRESENT=False
 from dune.pymor.functionals import wrap_affinely_decomposed_functional, wrap_functional
 from dune.pymor.operators import wrap_affinely_decomposed_operator, wrap_operator
 
@@ -86,7 +91,7 @@ def wrap_module(mod):
                     wrapped_class = wrap_functional(v, wrapper)
                 elif issubclass(v, OperatorInterface):
                     wrapped_class = wrap_operator(v, wrapper)
-                elif issubclass(v, StationaryMultiscaleDiscretiztionInterface):
+                elif MULTISCALE_PRESENT and issubclass(v, StationaryMultiscaleDiscretiztionInterface):
                     wrapped_class = wrap_multiscale_discretization(v, wrapper)
                 elif issubclass(v, StationaryDiscretizationInterface):
                     wrapped_class = wrap_stationary_discretization(v, wrapper)

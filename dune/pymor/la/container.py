@@ -9,7 +9,7 @@ from pybindgen import retval, param
 import numpy as np
 
 from pymor.core.defaults import defaults
-from pymor.la.listvectorarray import VectorInterface, ListVectorArray
+from pymor.vectorarrays.list import VectorInterface, ListVectorArray
 
 # ReturnValue for converting a raw C pointer to a PyBuffer object
 # from pybindgen/examples/buffer/modulegen.py

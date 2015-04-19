@@ -11,7 +11,7 @@ from types import ModuleType
 
 import numpy as np
 
-from pymor.core import getLogger
+from pymor.core.logger import getLogger
 from pymor.parameters.base import Parameter, ParameterType
 from pymor.parameters.functionals import ExpressionParameterFunctional
 
