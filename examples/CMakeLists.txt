@@ -12,3 +12,7 @@ add_python_bindings(stationarylinearexample
                     stationarylinear_bindings_generator.py
                     stationarylinear.hh
                     dunepymor-example-stationary-linear)
+
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/stationarylinear_test.py")
+  execute_process(COMMAND ln -s "${CMAKE_CURRENT_SOURCE_DIR}/stationarylinear_test.py" "${CMAKE_CURRENT_BINARY_DIR}/stationarylinear_test.py")
+endif(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/stationarylinear_test.py")
