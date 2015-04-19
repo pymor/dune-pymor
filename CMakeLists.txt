@@ -46,7 +46,13 @@ link_directories( "/usr/lib" ${CCGNU_LIBRARY_DIRS} )
 # header
 file( GLOB_RECURSE pymor "${CMAKE_CURRENT_SOURCE_DIR}/*.hh" )
 set( COMMON_HEADER ${pymor} ${DUNE_HEADERS} )
+# add header of dependent modules for header listing
+foreach(_mod ${ALL_DEPENDENCIES})
+        file(GLOB_RECURSE HEADER_LIST "${CMAKE_CURRENT_SOURCE_DIR}/../${_mod}/*.hh")
+        list(APPEND COMMON_HEADER ${HEADER_LIST})
+endforeach(_mod)
 set_source_files_properties( ${COMMON_HEADER} PROPERTIES HEADER_FILE_ONLY 1 )
+
 
 #disable most warnings from dependent modules
 foreach(_mod ${ALL_DEPENDENCIES})
