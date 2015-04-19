@@ -12,6 +12,7 @@
 #include <dune/stuff/common/float_cmp.hh>
 #include <dune/stuff/la/container/common.hh>
 #include <dune/stuff/la/container/eigen.hh>
+#include <dune/stuff/la/container/istl.hh>
 #include <dune/stuff/common/exceptions.hh>
 
 #include <dune/pymor/parameters/base.hh>
@@ -28,6 +29,9 @@ typedef testing::Types<
                         Stuff::LA::CommonDenseVector< double >
 #if HAVE_EIGEN
                       , Stuff::LA::EigenDenseVector< double >
+#endif
+#if HAVE_DUNE_ISTL
+                      , Stuff::LA::IstlDenseVector< double >
 #endif
                       > VectorTypes;
 
