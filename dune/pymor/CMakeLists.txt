@@ -11,5 +11,3 @@ set(lib_dune_pymor_sources
 dune_add_library("dunepymor" ${lib_dune_pymor_sources} ADD_LIBS ${DUNE_LIBS})
 target_link_dune_default_libraries(dunepymor)
 add_dune_tbb_flags(dunepymor)
-add_dune_superlu_flags(dunepymor)
-add_dune_alugrid_flags(dunepymor)
