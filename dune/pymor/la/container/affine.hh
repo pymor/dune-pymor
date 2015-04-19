@@ -12,10 +12,11 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <dune/stuff/aliases.hh>
+#include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/timedlogging.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/la/container/interfaces.hh>
-#include <dune/stuff/common/exceptions.hh>
-#include <dune/stuff/common/logging.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
