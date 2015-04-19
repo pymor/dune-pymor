@@ -5,6 +5,8 @@
 
 #include "config.h"
 
+#include <boost/exception/exception.hpp>
+
 #include <dune/stuff/common/color.hh>
 
 #include <dune/pymor/common/exceptions.hh>
@@ -45,10 +47,15 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << "done" << std::endl;
 
     // if we came that far, we can as well be happy about it
-    return 0;
+    return EXIT_SUCCESS;
   } catch (Dune::Exception& e) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("Dune reported error: ") << e << std::endl;
+    std::cerr << "Dune reported error: " << e << std::endl;
+  } catch (boost::exception& e) {
+    std::cerr << "boost reported error! " << std::endl;
+  } catch (std::exception& e) {
+    std::cerr << "stl reported error: " << e.what() << std::endl;
   } catch (...) {
-    std::cerr << Dune::Stuff::Common::colorStringRed("Unknown exception thrown!") << std::endl;
+    std::cerr << "Unknown exception thrown!" << std::endl;
   }
+  return EXIT_FAILURE;
 }
