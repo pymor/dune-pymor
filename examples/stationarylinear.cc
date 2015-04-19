@@ -231,20 +231,22 @@ typename SimpleDiscretization::VectorType SimpleDiscretization::create_vector() 
   return VectorType(dim_);
 }
 
-//std::vector< std::string > SimpleDiscretization::solver_options() const
-//{
-//  return { "problem" };
-//}
+std::vector< std::string > SimpleDiscretization::solver_types() const
+{
+  return { "simple" };
+}
 
-//std::string SimpleDiscretization::solver_options(const std::string context) const
-//{
-//  if (context != solver_options()[0])
-//    DUNE_THROW(Dune::Stuff::Exceptions::configuration_error,
-//               "context has to be '" << solver_options()[0] << "' (is '" << context << "')!");
-//  return OperatorType::invert_options()[0];
-//}
+DSC::Configuration SimpleDiscretization::solver_options(const std::string type) const
+{
+  if (type != solver_types()[0])
+    DUNE_THROW(Dune::Stuff::Exceptions::configuration_error,
+               "type has to be '" << solver_types()[0] << "' (is '" << type << "')!");
+  return DSC::Configuration("type", solver_types()[0]);
+}
 
-void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Parameter mu) const
+void SimpleDiscretization::solve(const DSC::Configuration options,
+                                 VectorType& vector,
+                                 const Dune::Pymor::Parameter mu) const
 {
   if (mu.type() != parameter_type())
     DUNE_THROW(Dune::Pymor::Exceptions::wrong_parameter_type,
@@ -253,6 +255,8 @@ void SimpleDiscretization::solve(VectorType& vector, const Dune::Pymor::Paramete
   if ((DUNE_STUFF_SSIZE_T)(vector.dim()) != dim_)
     DUNE_THROW(Dune::Stuff::Exceptions::shapes_do_not_match,
                "size of vector has to be " << dim_ << " is (" << vector.dim() << ")!");
+  if (!options.has_key("type") || options.get< std::string >("type") != solver_types()[0])
+    DUNE_THROW(Dune::Stuff::Exceptions::wrong_input_given, options);
   // freeze lhs and rhs
   const Dune::Pymor::Parameter mu_lhs = map_parameter(mu, "lhs");
   const auto lhs = op_->freeze_parameter(mu_lhs);

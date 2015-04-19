@@ -75,6 +75,7 @@ class SimpleDiscretization
   : public Dune::Pymor::StationaryDiscretizationInterface< SimpleDiscretizationTraits >
 {
   typedef SimpleDiscretizationTraits Traits;
+  typedef Dune::Pymor::StationaryDiscretizationInterface< SimpleDiscretizationTraits > BaseType;
 public:
   typedef typename Traits::MatrixType     MatrixType;
   typedef typename Traits::VectorType     VectorType;
@@ -96,11 +97,15 @@ public:
 
   VectorType create_vector() const;
 
-//  std::vector< std::string > solver_options() const;
+  std::vector< std::string > solver_types() const;
 
-//  std::string solver_options(const std::string context) const;
+  DSC::Configuration solver_options(const std::string type = "") const;
 
-  void solve(VectorType& vector, const Dune::Pymor::Parameter mu = Dune::Pymor::Parameter()) const;
+  using BaseType::solve;
+
+  void solve(const DSC::Configuration options,
+             VectorType& vector,
+             const Dune::Pymor::Parameter mu = Dune::Pymor::Parameter()) const;
 
   void visualize(const VectorType& vector, const std::string filename, const std::string name) const;
 
