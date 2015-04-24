@@ -21,7 +21,6 @@ class Wrapper(object):
     def __init__(self, DuneParameterType, DuneParameter, DuneParameterFunctional):
         self.wrapped_classes = {}
         self.wrapped_classes_by_type_this = {}
-        self.vector_arrays = {}
         self.DuneParameterType = DuneParameterType
         self.DuneParameter = DuneParameter
         self.instance_wrappers = {DuneParameterType: self._parameter_type,
@@ -37,15 +36,8 @@ class Wrapper(object):
                 logger = getLogger('dune.pymor.core')
                 logger.warn('Could not call type_this on {}. (Not a static method?)'.format(cls.__name__))
 
-    def add_vector_class(self, cls, wrapped_cls, vector_array):
+    def add_vector_class(self, cls, wrapped_cls):
         self.add_class(cls, wrapped_cls)
-        self.vector_arrays[wrapped_cls] = vector_array
-
-    def vector_array(self, obj):
-        if isclass(obj):
-            return self.vector_arrays[obj]
-        else:
-            return self.vector_arrays[type(obj)]([obj])
 
     def _parameter_type(self, dune_parameter_type):
         return ParameterType({k: v for k, v in izip(list(dune_parameter_type.keys()),

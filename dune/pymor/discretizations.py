@@ -13,6 +13,7 @@ import numpy as np
 
 from pymor.discretizations.interfaces import DiscretizationInterface
 from pymor.discretizations.basic import StationaryDiscretization
+from pymor.vectorarrays.list import ListVectorArray
 from pymor.vectorarrays.numpy import NumpyVectorArray
 from pymor.operators.constructions import induced_norm
 from pymor.tools.frozendict import FrozenDict
@@ -187,7 +188,7 @@ def wrap_stationary_discretization(cls, wrapper):
             assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.solver_options = self._impl.solver_options()
 
-        with_arguments = StationaryDiscretization.with_arguments | frozenset('solver_options')
+        with_arguments = frozenset({'operators', 'functionals', 'vector_operators', 'solver_options'})
 
         def with_(self, **kwargs):
             assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
@@ -224,7 +225,8 @@ def wrap_stationary_discretization(cls, wrapper):
             mu = self._wrapper.dune_parameter(mu)
             solution = self._impl.solve_and_return_ptr(self.solver_options, mu)
             assert solution.valid()
-            return self._wrapper.vector_array(self._wrapper[solution])
+            solution = self._wrapper[solution]
+            return ListVectorArray([solution])
 
         _solve = solve
 
@@ -382,7 +384,7 @@ if BLOCK_OPERATOR_PRESENT:
                 global_solution = self._impl.solve_and_return_ptr(mu)
                 assert global_solution.valid()
                 global_solution = self._wrapper[global_solution]
-                global_solution = self._wrapper.vector_array(global_solution)
+                global_solution = ListVectorArray(global_solution)
                 return BlockVectorArray([self.localize_vector(global_solution, ss)
                                          for ss in np.arange(self._impl.num_subdomains())])
 
@@ -404,14 +406,14 @@ if BLOCK_OPERATOR_PRESENT:
                 if len(global_vector) != 1:
                     raise NotImplementedError
                 assert subdomain < self.num_subdomains
-                return self._wrapper.vector_array(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
-                                                                                           subdomain)])
+                return ListVectorArray(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
+                                                                                subdomain)])
             def globalize_vectors(self, local_vectors):
                 assert isinstance(local_vectors, BlockVectorArray)
                 if len(local_vectors) != 1:
                     raise NotImplementedError
                 global_vector = self._impl.globalize_vectors([block._list[0]._impl for block in local_vectors._blocks])
-                return self._wrapper.vector_array(self._wrapper[global_vector])
+                return ListVectorArray([self._wrapper[global_vector]])
 
             def local_product(self, subdomain, id):
                 assert subdomain < self.num_subdomains

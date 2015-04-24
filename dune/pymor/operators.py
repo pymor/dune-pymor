@@ -10,6 +10,7 @@ import pybindgen
 from pybindgen import retval, param
 
 from pymor.vectorarrays.interfaces import VectorSpace
+from pymor.vectorarrays.list import ListVectorArray
 from pymor.operators.basic import OperatorBase
 from pymor.operators.constructions import LincombOperator
 
@@ -294,16 +295,13 @@ class WrappedOperatorBase(OperatorBase):
     vec_type_source = None
     vec_type_range = None
 
-    type_source = None
-    type_range = None
-
     _wrapper = None
 
     def __init__(self, op):
         assert isinstance(op, self.wrapped_type)
         self._impl = op
-        self.source = VectorSpace(self.type_source, int(op.dim_source()))
-        self.range = VectorSpace(self.type_range, int(op.dim_range()))
+        self.source = VectorSpace(ListVectorArray, (self.vec_type_source, int(op.dim_source())))
+        self.range = VectorSpace(ListVectorArray, (self.vec_type_range, int(op.dim_range())))
         self.linear = op.linear()
         if hasattr(op, 'parametric') and op.parametric():
             pt = self._wrapper[op.parameter_type()]
@@ -318,10 +316,10 @@ class WrappedOperatorBase(OperatorBase):
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
-            return self.type_range([self.vec_type_range(self._impl.apply(v._impl, mu)) for v in vectors],
+            return ListVectorArray([self.vec_type_range(self._impl.apply(v._impl, mu)) for v in vectors],
                                    subtype=self.range.subtype)
         else:
-            return self.type_range([self.vec_type_range(self._impl.apply(v._impl)) for v in vectors],
+            return ListVectorArray([self.vec_type_range(self._impl.apply(v._impl)) for v in vectors],
                                    subtype=self.range.subtype)
 
     def apply_inverse(self, U, ind=None, mu=None, options=None):
@@ -336,12 +334,14 @@ class WrappedOperatorBase(OperatorBase):
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
-            return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
-                                     for v in vectors], subtype=self.source.subtype)
+            return ListVectorArray([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
+                                    for v in vectors],
+                                   subtype=self.source.subtype)
         else:
             assert self.check_parameter(mu)
-            return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options))
-                                     for v in vectors], subtype=self.source.subtype)
+            return ListVectorArray([self.vec_type_source(self._impl.apply_inverse(v._impl, options))
+                                    for v in vectors],
+                                   subtype=self.source.subtype)
 
 
 def wrap_operator(cls, wrapper):
@@ -350,8 +350,6 @@ def wrap_operator(cls, wrapper):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
         vec_type_range = wrapper[cls.type_range()]
-        type_source = wrapper.vector_array(vec_type_source)
-        type_range = wrapper.vector_array(vec_type_range)
         _wrapper = wrapper
 
         def __init__(self, op):
@@ -523,8 +521,6 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
         vec_type_range = wrapper[cls.type_range()]
-        type_source = wrapper.vector_array(vec_type_source)
-        type_range = wrapper.vector_array(vec_type_range)
         _wrapper = wrapper
 
         def __init__(self, op):
@@ -538,9 +534,9 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
             else:
                 self.affine_part = False
 
-        def projected(self, source_basis, range_basis, product=None, name=None):
+        def projected(self, range_basis, source_basis, product=None, name=None):
             return (LincombOperator(self.operators, self.coefficients)
-                    .projected(source_basis, range_basis, product=product, name=name))
+                    .projected(range_basis, source_basis, product=product, name=name))
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator

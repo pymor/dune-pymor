@@ -11,6 +11,7 @@ import numpy as np
 
 from pymor.vectorarrays.numpy import NumpyVectorArray, NumpyVectorSpace
 from pymor.vectorarrays.interfaces import VectorSpace
+from pymor.vectorarrays.list import ListVectorArray
 from pymor.operators.basic import OperatorBase
 from pymor.operators.constructions import LincombOperator
 
@@ -77,7 +78,6 @@ class WrappedFunctionalBase(OperatorBase):
 
     vec_type_source = None
 
-    type_source = None
     range = NumpyVectorSpace(1)
 
     _wrapper = None
@@ -85,7 +85,7 @@ class WrappedFunctionalBase(OperatorBase):
     def __init__(self, op):
         assert isinstance(op, self.wrapped_type)
         self._impl = op
-        self.source = VectorSpace(self.type_source, op.dim_source())
+        self.source = VectorSpace(ListVectorArray, (self.vec_type_source, op.dim_source()))
         self.linear = op.linear()
         if hasattr(op, 'parametric') and op.parametric():
             pt = self._wrapper[op.parameter_type()]
@@ -106,15 +106,15 @@ class WrappedFunctionalBase(OperatorBase):
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             if hasattr(self._impl, 'as_vector'):
-                return self._wrapper.vector_array(self.vec_type_source(self._impl.as_vector(mu)))
+                return ListVectorArray([self.vec_type_source(self._impl.as_vector(mu))])
             elif hasattr(self._impl, 'freeze_parameter'):
-                return self._wrapper.vector_array(self.vec_type_source(self._impl.freeze_parameter(mu).as_vector()))
+                return ListVectorArray([self.vec_type_source(self._impl.freeze_parameter(mu).as_vector())])
             else:
                 raise NotImplementedError
         else:
             assert self.check_parameter(mu)
             if hasattr(self._impl, 'as_vector'):
-                return self._wrapper.vector_array(self.vec_type_source(self._impl.as_vector()))
+                return ListVectorArray([self.vec_type_source(self._impl.as_vector())])
             else:
                 raise NotImplementedError
 
@@ -124,7 +124,6 @@ def wrap_functional(cls, wrapper):
     class WrappedFunctional(WrappedFunctionalBase):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
-        type_source = wrapper.vector_array(vec_type_source)
         _wrapper = wrapper
 
         def __init__(self, op):
@@ -225,7 +224,6 @@ def wrap_affinely_decomposed_functional(cls, wrapper):
     class WrappedFunctional(WrappedFunctionalBase):
         wrapped_type = cls
         vec_type_source = wrapper[cls.type_source()]
-        type_source = wrapper.vector_array(vec_type_source)
         _wrapper = wrapper
 
         def __init__(self, op):
@@ -239,9 +237,9 @@ def wrap_affinely_decomposed_functional(cls, wrapper):
             else:
                 self.affine_part = False
 
-        def projected(self, source_basis, range_basis, product=None, name=None):
+        def projected(self, range_basis, source_basis, product=None, name=None):
             return (LincombOperator(self.operators, self.coefficients)
-                    .projected(source_basis, range_basis, product=product, name=name))
+                    .projected(range_basis, source_basis, product=product, name=name))
 
     WrappedFunctional.__name__ = cls.__name__
     return WrappedFunctional

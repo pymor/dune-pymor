@@ -17,6 +17,11 @@ except:
 from dune.pymor.functionals import wrap_affinely_decomposed_functional, wrap_functional
 from dune.pymor.operators import wrap_affinely_decomposed_operator, wrap_operator
 
+def get_StationaryMultiscaleDiscretiztionInterface(mod):
+    try:
+        return mod.Dune.Pymor.Tags.StationaryMultiscaleDiscretiztionInterface
+    except AttributeError:
+        return type(None)
 
 def wrap_module(mod):
 
@@ -29,7 +34,7 @@ def wrap_module(mod):
     ParameterFunctional = mod.Dune.Pymor.ParameterFunctional
     ParameterType = mod.Dune.Pymor.ParameterType
     StationaryDiscretizationInterface = mod.Dune.Pymor.Tags.StationaryDiscretizationInterface
-    StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.Tags.StationaryMultiscaleDiscretiztionInterface
+    StationaryMultiscaleDiscretiztionInterface = get_StationaryMultiscaleDiscretiztionInterface(mod)
 
     wrapped_modules = {}
 
@@ -71,10 +76,9 @@ def wrap_module(mod):
             elif v == VectorInterface:
                 continue
             elif isclass(v) and issubclass(v, VectorInterface):
-                wrapped_vector, vector_array = wrap_vector(v)
+                wrapped_vector = wrap_vector(v)
                 add_to_module(k, wrapped_vector, mod)
-                add_to_module(vector_array.__name__, vector_array, mod)
-                wrapper.add_vector_class(v, wrapped_vector, vector_array)
+                wrapper.add_vector_class(v, wrapped_vector)
 
     def wrap_classes(mod):
         for k, v in mod.__dict__.iteritems():
