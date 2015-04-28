@@ -516,26 +516,31 @@ def inject_LinearAffinelyDecomposedContainerBasedImplementation(module,
 
 def wrap_affinely_decomposed_operator(cls, wrapper):
 
-    class WrappedOperator(WrappedOperatorBase):
+    class WrappedOperator(LincombOperator):
         wrapped_type = cls
-        vec_type_source = wrapper[cls.type_source()]
-        vec_type_range = wrapper[cls.type_range()]
         _wrapper = wrapper
 
         def __init__(self, op):
-            WrappedOperatorBase.__init__(self, op)
-            self.operators = [self._wrapper[op.component(i)] for i in xrange(op.num_components())]
-            self.coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
+            self._impl = op
+            operators    = [self._wrapper[op.component(i)]   for i in xrange(op.num_components())]
+            coefficients = [self._wrapper[op.coefficient(i)] for i in xrange(op.num_components())]
             if op.has_affine_part():
-                self.operators.append(self._wrapper[op.affine_part()])
-                self.coefficients.append(1.)
-                self.affine_part = True
-            else:
-                self.affine_part = False
+                operators.append(self._wrapper[op.affine_part()])
+                coefficients.append(1.)
+            LincombOperator.__init__(self, operators, coefficients)
 
-        def projected(self, range_basis, source_basis, product=None, name=None):
-            return (LincombOperator(self.operators, self.coefficients)
-                    .projected(range_basis, source_basis, product=product, name=name))
+        def with_(self, **kwargs):
+            assert 'operators' in kwargs
+            ops = kwargs['operators']
+            assert len(ops) == len(self.operators)
+            return LincombOperator(operators=ops,
+                                   coefficients=kwargs['coefficients'] if 'coefficients' in kwargs.keys() else self.coefficients,
+                                   name=kwargs['name'] if 'name' in kwargs.keys() else self.name)
+
+        def assemble(self, mu=None):
+            mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
+            op = self._impl.freeze_parameter(mu)
+            return self._wrapper[op]
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator
