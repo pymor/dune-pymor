@@ -338,7 +338,6 @@ class WrappedOperatorBase(OperatorBase):
                                     for v in vectors],
                                    subtype=self.source.subtype)
         else:
-            assert self.check_parameter(mu)
             return ListVectorArray([self.vec_type_source(self._impl.apply_inverse(v._impl, options))
                                     for v in vectors],
                                    subtype=self.source.subtype)

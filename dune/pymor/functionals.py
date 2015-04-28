@@ -112,7 +112,6 @@ class WrappedFunctionalBase(OperatorBase):
             else:
                 raise NotImplementedError
         else:
-            assert self.check_parameter(mu)
             if hasattr(self._impl, 'as_vector'):
                 return ListVectorArray([self.vec_type_source(self._impl.as_vector())])
             else:
