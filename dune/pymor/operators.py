@@ -313,6 +313,8 @@ class WrappedOperatorBase(OperatorBase):
 
     def apply(self, U, ind=None, mu=None):
         assert U in self.source
+        if ind is not None and not isinstance(ind, list):
+            ind = [ind]
         vectors = U._list if ind is None else [U._list[i] for i in ind]
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
