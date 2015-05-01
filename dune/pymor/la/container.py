@@ -9,7 +9,7 @@ from pybindgen import retval, param
 import numpy as np
 
 from pymor.core.defaults import defaults
-from pymor.vectorarrays.list import VectorInterface
+from pymor.vectorarrays.list import VectorInterface, ListVectorArray
 
 # ReturnValue for converting a raw C pointer to a PyBuffer object
 # from pybindgen/examples/buffer/modulegen.py
@@ -306,6 +306,12 @@ def wrap_vector(cls):
 
         def __init__(self, v):
             self._impl = v
+
+        @classmethod
+        def make_array(cls, subtype=None, count=0, reserve=0):
+            assert count > 0
+            return ListVectorArray([cls.make_zeros(subtype) for ii in np.arange(count)])
+
 
         @classmethod
         def make_zeros(cls, subtype):

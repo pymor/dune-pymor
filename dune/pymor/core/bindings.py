@@ -16,6 +16,16 @@ import dune.pymor.functionals
 import dune.pymor.operators
 
 
+CommonDenseVector = 'Dune::Stuff::LA::CommonDenseVector< double >'
+EigenDenseVector = 'Dune::Stuff::LA::EigenDenseVector< double >'
+EigenMappedDenseVector = 'Dune::Stuff::LA::EigenMappedDenseVector< double >'
+IstlDenseVector = 'Dune::Stuff::LA::IstlDenseVector< double >'
+CommonDenseMatrix = 'Dune::Stuff::LA::CommonDenseMatrix< double >'
+EigenDenseMatrix = 'Dune::Stuff::LA::EigenDenseMatrix< double >'
+EigenRowMajorSparseMatrix = 'Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >'
+IstlRowMajorSparseMatrix = 'Dune::Stuff::LA::IstlRowMajorSparseMatrix< double >'
+
+
 def inject_Class(module, name, parent=None):
     namespace = module
     namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
@@ -58,6 +68,7 @@ def inject_stl(module, config_h_filename):
 
 
 def inject_lib_dune_stuff(module, config_h_filename):
+    interfaces = dict()
     mpdule, CONFIG_H = inject_stl(module, config_h_filename)
     # of dune we need the exceptions first
     module, exceptions = dune.pymor.common.inject_exceptions(module, CONFIG_H)
@@ -174,23 +185,6 @@ def inject_lib_dune_stuff(module, config_h_filename):
                                  custom_name='set')
     Configuration.add_method('empty', 'bool', [], is_const=True)
     Configuration.add_method('report_string', 'std::string', [], is_const=True)
-
-    return module, exceptions, CONFIG_H
-
-
-def inject_lib_dune_pymor(module, config_h_filename):
-    module, exceptions, CONFIG_H = inject_lib_dune_stuff(module, config_h_filename)
-    interfaces = dict()
-
-    # then all of parameters
-    (module, interfaces['Dune::Pymor::ParameterType']
-     ) = dune.pymor.parameters.inject_ParameterType(module, exceptions, CONFIG_H)
-    (module, interfaces['Dune::Pymor::Parameter']
-     ) = dune.pymor.parameters.inject_Parameter(module, exceptions, CONFIG_H)
-    (module, interfaces['Dune::Pymor::Parametric']
-     ) = dune.pymor.parameters.inject_Parametric(module, exceptions, CONFIG_H)
-    (module, interfaces['Dune::Pymor::ParameterFunctional']
-     ) = dune.pymor.parameters.inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H)
     # then what we need of la.container
     #   the vectors
     (module, interfaces['Dune::Stuff::LA::Tags::ContainerInterface']
@@ -203,7 +197,6 @@ def inject_lib_dune_pymor(module, config_h_filename):
      ) = inject_Class(module,
                      'Dune::Stuff::LA::Tags::MatrixInterface',
                      interfaces['Dune::Stuff::LA::Tags::ContainerInterface'])
-    CommonDenseVector = 'Dune::Stuff::LA::CommonDenseVector< double >'
     module, _ = dune.pymor.la.container.inject_VectorImplementation(
         module,
         exceptions,
@@ -215,8 +208,6 @@ def inject_lib_dune_pymor(module, config_h_filename):
         template_parameters='double',
         provides_data=False)
     if CONFIG_H['HAVE_EIGEN']:
-        EigenDenseVector = 'Dune::Stuff::LA::EigenDenseVector< double >'
-        EigenMappedDenseVector = 'Dune::Stuff::LA::EigenMappedDenseVector< double >'
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
             exceptions,
@@ -239,7 +230,6 @@ def inject_lib_dune_pymor(module, config_h_filename):
             template_parameters='double',
             provides_data=False)
     if CONFIG_H['HAVE_DUNE_ISTL']:
-        IstlDenseVector = 'Dune::Stuff::LA::IstlDenseVector< double >'
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
             exceptions,
@@ -251,7 +241,6 @@ def inject_lib_dune_pymor(module, config_h_filename):
             template_parameters='double',
             provides_data=False)
     #   and the matrices
-    CommonDenseMatrix = 'Dune::Stuff::LA::CommonDenseMatrix< double >'
     module, _ = dune.pymor.la.container.inject_MatrixImplementation(
         module, exceptions, interfaces, CONFIG_H,
         name='Dune::Stuff::LA::CommonDenseMatrix',
@@ -260,8 +249,6 @@ def inject_lib_dune_pymor(module, config_h_filename):
                 'ScalarType': 'double'},
         template_parameters='double')
     if CONFIG_H['HAVE_EIGEN']:
-        EigenDenseMatrix = 'Dune::Stuff::LA::EigenDenseMatrix< double >'
-        EigenRowMajorSparseMatrix = 'Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >'
         module, _ = dune.pymor.la.container.inject_MatrixImplementation(
             module, exceptions, interfaces, CONFIG_H,
             name='Dune::Stuff::LA::EigenDenseMatrix',
@@ -277,7 +264,6 @@ def inject_lib_dune_pymor(module, config_h_filename):
                     'ScalarType' : 'double'},
             template_parameters='double')
     if CONFIG_H['HAVE_DUNE_ISTL']:
-        IstlRowMajorSparseMatrix = 'Dune::Stuff::LA::IstlRowMajorSparseMatrix< double >'
         module, _ = dune.pymor.la.container.inject_MatrixImplementation(
             module, exceptions, interfaces, CONFIG_H,
             name='Dune::Stuff::LA::IstlRowMajorSparseMatrix',
@@ -285,6 +271,22 @@ def inject_lib_dune_pymor(module, config_h_filename):
                     'VectorType': IstlDenseVector,
                     'ScalarType' : 'double'},
             template_parameters='double')
+
+    return module, exceptions, interfaces, CONFIG_H
+
+
+def inject_lib_dune_pymor(module, config_h_filename):
+    module, exceptions, interfaces, CONFIG_H = inject_lib_dune_stuff(module, config_h_filename)
+
+    # all of parameters
+    (module, interfaces['Dune::Pymor::ParameterType']
+     ) = dune.pymor.parameters.inject_ParameterType(module, exceptions, CONFIG_H)
+    (module, interfaces['Dune::Pymor::Parameter']
+     ) = dune.pymor.parameters.inject_Parameter(module, exceptions, CONFIG_H)
+    (module, interfaces['Dune::Pymor::Parametric']
+     ) = dune.pymor.parameters.inject_Parametric(module, exceptions, CONFIG_H)
+    (module, interfaces['Dune::Pymor::ParameterFunctional']
+     ) = dune.pymor.parameters.inject_ParameterFunctional(module, exceptions, interfaces, CONFIG_H)
     # next we add what we need of the functionals
     (module, interfaces['Dune::Pymor::Tags::FunctionalInterface']
             ) = inject_Class(module, 'Dune::Pymor::Tags::FunctionalInterface')

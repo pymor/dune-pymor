@@ -6,7 +6,7 @@
 from inspect import isclass
 from types import ModuleType
 
-from dune.pymor.core.wrapper import Wrapper
+from dune.pymor.core.wrapper import DuneStuffWrapper, Wrapper
 from dune.pymor.la.container import wrap_vector
 from dune.pymor.discretizations import wrap_stationary_discretization
 try:
@@ -17,11 +17,65 @@ except:
 from dune.pymor.functionals import wrap_affinely_decomposed_functional, wrap_functional
 from dune.pymor.operators import wrap_affinely_decomposed_operator, wrap_operator
 
+
 def get_StationaryMultiscaleDiscretiztionInterface(mod):
     try:
         return mod.Dune.Pymor.Tags.StationaryMultiscaleDiscretiztionInterface
     except AttributeError:
         return type(None)
+
+
+def wrap_dune_stuff_module(mod):
+
+    VectorInterface = mod.Dune.Stuff.LA.Tags.VectorInterface
+
+    wrapped_modules = {}
+
+    wrapper = DuneStuffWrapper()
+
+    def create_modules(mod):
+        wrapped_mod = ModuleType(mod.__name__.lower())
+        wrapped_modules[mod] = {'wrapped': wrapped_mod, 'empty': True}
+        for k, v in mod.__dict__.iteritems():
+            if isinstance(v, ModuleType):
+                create_modules(v)
+
+    def add_to_module(k, v, mod):
+        wrapped_mod = wrapped_modules[mod]['wrapped']
+        try:
+            v.__module__ = wrapped_mod.__name__
+        except AttributeError:
+            pass
+        wrapped_mod.__dict__[k] = v
+        wrapped_modules[mod]['empty'] = False
+
+    def add_modules(mod):
+        wrapped_mod = wrapped_modules[mod]['wrapped']
+        for k, v in mod.__dict__.iteritems():
+            if isinstance(v, ModuleType):
+                wv = add_modules(v)
+                if not wrapped_modules[v]['empty']:
+                    wrapped_mod.__dict__[k.lower()] = wv
+                    wrapped_modules[mod]['empty'] = False
+
+        return wrapped_mod
+
+    def wrap_vectors(mod):
+        for k, v in mod.__dict__.iteritems():
+            if isinstance(v, ModuleType):
+                wrap_vectors(v)
+            elif v == VectorInterface:
+                continue
+            elif isclass(v) and issubclass(v, VectorInterface):
+                wrapped_vector = wrap_vector(v)
+                add_to_module(k, wrapped_vector, mod)
+                wrapper.add_vector_class(v, wrapped_vector)
+
+    create_modules(mod)
+    wrap_vectors(mod)
+    wrapped_module = add_modules(mod)
+
+    return wrapped_module, wrapper
 
 def wrap_module(mod):
 

@@ -3,14 +3,10 @@
 // Copyright holders: Stephan Rave, Felix Schindler
 // License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
-#ifndef DUNE_PYMOR_PYTHON_BINDINGS_HH
-#define DUNE_PYMOR_PYTHON_BINDINGS_HH
+#ifndef DUNE_PYMOR_BINDINGS_PYMOR_HH
+#define DUNE_PYMOR_BINDINGS_PYMOR_HH
 
-#include <dune/stuff/la/container/interfaces.hh>
-#include <dune/stuff/la/container/common.hh>
-#include <dune/stuff/la/container/istl.hh>
-#include <dune/stuff/la/container/eigen.hh>
-#include <dune/stuff/la/container.hh>
+#include "stuff.hh"
 
 #include <dune/pymor/discretizations/interfaces.hh>
 #include <dune/pymor/functionals/affine.hh>
@@ -23,4 +19,4 @@
 #include <dune/pymor/parameters/base.hh>
 #include <dune/pymor/parameters/functional.hh>
 
-#endif // DUNE_PYMOR_PYTHON_BINDINGS_HH
+#endif // DUNE_PYMOR_BINDINGS_PYMOR_HH

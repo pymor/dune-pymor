@@ -35,3 +35,4 @@ demos
 .kateproject.d
 *.kdev4
 build-*
+*.pyo

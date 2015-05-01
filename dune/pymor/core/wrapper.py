@@ -16,6 +16,33 @@ from pymor.parameters.base import Parameter, ParameterType
 from pymor.parameters.functionals import ExpressionParameterFunctional
 
 
+class DuneStuffWrapper(object):
+
+    def __init__(self):
+        self.wrapped_classes = {}
+        self.wrapped_classes_by_type_this = {}
+
+    def add_class(self, cls, wrapped_cls):
+        self.wrapped_classes[cls] = wrapped_cls
+        if hasattr(cls, 'type_this'):
+            try:
+                self.wrapped_classes_by_type_this[cls.type_this()] = wrapped_cls
+            except TypeError:
+                logger = getLogger('dune.pymor.core')
+                logger.warn('Could not call type_this on {}. (Not a static method?)'.format(cls.__name__))
+
+    def add_vector_class(self, cls, wrapped_cls):
+        self.add_class(cls, wrapped_cls)
+
+    def __getitem__(self, obj):
+        if isclass(obj):
+            return self.wrapped_classes[obj]
+        elif isinstance(obj, str):
+            return self.wrapped_classes_by_type_this[obj]
+        else:
+            return self.wrapped_classes[type(obj)](obj)
+
+
 class Wrapper(object):
 
     def __init__(self, DuneParameterType, DuneParameter, DuneParameterFunctional):
