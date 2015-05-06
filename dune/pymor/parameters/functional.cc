@@ -132,14 +132,10 @@ void ParameterFunctional::setup()
   const ParameterType& type = parameter_type();
   for (auto variable_prefix : type.keys()) {
     const size_t variable_size = type.get(variable_prefix);
-    if (variable_size == 1) {
-      variables_.push_back(variable_prefix);
-    } else {
-      for (size_t ii = 0; ii < variable_size; ++ii) {
-        std::stringstream ss;
-        ss << variable_prefix << "[" << ii << "]";
-        variables_.push_back(ss.str());
-      }
+    for (size_t ii = 0; ii < variable_size; ++ii) {
+      std::stringstream ss;
+      ss << variable_prefix << "[" << ii << "]";
+      variables_.push_back(ss.str());
     }
   }
   actual_size_ = variables_.size();
