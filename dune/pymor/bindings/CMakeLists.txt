@@ -7,3 +7,4 @@ add_python_bindings(dunestuffbindings
                     stuff.py
                     stuff.hh
                     dunestuff)
+target_link_dune_default_libraries(dunestuffbindings)
