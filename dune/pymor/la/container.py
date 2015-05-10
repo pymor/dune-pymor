@@ -265,6 +265,10 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     Class.add_method('valid',
                      'bool',
                      [], is_const=True, throw=exceptions)
+    Class.add_method('pb_non_zeros',
+                     CONFIG_H['DUNE_STUFF_SSIZE_T'],
+                     [], is_const=True, throw=exceptions,
+                     custom_name='non_zeros')
     Class.add_method('pb_clear_row',
                      None, [param('const ' + CONFIG_H['DUNE_STUFF_SSIZE_T'], 'ii')],
                      throw=exceptions,
