@@ -47,9 +47,9 @@ public:
   typedef typename Traits::FrozenType   FrozenType;
   typedef typename Traits::InverseType  InverseType;
 
-  static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename SourceType::Traits >, SourceType >::value,
+  static_assert(Stuff::LA::is_vector< SourceType >::value,
                 "SourceType has to be derived from Stuff::LA::VectorInterface!");
-  static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,
+  static_assert(Stuff::LA::is_vector< RangeType >::value,
                 "RangeType has to be derived from Stuff::LA::VectorInterface!");
 
   static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
@@ -66,6 +66,8 @@ public:
   OperatorInterface(const Parametric& other)
     : Parametric(other)
   {}
+
+  virtual ~OperatorInterface() {}
 
   bool linear() const
   {
@@ -90,7 +92,7 @@ public:
     CHECK_AND_CALL_CRTP(this->as_imp(*this).apply(source, range, mu));
   }
 
-  RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
+  virtual RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
     RangeType range(dim_range());
     apply(source, range, mu);
@@ -106,7 +108,7 @@ public:
    * \note  This default implementation of apply2 creates a temporary vector. Any derived class which can do better
    *        should implement this method!
    */
-  ScalarType apply2(const RangeType& range, const SourceType& source, const Parameter mu = Parameter()) const
+  virtual ScalarType apply2(const RangeType& range, const SourceType& source, const Parameter mu = Parameter()) const
   {
     RangeType tmp = range.copy();
     apply(source, tmp, mu);
@@ -162,18 +164,18 @@ public:
     invert(option, mu).apply(range, source);
   }
 
-  SourceType apply_inverse(const RangeType& range,
-                           const std::string type = invert_options()[0],
-                           const Parameter mu = Parameter()) const
+  virtual SourceType apply_inverse(const RangeType& range,
+                                   const std::string type = invert_options()[0],
+                                   const Parameter mu = Parameter()) const
   {
     SourceType source(dim_source());
     apply_inverse(range, source, type, mu);
     return source;
   }
 
-  SourceType apply_inverse(const RangeType& range,
-                           const Stuff::Common::Configuration& option,
-                           const Parameter mu = Parameter()) const
+  virtual SourceType apply_inverse(const RangeType& range,
+                                   const Stuff::Common::Configuration& option,
+                                   const Parameter mu = Parameter()) const
   {
     SourceType source(dim_source());
     apply_inverse(range, source, option, mu);
