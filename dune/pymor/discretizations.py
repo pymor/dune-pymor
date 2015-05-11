@@ -168,8 +168,13 @@ def wrap_stationary_discretization(cls, wrapper):
         _wrapper = wrapper
 
         def __init__(self, d):
+            def wrap_op(op):
+                if not op.parametric() and op.num_components() == 0 and op.has_affine_part():
+                    return self._wrapper[op.affine_part()]
+                else:
+                    return self._wrapper[op]
             self._impl = d
-            operators = {'operator': self._wrapper[d.get_operator()]}
+            operators = {'operator': wrap_op(d.get_operator())}
             functionals = {'rhs': self._wrapper[d.get_rhs()]}
             vector_operators = {}
             self.operators = FrozenDict(operators)
@@ -177,7 +182,7 @@ def wrap_stationary_discretization(cls, wrapper):
             self.vector_operators = FrozenDict(vector_operators)
             self.operator = operators['operator']
             self.rhs = functionals['rhs']
-            self.products = FrozenDict({k: self._wrapper[d.get_product(k)] for k in list(d.available_products())})
+            self.products = FrozenDict({k: wrap_op(d.get_product(k)) for k in list(d.available_products())})
             if self.products:
                 for k, v in self.products.iteritems():
                     setattr(self, '{}_product'.format(k), v)
