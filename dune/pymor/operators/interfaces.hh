@@ -89,13 +89,12 @@ public:
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
-    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply__source_range_mu)");
     CHECK_AND_CALL_CRTP(this->as_imp(*this).apply(source, range, mu));
   }
 
   RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
-    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply__source_mu)");
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply");
     RangeType range(dim_range());
     apply(source, range, mu);
     return range;
@@ -103,7 +102,6 @@ public:
 
   RangeType* apply_and_return_ptr(const SourceType& source, const Parameter mu = Parameter()) const
   {
-    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply_and_return_ptr");
     return new RangeType(apply(source, mu));
   }
 
