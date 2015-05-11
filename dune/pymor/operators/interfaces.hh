@@ -6,11 +6,12 @@
 #ifndef DUNE_PYMOR_OPERATORS_INTERFACES_HH
 #define DUNE_PYMOR_OPERATORS_INTERFACES_HH
 
+#include <dune/stuff/common/configuration.hh>
+#include <dune/stuff/common/crtp.hh>
+#include <dune/stuff/common/profiler.hh>
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/la/solver.hh>
-#include <dune/stuff/common/crtp.hh>
-#include <dune/stuff/common/configuration.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -52,6 +53,7 @@ public:
   static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,
                 "RangeType has to be derived from Stuff::LA::VectorInterface!");
 
+  static std::string static_id() {    return "pymor.operators.interface"; }
   static std::string type_this() {    return Stuff::Common::Typename< derived_type >::value(); }
   static std::string type_source() {  return Stuff::Common::Typename< SourceType >::value(); }
   static std::string type_range() {   return Stuff::Common::Typename< RangeType >::value(); }
@@ -87,11 +89,13 @@ public:
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply__source_range_mu)");
     CHECK_AND_CALL_CRTP(this->as_imp(*this).apply(source, range, mu));
   }
 
   RangeType apply(const SourceType& source, const Parameter mu = Parameter()) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply__source_mu)");
     RangeType range(dim_range());
     apply(source, range, mu);
     return range;
@@ -99,6 +103,7 @@ public:
 
   RangeType* apply_and_return_ptr(const SourceType& source, const Parameter mu = Parameter()) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply_and_return_ptr");
     return new RangeType(apply(source, mu));
   }
 

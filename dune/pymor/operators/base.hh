@@ -8,10 +8,11 @@
 
 #include <type_traits>
 
+#include <dune/stuff/common/exceptions.hh>
+#include <dune/stuff/common/profiler.hh>
 #include <dune/stuff/la/container.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/la/solver.hh>
-#include <dune/stuff/common/exceptions.hh>
 
 #include "interfaces.hh"
 
@@ -209,6 +210,8 @@ private:
                 "MatrixType has to be derived from Stuff::LA::MatrixInterface!");
 
 public:
+  static std::string static_id() { return "pymor.operators.matrixbaseddefault"; }
+
   /**
    * \attention This class takes ownership of matrix_ptr!
    */
@@ -241,6 +244,7 @@ public:
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply");
     if (!mu.empty()) DUNE_THROW(Exceptions::this_is_not_parametric,
                                 "mu has to be empty if parametric() == false (is " << mu << ")!");
     if (source.pb_dim() != dim_source())

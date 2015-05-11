@@ -8,6 +8,7 @@
 
 #include <type_traits>
 
+#include <dune/stuff/common/profiler.hh>
 #include <dune/stuff/la/container.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 
@@ -58,6 +59,8 @@ private:
   typedef LA::AffinelyDecomposedConstContainer< MatrixImp > AffinelyDecomposedContainerType;
 
 public:
+  static std::string static_id() { return "pymor.operators.linearaffinelydecomposedcontainerbased"; }
+
   LinearAffinelyDecomposedContainerBased(const AffinelyDecomposedContainerType affinelyDecomposedContainer)
     : BaseType(affinelyDecomposedContainer)
     , affinelyDecomposedContainer_(affinelyDecomposedContainer)
@@ -115,6 +118,7 @@ public:
 
   void apply(const SourceType& source, RangeType& range, const Parameter mu = Parameter()) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".apply");
     if (mu.type() != Parametric::parameter_type())
       DUNE_THROW(Exceptions::wrong_parameter_type, "the type of mu (" << mu.type()
                  << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
@@ -143,6 +147,7 @@ public:
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
   {
+    DUNE_STUFF_PROFILE_SCOPE(static_id() + ".freeze_parameter");
     if (mu.type() != Parametric::parameter_type())
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
