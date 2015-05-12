@@ -17,6 +17,7 @@
 #include <dune/stuff/common/timedlogging.hh>
 #include <dune/stuff/common/string.hh>
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container/istl.hh>
 
 #include <dune/pymor/common/exceptions.hh>
 #include <dune/pymor/parameters/base.hh>
@@ -231,9 +232,6 @@ public:
 
   ContainerType freeze_parameter(const Parameter mu = Parameter()) const
   {
-#ifndef NDEBUG
-    auto logger = DSC::TimedLogger().get(static_id() + ".with_mu");
-#endif
     if (mu.type() != parameter_type())
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
@@ -245,38 +243,26 @@ public:
      DUNE_THROW(Stuff::Exceptions::internal_error, "");
     if (coefficients_.size() != boost::numeric_cast< size_t >(num_components_))
       DUNE_THROW(Stuff::Exceptions::internal_error, "");
-    if (hasAffinePart_) {
-      ContainerType result = affinePart_->copy();
-      if (num_components_ > 0) {
-#ifndef NDEBUG
-        logger.debug() << "combining affine_part and " << num_components_ << " component"
-                       << (num_components_ == 1 ? "" : "s") << "..." << std::endl;
-#endif
-        for (DUNE_STUFF_SSIZE_T ii = 0; ii < num_components_; ++ii) {
-          const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
-          result.axpy(coefficients_[ii]->evaluate(muCoefficient), *(components_[ii]));
-        }
-      } else {
-#ifndef NDEBUG
-        logger.debug() << "returning affine_part" << std::endl;
-#endif
-      }
-      return result;
+    if (hasAffinePart_ && (num_components_ == 0))
+      return *affinePart_;
+    else if (!hasAffinePart_ && num_components_ == 1) {
+      auto ret = components_[0]->copy();
+      ret.scal(coefficients_[0]->evaluate(map_parameter(mu, "coefficient_0")));
+      return ret;
     } else {
-#ifndef NDEBUG
-      logger.debug() << "combining " << num_components_ << " component"
-                     << (num_components_ == 1 ? "" : "s") << "..." << std::endl;
-#endif
-      ContainerType result = components_[0]->copy();
-      const Parameter muCoefficient0 = map_parameter(mu, "coefficient_0");
-      result.scal(coefficients_[0]->evaluate(muCoefficient0));
-      for (DUNE_STUFF_SSIZE_T ii = 1; ii < num_components_; ++ii) {
-        const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
-        result.axpy(coefficients_[ii]->evaluate(muCoefficient), *(components_[ii]));
+      std::vector< std::shared_ptr< const ContainerType > > containers;
+      std::vector< double > evals;
+      if (hasAffinePart_) {
+        containers.push_back(affinePart_);
+        evals.push_back(1.);
       }
-      return result;
+      for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components_; ++qq) {
+        containers.push_back(components_[qq]);
+        evals.push_back(coefficients_[qq]->evaluate(map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(qq))));
+      }
+      return Assemble< ContainerType >::lincomb(containers, evals);
     }
-  }
+  } // ... freeze_parameter(...)
 
   ThisType copy()
   {
@@ -300,6 +286,58 @@ public:
   } // ... pruned(...)
 
 protected:
+  template< class CC, bool anything = true >
+  struct Assemble
+  {
+    static CC lincomb(const std::vector< std::shared_ptr< const CC > >& containers,
+                      const std::vector< double >& evals)
+    {
+      assert(containers.size() == evals.size());
+      assert(containers.size() > 0);
+      auto ret = containers[0]->copy();
+      ret.scal(evals[0]);
+      for (size_t qq = 1; qq < containers.size(); ++qq)
+        ret.axpy(evals[qq], *containers[qq]);
+      return ret;
+    }
+  }; // struct Assemble
+
+  template< class SS, bool anything >
+  struct Assemble< Stuff::LA::IstlRowMajorSparseMatrix< SS >, anything >
+  {
+    typedef Stuff::LA::IstlRowMajorSparseMatrix< SS > CC;
+
+    static CC lincomb(const std::vector< std::shared_ptr< const CC > >& containers,
+                      const std::vector< double >& evals)
+    {
+      assert(containers.size() == evals.size());
+      assert(containers.size() > 0);
+      Stuff::LA::SparsityPatternDefault merged_pattern(containers[0]->rows());
+      for (size_t qq = 0; qq < containers.size(); ++qq) {
+        auto pattern = containers[qq]->pattern();
+        for (size_t ii = 0; ii < pattern.size(); ++ii)
+          for (const size_t& jj : pattern.inner(ii))
+            merged_pattern.insert(ii, jj);
+      }
+      merged_pattern.sort();
+      Stuff::LA::IstlRowMajorSparseMatrix< SS > ret(containers[0]->rows(), containers[0]->cols(), merged_pattern);
+      for (size_t ii = 0; ii < ret.rows(); ++ii) {
+        auto& row = ret.backend()[ii];
+        row *= SS(0);
+        for (size_t qq = 0; qq < containers.size(); ++qq) {
+          const auto& other_row = containers[qq]->backend()[ii];
+          const auto it_end = other_row.end();
+          for (auto it = other_row.begin(); it != it_end; ++it) {
+            const auto jj = it.index();
+            const auto& val = *it;
+            row[jj][0][0] += val*evals[qq];
+          }
+        }
+      }
+      return ret;
+    }
+  }; // struct Assemble< Stuff::LA::IstlRowMajorSparseMatrix< ... > >
+
   bool hasAffinePart_;
   DUNE_STUFF_SSIZE_T num_components_;
   std::vector< std::shared_ptr< const ContainerType > > components_;
