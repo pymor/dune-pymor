@@ -184,10 +184,10 @@ public:
   }
 
   SourceType* apply_inverse_and_return_ptr(const RangeType& range,
-                                           const std::string tyep = invert_options()[0],
+                                           const std::string type = invert_options()[0],
                                            const Parameter mu = Parameter()) const
   {
-    return new SourceType(apply_inverse(range, tyep, mu));
+    return new SourceType(apply_inverse(range, type, mu));
   }
 
   SourceType* apply_inverse_and_return_ptr(const RangeType& range,
