@@ -27,6 +27,11 @@ namespace Pymor {
 namespace LA {
 
 
+// forward
+template< class ContainerImp >
+class AffinelyDecomposedContainer;
+
+
 template< class ContainerImp >
 class AffinelyDecomposedConstContainer
   : public Parametric
@@ -283,6 +288,16 @@ public:
                              new ParameterFunctional(*coefficients_[qq]));
     return ret;
   } // ... copy(...)
+
+  AffinelyDecomposedContainer< ContainerType > pruned() const
+  {
+    AffinelyDecomposedContainer< ContainerType > ret;
+    for (size_t qq = 0; qq < num_components_; ++qq)
+      ret.register_component(new ContainerType(components_[qq]->backend(), true), coefficients_[qq]);
+    if (hasAffinePart_)
+      ret.register_affine_part(new ContainerType(affinePart_->backend(), true));
+    return ret;
+  } // ... pruned(...)
 
 protected:
   bool hasAffinePart_;
