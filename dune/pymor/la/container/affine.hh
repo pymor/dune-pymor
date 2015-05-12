@@ -256,7 +256,7 @@ public:
         logger.debug() << "returning affine_part" << std::endl;
 #endif
       }
-      return prune(result);
+      return result;
     } else {
 #ifndef NDEBUG
       logger.debug() << "combining " << num_components_ << " component"
@@ -269,7 +269,7 @@ public:
         const Parameter muCoefficient = map_parameter(mu, "coefficient_" + Dune::Stuff::Common::toString(ii));
         result.axpy(coefficients_[ii]->evaluate(muCoefficient), *(components_[ii]));
       }
-      return prune(result);
+      return result;
     }
   }
 
@@ -285,18 +285,6 @@ public:
   } // ... copy(...)
 
 protected:
-  template< class CC, bool is_matrix = Stuff::LA::is_matrix< CC >::value >
-  struct Prune{              static CC call(CC& cc){ return cc.pruned(); }};
-
-  template< class CC >
-  struct Prune< CC, false >{ static CC call(CC& cc){ return cc; }};
-
-  template< class CC >
-  static CC prune(CC& cc)
-  {
-    return Prune< CC >::call(cc);
-  }
-
   bool hasAffinePart_;
   DUNE_STUFF_SSIZE_T num_components_;
   std::vector< std::shared_ptr< const ContainerType > > components_;
