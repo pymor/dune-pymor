@@ -302,6 +302,8 @@ protected:
     }
   }; // struct Assemble
 
+#if HAVE_DUNE_ISTL
+
   template< class SS, bool anything >
   struct Assemble< Stuff::LA::IstlRowMajorSparseMatrix< SS >, anything >
   {
@@ -325,18 +327,23 @@ protected:
         auto& row = ret.backend()[ii];
         row *= SS(0);
         for (size_t qq = 0; qq < containers.size(); ++qq) {
-          const auto& other_row = containers[qq]->backend()[ii];
-          const auto it_end = other_row.end();
-          for (auto it = other_row.begin(); it != it_end; ++it) {
-            const auto jj = it.index();
-            const auto& val = *it;
-            row[jj][0][0] += val*evals[qq];
+          const auto& other = containers[qq]->backend();
+          if (other.getrowsize(ii) > 0) {
+            const auto& other_row = other[ii];
+            const auto it_end = other_row.end();
+            for (auto it = other_row.begin(); it != it_end; ++it) {
+              const auto jj = it.index();
+              const auto& val = *it;
+              row[jj][0][0] += val*evals[qq];
+            }
           }
         }
       }
       return ret;
     }
   }; // struct Assemble< Stuff::LA::IstlRowMajorSparseMatrix< ... > >
+
+#endif // HAVE_DUNE_ISTL
 
   bool hasAffinePart_;
   DUNE_STUFF_SSIZE_T num_components_;
