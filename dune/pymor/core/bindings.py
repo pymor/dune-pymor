@@ -206,7 +206,7 @@ def inject_lib_dune_stuff(module, config_h_filename):
         Traits={'ThisType': CommonDenseVector,
                 'ScalarType': 'double'},
         template_parameters='double',
-        provides_data=False)
+        provides_data=True)
     if CONFIG_H['HAVE_EIGEN']:
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
@@ -217,7 +217,7 @@ def inject_lib_dune_stuff(module, config_h_filename):
             Traits={'ThisType': EigenDenseVector,
                     'ScalarType': 'double'},
             template_parameters='double',
-            provides_data=False)
+            provides_data=True)
         module.add_container('std::vector< Dune::Stuff::LA::EigenDenseVector< double > >', 'Dune::Stuff::LA::EigenDenseVector< double >', 'list')
         module, _ = dune.pymor.la.container.inject_VectorImplementation(
             module,
@@ -239,7 +239,7 @@ def inject_lib_dune_stuff(module, config_h_filename):
             Traits={'ThisType': IstlDenseVector,
                     'ScalarType': 'double'},
             template_parameters='double',
-            provides_data=False)
+            provides_data=True)
     #   and the matrices
     module, _ = dune.pymor.la.container.inject_MatrixImplementation(
         module, exceptions, interfaces, CONFIG_H,
