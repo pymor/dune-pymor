@@ -22,17 +22,17 @@ namespace Operators {
 
 
 // forwards
-template< class MatrixType, class VectorType >
+template< class MatrixType, class VectorType, class SpaceImp  >
 class MatrixBasedInverseDefault;
 
-template< class MatrixType, class VectorType >
+template< class MatrixType, class VectorType, class SpaceImp >
 class MatrixBasedDefault;
 
 
 namespace internal {
 
 
-template< class MatrixType, class VectorType >
+template< class MatrixType, class VectorType, class SpaceImp >
 class MatrixBasedDefaultTraits
 {
   static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
@@ -42,17 +42,17 @@ class MatrixBasedDefaultTraits
   static_assert(std::is_same< typename MatrixType::ScalarType, typename VectorType::ScalarType >::value,
                 "Types do not match!");
 public:
-  typedef MatrixBasedDefault< MatrixType, VectorType > derived_type;
+  typedef MatrixBasedDefault< MatrixType, VectorType, SpaceImp > derived_type;
   typedef MatrixType ContainerType;
   typedef VectorType SourceType;
   typedef VectorType RangeType;
   typedef typename MatrixType::ScalarType ScalarType;
-  typedef MatrixBasedDefault< MatrixType, VectorType > FrozenType;
-  typedef MatrixBasedInverseDefault< MatrixType, VectorType > InverseType;
+  typedef MatrixBasedDefault< MatrixType, VectorType, SpaceImp > FrozenType;
+  typedef MatrixBasedInverseDefault< MatrixType, VectorType, SpaceImp > InverseType;
 }; // class MatrixBasedDefaultTraits
 
 
-template< class MatrixType, class VectorType >
+template< class MatrixType, class VectorType, class SpaceImp >
 class MatrixBasedInverseDefaultTraits
 {
   static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
@@ -62,25 +62,25 @@ class MatrixBasedInverseDefaultTraits
   static_assert(std::is_same< typename MatrixType::ScalarType, typename VectorType::ScalarType >::value,
                 "Types do not match!");
 public:
-  typedef MatrixBasedInverseDefault< MatrixType, VectorType > derived_type;
+  typedef MatrixBasedInverseDefault< MatrixType, VectorType, SpaceImp > derived_type;
   typedef VectorType SourceType;
   typedef VectorType RangeType;
   typedef typename MatrixType::ScalarType ScalarType;
-  typedef MatrixBasedInverseDefault< MatrixType, VectorType > FrozenType;
-  typedef MatrixBasedDefault< MatrixType, VectorType > InverseType;
+  typedef MatrixBasedInverseDefault< MatrixType, VectorType, SpaceImp > FrozenType;
+  typedef MatrixBasedDefault< MatrixType, VectorType, SpaceImp > InverseType;
 }; // class MatrixBasedInverseDefaultTraits
 
 
 } // namespace internal
 
 
-template< class MatrixImp, class VectorType >
+template< class MatrixImp, class VectorType, class SpaceImp >
 class MatrixBasedInverseDefault
-  : public OperatorInterface< internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType > >
+  : public OperatorInterface< internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType, SpaceImp > >
 {
-  typedef OperatorInterface< internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType > > BaseType;
+  typedef OperatorInterface< internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType, SpaceImp > > BaseType;
 public:
-  typedef internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType > Traits;
+  typedef internal::MatrixBasedInverseDefaultTraits< MatrixImp, VectorType, SpaceImp > Traits;
   typedef typename Traits::ScalarType   ScalarType;
   typedef typename Traits::SourceType   SourceType;
   typedef typename Traits::RangeType    RangeType;
@@ -88,29 +88,33 @@ public:
   typedef typename Traits::InverseType  InverseType;
 protected:
   typedef MatrixImp MatrixType;
-  typedef Stuff::LA::Solver< MatrixType > LinearSolverType;
+  typedef Stuff::LA::Solver< MatrixType, typename SpaceImp::CommunicatorType > LinearSolverType;
 
 public:
-  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const std::string type = LinearSolverType::options()[0])
+  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const SpaceImp& space, const std::string type = LinearSolverType::options()[0])
     : matrix_(matrix_ptr)
     , options_(LinearSolverType::options(type))
+    , space_(space)
   {}
 
-  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const Stuff::Common::Configuration& options)
+  MatrixBasedInverseDefault(const MatrixType* matrix_ptr, const SpaceImp& space, const Stuff::Common::Configuration& options)
     : matrix_(matrix_ptr)
     , options_(options)
+    , space_(space)
   {}
 
-  MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr,
+  MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr, const SpaceImp& space,
                             const std::string type = LinearSolverType::options()[0])
     : matrix_(matrix_ptr)
     , options_(LinearSolverType::options(type))
+    , space_(space)
   {}
 
-  MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr,
+  MatrixBasedInverseDefault(const std::shared_ptr< const MatrixType > matrix_ptr, const SpaceImp& space,
                             const Stuff::Common::Configuration& options)
     : matrix_(matrix_ptr)
     , options_(options)
+    , space_(space)
   {}
 
   bool linear() const
@@ -141,7 +145,7 @@ public:
       DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                  "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
                  << dim_range() << ")!");
-    LinearSolverType(*matrix_).apply(source, range, options_);
+    LinearSolverType(*matrix_, space_.communicator()).apply(source, range, options_);
   } // ... apply(...)
 
   using BaseType::apply;
@@ -183,17 +187,18 @@ public:
 private:
   std::shared_ptr< const MatrixType > matrix_;
   const Stuff::Common::Configuration options_;
+  const SpaceImp& space_;
 }; // class MatrixBasedInverseDefault
 
 
-template< class MatrixImp, class VectorType >
+template< class MatrixImp, class VectorType, class SpaceImp >
 class MatrixBasedDefault
-  : public OperatorInterface< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > >
-  , public Stuff::LA::ProvidesConstContainer< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > >
+  : public OperatorInterface< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType, SpaceImp > >
+  , public Stuff::LA::ProvidesConstContainer< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType, SpaceImp > >
 {
-  typedef OperatorInterface< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > > BaseType;
+  typedef OperatorInterface< internal::MatrixBasedDefaultTraits< MatrixImp, VectorType,  SpaceImp > > BaseType;
 public:
-  typedef internal::MatrixBasedDefaultTraits< MatrixImp, VectorType > Traits;
+  typedef internal::MatrixBasedDefaultTraits< MatrixImp, VectorType, SpaceImp > Traits;
   typedef typename Traits::derived_type   ThisType;
   typedef typename Traits::ScalarType     ScalarType;
   typedef typename Traits::SourceType     SourceType;
@@ -205,7 +210,7 @@ public:
 protected:
   typedef MatrixImp MatrixType;
 private:
-  typedef Stuff::LA::Solver< MatrixImp >  LinearSolverType;
+  typedef Stuff::LA::Solver< MatrixImp, typename SpaceImp::CommunicatorType >  LinearSolverType;
   static_assert(std::is_base_of< Stuff::LA::MatrixInterface< typename MatrixType::Traits >, MatrixType >::value,
                 "MatrixType has to be derived from Stuff::LA::MatrixInterface!");
 
@@ -215,16 +220,19 @@ public:
   /**
    * \attention This class takes ownership of matrix_ptr!
    */
-  MatrixBasedDefault(const MatrixType* matrix_ptr)
+  MatrixBasedDefault(const MatrixType* matrix_ptr, const SpaceImp& space)
     : matrix_(matrix_ptr)
+    , space_(space)
   {}
 
-  MatrixBasedDefault(const std::shared_ptr< const MatrixType > matrix_ptr)
+  MatrixBasedDefault(const std::shared_ptr< const MatrixType > matrix_ptr, const SpaceImp& space)
     : matrix_(matrix_ptr)
+    , space_(space)
   {}
 
-  MatrixBasedDefault(const MatrixType& matrix)
+  MatrixBasedDefault(const MatrixType& matrix, const SpaceImp& space)
     : matrix_(new MatrixType(matrix))
+    , space_(space)
   {}
 
   bool linear() const
@@ -278,7 +286,7 @@ public:
       DUNE_THROW(Stuff::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
     Stuff::LA::SolverUtils::check_given(options.get< std::string >("type"), invert_options());
-    return InverseType(matrix_, options);
+    return InverseType(matrix_, space_, options);
   } // ... invert(...)
 
   using BaseType::invert;
@@ -304,6 +312,7 @@ public:
 
 private:
   std::shared_ptr< const ContainerType > matrix_;
+  const SpaceImp& space_;
 }; // class MatrixBasedDefault
 
 
