@@ -240,6 +240,7 @@ def inject_lib_dune_stuff(module, config_h_filename):
                     'ScalarType': 'double'},
             template_parameters='double',
             provides_data=True)
+        module.add_container('std::vector< Dune::Stuff::LA::IstlDenseVector< double > >', 'Dune::Stuff::LA::IstlDenseVector< double >', 'list')
     #   and the matrices
     module, _ = dune.pymor.la.container.inject_MatrixImplementation(
         module, exceptions, interfaces, CONFIG_H,
