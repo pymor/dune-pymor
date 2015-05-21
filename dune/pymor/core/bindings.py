@@ -276,9 +276,8 @@ def inject_lib_dune_stuff(module, config_h_filename):
     return module, exceptions, interfaces, CONFIG_H
 
 
-def inject_lib_dune_pymor(module, config_h_filename):
+def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
     module, exceptions, interfaces, CONFIG_H = inject_lib_dune_stuff(module, config_h_filename)
-
     # all of parameters
     (module, interfaces['Dune::Pymor::ParameterType']
      ) = dune.pymor.parameters.inject_ParameterType(module, exceptions, CONFIG_H)
@@ -359,34 +358,38 @@ def inject_lib_dune_pymor(module, config_h_filename):
     BaseOperatorName='Dune::Pymor::Operators::MatrixBasedDefault'
     BaseOperatorInverseName='Dune::Pymor::Operators::MatrixBasedInverseDefault'
     def inject_operator_inverse_combo(matrix, vector):
+        def op_name(op):
+            return '{} < {}, {}, {} >'.format(op, matrix, vector, space_type)
         _, _ = dune.pymor.operators.inject_OperatorAndInverseImplementation(
             module, exceptions, interfaces, CONFIG_H,
             operator_name=BaseOperatorName,
             operator_Traits={'SourceType': vector,
                              'RangeType': vector,
                              'ScalarType': 'double',
-                             'FrozenType': BaseOperatorName + '< ' + matrix + ', ' + vector + ' >',
+                             'FrozenType': op_name(BaseOperatorName),
                              'ContainerType': matrix,
-                             'InverseType': BaseOperatorInverseName + '< ' + matrix + ', ' + vector + ' >'},
+                             'InverseType': op_name(BaseOperatorInverseName)},
             inverse_name=BaseOperatorInverseName,
             inverse_Traits={'SourceType': vector,
                             'RangeType': vector,
                             'ScalarType': 'double',
-                            'FrozenType': BaseOperatorInverseName + '< ' + matrix + ', ' + vector + ' >',
-                            'InverseType': BaseOperatorName + '< ' + matrix + ', ' + vector + ' >'},
-            operator_template_parameters=(matrix, vector),
-            inverse_template_parameters=(matrix, vector),
+                            'FrozenType': op_name(BaseOperatorInverseName),
+                            'InverseType': op_name(BaseOperatorName)},
+            operator_template_parameters=(matrix, vector, space_type),
+            inverse_template_parameters=(matrix, vector, space_type),
             container_based=True)
     def inject_affinelydecomposed_operator(matrix, vector):
+        def op_name(op):
+            return '{} < {}, {}, {} >'.format(op, matrix, vector, space_type)
         _ = dune.pymor.operators.inject_LinearAffinelyDecomposedContainerBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType': vector,
                     'RangeType': vector,
                     'ScalarType': 'double',
-                    'FrozenType': BaseOperatorName + '< ' + matrix + ', ' + vector + ' >',
-                    'ComponentType': BaseOperatorName + '< ' + matrix + ', ' + vector + ' >',
-                    'InverseType': BaseOperatorInverseName + '< ' + matrix + ', ' + vector + ' >'},
-            template_parameters=(matrix, vector))
+                    'FrozenType': op_name(BaseOperatorName),
+                    'ComponentType': op_name(BaseOperatorName),
+                    'InverseType': op_name(BaseOperatorInverseName)},
+            template_parameters=(matrix, vector, space_type))
     #   the Dune::CommonDense backend
     inject_operator_inverse_combo(CommonDenseMatrix, CommonDenseVector)
     inject_affinelydecomposed_operator(CommonDenseMatrix, CommonDenseVector)
