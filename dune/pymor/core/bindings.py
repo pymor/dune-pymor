@@ -26,6 +26,13 @@ EigenRowMajorSparseMatrix = 'Dune::Stuff::LA::EigenRowMajorSparseMatrix< double 
 IstlRowMajorSparseMatrix = 'Dune::Stuff::LA::IstlRowMajorSparseMatrix< double >'
 
 
+def _mk_namespace(module, ns_string):
+    namespace = module
+    for ns in [nspace.strip() for nspace in ns_string.split('::')[:-1]]:
+        namespace = namespace.add_cpp_namespace(ns)
+    return module
+
+
 def inject_Class(module, name, parent=None):
     namespace = module
     namespaces = [nspace.strip() for nspace in name.split('::')[:-1]]
@@ -366,6 +373,7 @@ def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
             operator_Traits={'SourceType': vector,
                              'RangeType': vector,
                              'ScalarType': 'double',
+                             'SpaceType': space_type,
                              'FrozenType': op_name(BaseOperatorName),
                              'ContainerType': matrix,
                              'InverseType': op_name(BaseOperatorInverseName)},
@@ -373,6 +381,7 @@ def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
             inverse_Traits={'SourceType': vector,
                             'RangeType': vector,
                             'ScalarType': 'double',
+                            'SpaceType': space_type,
                             'FrozenType': op_name(BaseOperatorInverseName),
                             'InverseType': op_name(BaseOperatorName)},
             operator_template_parameters=(matrix, vector, space_type),
@@ -386,6 +395,7 @@ def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
             Traits={'SourceType': vector,
                     'RangeType': vector,
                     'ScalarType': 'double',
+                    'SpaceType': space_type,
                     'FrozenType': op_name(BaseOperatorName),
                     'ComponentType': op_name(BaseOperatorName),
                     'InverseType': op_name(BaseOperatorInverseName)},
@@ -409,6 +419,22 @@ def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
 
     return module, exceptions, interfaces, CONFIG_H
 
+def inject_spaces(module, view_type):
+    rangedim = rangecols = polorder = '1'
+    worlddim = '2'
+    fieldimp = 'double'
+
+    traits_name = 'Dune::GDT::Spaces::CG::PdelabBasedTraits'
+    traits = '{}< {}, {}, {}, {}, {} >'.format(traits_name, view_type, polorder, fieldimp, rangedim, rangecols)
+    parent_name = 'Dune::GDT::Spaces::CGInterface'
+    parent = '{}< {}, {}, {}, {} >'.format(parent_name, traits, worlddim, rangedim, rangecols)
+
+    space_name = 'Dune::GDT::Spaces::CG::PdelabBased'
+    space_namespace = _mk_namespace(module, space_name)
+    space = space_namespace.add_class(space_name,
+                                          parent=None,
+                                          template_parameters=(view_type, polorder, fieldimp, rangedim, rangecols))
+    return space_namespace, '{}< {}, {}, {}, {}, {} >'.format(space_name, view_type, polorder, fieldimp, rangedim, rangecols)
 
 def finalize_python_bindings(module, pybindgen_filename):
     assert(isinstance(module, pybindgen.module.Module))

@@ -170,7 +170,7 @@ public:
       DUNE_THROW(Stuff::Exceptions::configuration_error,
                  "Given options (see below) need to have at least the key 'type' set!\n\n" << options);
     Stuff::LA::SolverUtils::check_given(options.get< std::string >("type"), invert_options());
-    return InverseType(matrix_);
+    return InverseType(matrix_, space_);
   } // ... invert(...)
 
   using BaseType::invert;
@@ -181,7 +181,7 @@ public:
       DUNE_THROW(Stuff::Exceptions::internal_error, "This must not happen");
     DUNE_THROW(Exceptions::this_is_not_parametric,
                "do not call freeze_parameter(" << mu << ") if parametric() == false!");
-    return FrozenType(nullptr, invert_options()[0]);
+    return FrozenType(nullptr, space_, invert_options()[0]);
   } // ... freeze_parameter(...)
 
 private:
@@ -297,7 +297,7 @@ public:
       DUNE_THROW(Stuff::Exceptions::internal_error, "This must not happen");
     DUNE_THROW(Exceptions::this_is_not_parametric,
                "do not call freeze_parameter(" << mu << ") if parametric() == false!");
-    return FrozenType(nullptr);
+    return FrozenType(nullptr, space_);
   } // ... freeze_parameter(...)
 
   std::shared_ptr< const ContainerType > container() const

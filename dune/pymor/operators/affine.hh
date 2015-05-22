@@ -84,7 +84,7 @@ public:
 
   ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
-    return ComponentType(affinelyDecomposedContainer_.component(qq));
+    return ComponentType(affinelyDecomposedContainer_.component(qq), space_);
   }
 
   ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
@@ -124,7 +124,7 @@ public:
       DUNE_THROW(Exceptions::wrong_parameter_type, "the type of mu (" << mu.type()
                  << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
     if (!Parametric::parametric())
-      ComponentType(affinelyDecomposedContainer_.affine_part()).apply(source, range);
+      ComponentType(affinelyDecomposedContainer_.affine_part(), space_).apply(source, range);
     else
       freeze_parameter(mu).apply(source, range);
   }

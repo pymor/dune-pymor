@@ -45,6 +45,7 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
     operator_InverseType = operator_Traits['InverseType']
     assert('FrozenType' in operator_Traits)
     operator_FrozenType = operator_Traits['FrozenType']
+    operator_SpaceType = operator_Traits['SpaceType']
     if container_based:
         operator_ContainerType = operator_Traits['ContainerType']
     if operator_template_parameters is not None:
@@ -100,7 +101,8 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
                                           template_parameters=inverse_template_parameters)
     # fill the operator
     if container_based:
-        Operator.add_constructor([param('const ' + operator_ContainerType + '&', 'matrix')], throw=exceptions)
+        Operator.add_constructor([param('const ' + operator_ContainerType + '&', 'matrix'),
+                                  param('const {}&'.format(operator_SpaceType), 'space')], throw=exceptions)
     Operator.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Operator.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Operator.add_method('type_range', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
