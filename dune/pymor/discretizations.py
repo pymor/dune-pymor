@@ -120,7 +120,7 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                      is_const=True, throw=exceptions)
     Class.add_method('solve',
                      None,
-                     [param('const Dune::Stuff::Common::Configuration&', 'options'),
+                     [param('const Dune::Stuff::Common::Configuration', 'options'),
                       param(VectorType + ' &', 'vector'),
                       param('Dune::Pymor::Parameter', 'mu')],
                      is_const=True, throw=exceptions)
@@ -133,6 +133,12 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                      None,
                      [param(VectorType + ' &', 'vector')],
                      is_const=True, throw=exceptions)
+    Class.add_method('solve',
+                     None,
+                     [param('const Dune::Stuff::Common::Configuration', 'options'),
+                      param(VectorType + ' &', 'vector')],
+                     is_const=True, throw=exceptions)
+
     Class.add_method('solve_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
                      [param('const std::string&', 'type'),

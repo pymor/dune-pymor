@@ -25,6 +25,54 @@ EigenDenseMatrix = 'Dune::Stuff::LA::EigenDenseMatrix< double >'
 EigenRowMajorSparseMatrix = 'Dune::Stuff::LA::EigenRowMajorSparseMatrix< double >'
 IstlRowMajorSparseMatrix = 'Dune::Stuff::LA::IstlRowMajorSparseMatrix< double >'
 
+class ArgvParam(pybindgen.Parameter):
+    """
+    via https://answers.launchpad.net/pybindgen/+question/244903:
+    Converts a python list-of-strings argument to a pair of 'int argc,
+    char *argv[]' arguments to pass into C.
+
+    One Python argument becomes two C function arguments -> it's a miracle!
+
+    Note: this parameter type handler is not registered by any name;
+    must be used explicitly.
+    """
+
+    DIRECTIONS = [pybindgen.Parameter.DIRECTION_IN]
+    CTYPES = []
+
+    def convert_c_to_python(self, wrapper):
+        raise NotImplementedError
+
+    def convert_python_to_c(self, wrapper):
+        py_name = wrapper.declarations.declare_variable('PyObject*', 'py_' + self.name)
+        argc_var = wrapper.declarations.declare_variable('int', 'argc')
+        name = wrapper.declarations.declare_variable('char**', self.name)
+        idx = wrapper.declarations.declare_variable('Py_ssize_t', 'idx')
+        wrapper.parse_params.add_parameter('O!', ['&PyList_Type', '&'+py_name], self.name)
+        wrapper.before_call.write_code("%s = (char **) malloc(sizeof(char*)*PyList_Size(%s));"
+                                       % (name, py_name))
+        wrapper.before_call.add_cleanup_code('free(%s);' % name)
+        wrapper.before_call.write_code('''
+for (%(idx)s = 0; %(idx)s < PyList_Size(%(py_name)s); %(idx)s++)
+{
+''' % vars())
+        wrapper.before_call.sink.indent()
+        wrapper.before_call.write_code('''
+PyObject *item = PyList_GET_ITEM(%(py_name)s, %(idx)s);
+''' % vars())
+        wrapper.before_call.write_error_check(
+            '!PyString_Check(item)',
+            failure_cleanup=('PyErr_SetString(PyExc_TypeError, '
+                             '"argument %s must be a list of strings");') % self.name)
+        wrapper.before_call.write_code(
+            '%s[%s] = PyString_AsString(item);' % (name, idx))
+        wrapper.before_call.sink.unindent()
+        wrapper.before_call.write_code('}')
+        wrapper.before_call.write_code('%s = PyList_Size(%s);' % (argc_var, py_name))
+
+        wrapper.call_params.append(argc_var)
+        wrapper.call_params.append(name)
+
 
 def _mk_namespace(module, ns_string):
     namespace = module
@@ -85,6 +133,7 @@ def inject_lib_dune_stuff(module, config_h_filename):
     Configuration.add_constructor([])
     Configuration.add_copy_constructor()
     # Configuration.add_constructor([param('const std::string', 'filename')], throw=exceptions)
+    Configuration.add_constructor([ArgvParam(None, 'argv'), param('const std::string', 'filename')], throw=exceptions)
     for T in BASIC_TYPES:
         Configuration.add_constructor([param('const std::string', 'key'),
                                        param(T, 'value')],
@@ -100,6 +149,10 @@ def inject_lib_dune_stuff(module, config_h_filename):
                                        throw=exceptions)
     Configuration.add_method('has_key',
                              retval('bool'),
+                             [param('const std::string&', 'key')],
+                             is_const=True)
+    Configuration.add_method('sub',
+                             retval('Dune::Stuff::Common::Configuration'),
                              [param('const std::string&', 'key')],
                              is_const=True)
     Configuration.add_method('report', None, [], is_const=True)
