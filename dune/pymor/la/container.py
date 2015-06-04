@@ -9,6 +9,7 @@ from pybindgen import retval, param
 import numpy as np
 
 from pymor.core.defaults import defaults
+from pymor.core.interfaces import UberMeta
 from pymor.vectorarrays.list import VectorInterface, ListVectorArray
 
 # ReturnValue for converting a raw C pointer to a PyBuffer object
@@ -298,9 +299,15 @@ def inject_MatrixImplementation(module, exceptions, interfaces, CONFIG_H, name, 
     return module, Class
 
 
+class WrappedMeta(UberMeta):
+    pass
+
+
 def wrap_vector(cls):
 
     class WrappedVector(VectorInterface):
+
+        __metaclass__ = WrappedMeta
 
         wrapped_type = cls
 
@@ -394,4 +401,25 @@ def wrap_vector(cls):
 
     WrappedVector.__name__ = cls.__name__
 
+    wrapped_vectors[cls] = WrappedVector
+
     return WrappedVector
+
+
+# make vector types picklable
+
+import copy_reg
+
+
+wrapped_vectors = {}
+
+
+def unpickle_vector_class(cls):
+    return wrapped_vectors[cls]
+
+
+def pickle_vector_class(cls):
+    return unpickle_vector_class, (cls.wrapped_type,)
+
+
+copy_reg.pickle(WrappedMeta, pickle_vector_class)
