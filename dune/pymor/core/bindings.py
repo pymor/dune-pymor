@@ -156,6 +156,7 @@ def inject_lib_dune_stuff(module, config_h_filename):
                              [param('const std::string&', 'key')],
                              is_const=True)
     Configuration.add_method('report', None, [], is_const=True)
+    Configuration.add_method('report_string', retval('std::string'), [], is_const=True)
     Configuration.add_method('pb_get',
                              retval(CONFIG_H['DUNE_STUFF_SSIZE_T']),
                              [param('const std::string', 'key')],

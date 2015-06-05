@@ -127,6 +127,7 @@ public:
       ComponentType(affinelyDecomposedContainer_.affine_part(), space_).apply(source, range);
     else
       freeze_parameter(mu).apply(source, range);
+
   }
 
   using BaseType::apply;
