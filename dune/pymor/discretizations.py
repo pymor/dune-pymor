@@ -18,6 +18,7 @@ from pymor.vectorarrays.numpy import NumpyVectorArray
 from pymor.operators.constructions import induced_norm
 from pymor.tools.frozendict import FrozenDict
 from pymor.vectorarrays.block import BlockVectorArray
+from pymor.tools import mpi as pmpi
 try:
     from pymor.playground.operators import BlockOperator
     BLOCK_OPERATOR_PRESENT=True
@@ -243,12 +244,14 @@ def wrap_stationary_discretization(cls, wrapper):
 
         def visualize(self, U, file_name=None, name='solution', delete=True):
             assert len(U) == 1
+            suf = '.vtu'
             if file_name is None:
-                _, file_name = mkstemp(suffix='.vtu')
-            if not file_name.endswith('.vtu'):
-                file_name = file_name + '.vtu'
-            self._impl.visualize(U._list[0]._impl, file_name[:-4], name)
-            subprocess.call(['paraview', file_name])
+                _, file_name = mkstemp(suffix=suf)
+            if not file_name.endswith(suf):
+                file_name = file_name + suf
+            self._impl.visualize(U._list[0]._impl, file_name[:-len(suf)], name)
+            if not pmpi.parallel:
+                subprocess.call(['paraview', file_name])
             if delete:
                 os.remove(file_name)
 
