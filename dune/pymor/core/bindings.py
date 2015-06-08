@@ -355,19 +355,22 @@ def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
             ) = inject_Class(module, 'Dune::Pymor::Tags::AffinelyDecomposedFunctionalInterface',
                              parent=interfaces['Dune::Pymor::Tags::FunctionalInterface'])
     #   for the Dune::CommonDenseVector
+    def _mk_functional(vector_imp):
+        return 'Dune::Pymor::Functionals::VectorBased< {},{} >'.format(vector_imp, space_type)
+
     _ = dune.pymor.functionals.inject_VectorBasedImplementation(
         module, exceptions, interfaces, CONFIG_H,
         Traits={'SourceType' : CommonDenseVector,
                 'ScalarType' : 'double',
                 'ContainerType' : CommonDenseVector},
-        template_parameters=CommonDenseVector)
+        template_parameters=(CommonDenseVector, space_type))
     _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
         module, exceptions, interfaces, CONFIG_H,
         Traits={'SourceType' : CommonDenseVector,
-                'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + CommonDenseVector + ' >',
-                'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + CommonDenseVector + ' >',
+                'ComponentType': _mk_functional(CommonDenseVector),
+                'FrozenType':  _mk_functional(CommonDenseVector),
                 'ScalarType' : 'double'},
-        template_parameters=CommonDenseVector)
+        template_parameters=(CommonDenseVector, space_type))
     #   and the Eigen backend
     if CONFIG_H['HAVE_EIGEN']:
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
@@ -375,41 +378,41 @@ def inject_lib_dune_pymor(module, config_h_filename, view_type, space_type):
             Traits={'SourceType' : EigenDenseVector,
                     'ScalarType' : 'double',
                     'ContainerType' : EigenDenseVector},
-            template_parameters=EigenDenseVector)
+            template_parameters=(EigenDenseVector, space_type))
         _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : EigenDenseVector,
-                    'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenDenseVector + ' >',
-                    'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenDenseVector + ' >',
+                    'ComponentType': _mk_functional(EigenDenseVector),
+                    'FrozenType': _mk_functional(EigenDenseVector),
                     'ScalarType' : 'double'},
-            template_parameters=EigenDenseVector)
+            template_parameters=[EigenDenseVector, space_type])
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : EigenMappedDenseVector,
                     'ScalarType' : 'double',
                     'ContainerType' : EigenMappedDenseVector},
-            template_parameters=EigenMappedDenseVector)
+            template_parameters=[EigenMappedDenseVector, space_type])
         _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : EigenMappedDenseVector,
-                    'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenMappedDenseVector + ' >',
-                    'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenMappedDenseVector + ' >',
+                    'ComponentType': _mk_functional(EigenMappedDenseVector),
+                    'FrozenType': _mk_functional(EigenMappedDenseVector),
                     'ScalarType' : 'double'},
-            template_parameters=EigenMappedDenseVector)
+            template_parameters=[EigenMappedDenseVector, space_type])
     if CONFIG_H['HAVE_DUNE_ISTL']:
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : IstlDenseVector,
                     'ScalarType' : 'double',
                     'ContainerType' : IstlDenseVector},
-            template_parameters=IstlDenseVector)
+            template_parameters=[IstlDenseVector, space_type])
         _ = dune.pymor.functionals.inject_LinearAffinelyDecomposedVectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
             Traits={'SourceType' : IstlDenseVector,
-                    'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + IstlDenseVector + ' >',
-                    'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + IstlDenseVector + ' >',
+                    'ComponentType':_mk_functional(IstlDenseVector),
+                    'FrozenType': _mk_functional(IstlDenseVector),
                     'ScalarType' : 'double'},
-            template_parameters=IstlDenseVector)
+            template_parameters=[IstlDenseVector, space_type])
     # next we add what we need of the operators
     (_, interfaces['Dune::Pymor::Tags::OperatorInterface']
             ) = inject_Class(module, 'Dune::Pymor::Tags::OperatorInterface')

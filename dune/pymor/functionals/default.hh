@@ -20,15 +20,15 @@ namespace Pymor {
 namespace Functionals {
 
 
-template< class VectorImp >
+template< class VectorImp, class SpaceImp >
 class VectorBased;
 
 
-template< class VectorImp >
+template< class VectorImp, class SpaceImp >
 class VectorBasedTraits
 {
 public:
-  typedef VectorBased< VectorImp >        derived_type;
+  typedef VectorBased< VectorImp, SpaceImp >        derived_type;
   typedef VectorImp                       ContainerType;
   typedef VectorImp                       SourceType;
   typedef derived_type                    FrozenType;
@@ -37,14 +37,20 @@ public:
                 "VectorImp must be derived from Dune::Pymor::LA::VectorInterface!");
 };
 
+template < class Vector, class Source, class Space >
+typename Vector::FieldType communicated_dot(const Vector& vector, const Source& source, const Space& space) {
+DUNE_THROW(NotImplemented, "");
 
-template< class VectorImp >
+//      return space_.communicator().dot(vector_->backend(), source.backend());
+}
+
+template< class VectorImp, class SpaceImp >
 class VectorBased
-  : public FunctionalInterface< VectorBasedTraits< VectorImp > >
-  , public Stuff::LA::ProvidesContainer< VectorBasedTraits< VectorImp > >
+  : public FunctionalInterface< VectorBasedTraits< VectorImp, SpaceImp > >
+  , public Stuff::LA::ProvidesContainer< VectorBasedTraits< VectorImp, SpaceImp > >
 {
 public:
-  typedef VectorBasedTraits< VectorImp >  Traits;
+  typedef VectorBasedTraits< VectorImp, SpaceImp >  Traits;
   typedef typename Traits::derived_type   ThisType;
   typedef typename Traits::ContainerType  ContainerType;
   typedef typename Traits::SourceType     SourceType;
@@ -54,12 +60,14 @@ public:
   /**
    * \attention This class takes ownership of vector_ptr (in the sense, that you must not delete it manually)!
    */
-  VectorBased(const ContainerType* vector_ptr)
+  VectorBased(const ContainerType* vector_ptr, const SpaceImp& space)
     : vector_(vector_ptr)
+    , space_(space)
   {}
 
-  VectorBased(const std::shared_ptr< const ContainerType > vector_ptr)
+  VectorBased(const std::shared_ptr< const ContainerType > vector_ptr, const SpaceImp& space)
     : vector_(vector_ptr)
+    , space_(space)
   {}
 
   bool linear() const
@@ -80,7 +88,8 @@ public:
       DUNE_THROW(Stuff::Exceptions::shapes_do_not_match,
                  "the dim of source (" << source.dim() << ") does not match the dim_source of this (" << dim_source()
                  << ")!");
-    return vector_->dot(source);
+//    return space_.communicator().dot(vector_->backend(), source.backend());
+    return communicated_dot(*vector, source, space);
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const
@@ -102,6 +111,7 @@ public:
 
 private:
   std::shared_ptr< const ContainerType > vector_;
+  const SpaceImp& space_;
 }; // class VectorBased
 
 

@@ -23,32 +23,32 @@ namespace Pymor {
 namespace Functionals {
 
 
-template< class VectorImp >
+template< class VectorImp, class SpaceImp >
 class LinearAffinelyDecomposedVectorBased;
 
 
-template< class VectorImp >
+template< class VectorImp, class SpaceImp >
 class LinearAffinelyDecomposedVectorBasedTraits
 {
 public:
-  typedef LinearAffinelyDecomposedVectorBased< VectorImp >  derived_type;
+  typedef LinearAffinelyDecomposedVectorBased< VectorImp, SpaceImp >  derived_type;
   typedef VectorImp                                         VectorType;
   typedef VectorType                                        SourceType;
-  typedef VectorBased< VectorImp >                          ComponentType;
-  typedef VectorBased< VectorImp >                          FrozenType;
+  typedef VectorBased< VectorImp, SpaceImp >                          ComponentType;
+  typedef VectorBased< VectorImp, SpaceImp >                          FrozenType;
   typedef typename SourceType::ScalarType                   ScalarType;
   static_assert(std::is_base_of< Dune::Stuff::LA::VectorInterface< typename VectorImp::Traits >, VectorType >::value,
                 "VectorType must be derived from Dune::Pymor::LA::VectorInterface!");
 };
 
 
-template< class VectorImp >
+template< class VectorImp, class SpaceImp >
 class LinearAffinelyDecomposedVectorBased
-  : public AffinelyDecomposedFunctionalInterface< LinearAffinelyDecomposedVectorBasedTraits< VectorImp > >
+  : public AffinelyDecomposedFunctionalInterface< LinearAffinelyDecomposedVectorBasedTraits< VectorImp, SpaceImp > >
 {
-  typedef AffinelyDecomposedFunctionalInterface< LinearAffinelyDecomposedVectorBasedTraits< VectorImp > > BaseType;
+  typedef AffinelyDecomposedFunctionalInterface< LinearAffinelyDecomposedVectorBasedTraits< VectorImp, SpaceImp > > BaseType;
 public:
-  typedef LinearAffinelyDecomposedVectorBasedTraits< VectorImp >  Traits;
+  typedef LinearAffinelyDecomposedVectorBasedTraits< VectorImp, SpaceImp >  Traits;
   typedef typename Traits::VectorType     VectorType;
   typedef typename Traits::SourceType     SourceType;
   typedef typename Traits::ComponentType  ComponentType;
@@ -56,9 +56,10 @@ public:
   typedef typename Traits::ScalarType     ScalarType;
   typedef typename LA::AffinelyDecomposedConstContainer< VectorType > AffinelyDecomposedVectorType;
 
-  LinearAffinelyDecomposedVectorBased(const AffinelyDecomposedVectorType affinelyDecomposedVector)
-    : BaseType(affinelyDecomposedVector)
+  LinearAffinelyDecomposedVectorBased(const AffinelyDecomposedVectorType affinelyDecomposedVector, const SpaceImp& space)
+    : BaseType(affinelyDecomposedVector, space)
     , affinelyDecomposedVector_(affinelyDecomposedVector)
+    , space_(space)
   {
     if (!affinelyDecomposedVector_.has_affine_part() && affinelyDecomposedVector_.num_components() == 0)
       DUNE_THROW(Stuff::Exceptions::requirements_not_met, "affinelyDecomposedVector must not be empty!");
@@ -75,7 +76,7 @@ public:
 
   ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
-    return ComponentType(affinelyDecomposedVector_.component(qq));
+    return ComponentType(affinelyDecomposedVector_.component(qq), space_);
   }
 
   ComponentType* component_and_return_ptr(const DUNE_STUFF_SSIZE_T qq)
@@ -100,7 +101,7 @@ public:
 
   ComponentType affine_part() const
   {
-    return ComponentType(affinelyDecomposedVector_.affine_part());
+    return ComponentType(affinelyDecomposedVector_.affine_part(), space_);
   }
 
   ComponentType* affine_part_and_return_ptr()
@@ -138,7 +139,7 @@ public:
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                  << Parametric::parameter_type() << ")!");
-    return FrozenType(new VectorType(affinelyDecomposedVector_.freeze_parameter(mu)));
+    return FrozenType(new VectorType(affinelyDecomposedVector_.freeze_parameter(mu), space_));
   }
 
   FrozenType* freeze_parameter_and_return_ptr(const Parameter mu = Parameter()) const
@@ -149,6 +150,7 @@ public:
 private:
   const AffinelyDecomposedVectorType affinelyDecomposedVector_;
   DUNE_STUFF_SSIZE_T dim_;
+  const SpaceImp& space_;
 }; // class LinearAffinelyDecomposedVectorBased
 
 
