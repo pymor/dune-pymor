@@ -185,7 +185,18 @@ def inject_OperatorAndInverseImplementation(module, exceptions, interfaces, CONF
     Operator.add_method('apply_inverse_and_return_ptr',
                         retval(operator_SourceType + ' *', caller_owns_return=True),
                         [param('const ' + operator_RangeType + ' &', 'range'),
+                         param('const Dune::Stuff::Common::Configuration &', 'option')],
+                        is_const=True, throw=exceptions, custom_name='apply_inverse')
+    Operator.add_method('apply_inverse_and_return_ptr',
+                        retval(operator_SourceType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_RangeType + ' &', 'range'),
                          param('const std::string', 'option'),
+                         param('const Dune::Pymor::Parameter', 'mu')],
+                        is_const=True, throw=exceptions, custom_name='apply_inverse')
+    Operator.add_method('apply_inverse_and_return_ptr',
+                        retval(operator_SourceType + ' *', caller_owns_return=True),
+                        [param('const ' + operator_RangeType + ' &', 'range'),
+                         param('const Dune::Stuff::Common::Configuration &', 'option'),
                          param('const Dune::Pymor::Parameter', 'mu')],
                         is_const=True, throw=exceptions, custom_name='apply_inverse')
     Operator.add_method('freeze_parameter_and_return_ptr',
