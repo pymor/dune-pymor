@@ -5,6 +5,9 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 from collections import OrderedDict
+from numbers import Number
+
+import numpy as np
 
 import pybindgen
 from pybindgen import retval, param
@@ -336,6 +339,42 @@ class WrappedOperatorBase(OperatorBase):
         else:
             return ListVectorArray([self.vec_type_range(self._impl.apply(v._impl)) for v in vectors],
                                    subtype=self.range.subtype)
+
+    def apply2(self, V, U, U_ind=None, V_ind=None, mu=None, product=None):
+        if product:
+            raise NotImplementedError
+
+        mu = self.parse_parameter(mu)
+        assert V in self.range
+        assert U in self.source
+        U_vectors = U._list if U_ind is None else [U._list[U_ind]] if isinstance(U_ind, Number) else [U._list[i] for i in U_ind]
+        V_vectors = V._list if V_ind is None else [V._list[V_ind]] if isinstance(V_ind, Number) else [V._list[i] for i in V_ind]
+        result = np.empty((len(V_vectors), len(U_vectors)))
+        for i, v in enumerate(V_vectors):
+            for j, u in enumerate(U_vectors):
+                if self.parametric:
+                    result[i, j] = self._impl.apply2(v._impl, u._impl, mu)
+                else:
+                    result[i, j] = self._impl.apply2(v._impl, u._impl)
+        return result
+
+    def pairwise_apply2(self, V, U, U_ind=None, V_ind=None, mu=None, product=None):
+        if product:
+            raise NotImplementedError
+
+        mu = self.parse_parameter(mu)
+        assert V in self.range
+        assert U in self.source
+        U_vectors = U._list if U_ind is None else [U._list[U_ind]] if isinstance(U_ind, Number) else [U._list[i] for i in U_ind]
+        V_vectors = V._list if V_ind is None else [V._list[V_ind]] if isinstance(V_ind, Number) else [V._list[i] for i in V_ind]
+        assert len(U_vectors) == len(V_vectors)
+        result = np.empty(len(V_vectors))
+        for i, (v, u) in enumerate(zip(V_vectors, U_vectors)):
+            if self.parametric:
+                result[i] = self._impl.apply2(v._impl, u._impl, mu)
+            else:
+                result[i] = self._impl.apply2(v._impl, u._impl)
+        return result
 
     def apply_inverse(self, U, ind=None, mu=None, options=None):
         assert U in self.range
