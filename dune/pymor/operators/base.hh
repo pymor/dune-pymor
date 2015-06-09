@@ -273,9 +273,7 @@ public:
   {
     RangeType tmp = range.copy();
     apply(source, tmp, mu);
-    typename SpaceImp::RangeFieldType result = typename SpaceImp::RangeFieldType(0);
-    space_.communicator().dot(tmp.backend(), source.backend(), result);
-    return result;
+    return communicated_dot(tmp, source, space_);
   }
 
   static std::vector< std::string > invert_options()
