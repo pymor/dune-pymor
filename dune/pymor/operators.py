@@ -339,9 +339,9 @@ class WrappedOperatorBase(OperatorBase):
 
     def apply_inverse(self, U, ind=None, mu=None, options=None):
         assert U in self.range
-        assert options is None or isinstance(options, str) \
-            or (isinstance(options, dict) and options.keys() == ['type'] and
-                options['type'] in self.invert_options.keys())
+        # assert options is None or isinstance(options, str) \
+        #     or (isinstance(options, dict) and options.keys() == ['type'] and
+        #         options['type'] in self.invert_options.keys())
         if isinstance(options, dict):
             options = options['type']
         elif options is None:
