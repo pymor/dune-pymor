@@ -11,6 +11,9 @@
 #include <dune/common/typetraits.hh>
 
 #include <dune/stuff/la/container/interfaces.hh>
+#include <dune/stuff/la/container/istl.hh>
+#include <dune/stuff/la/container/common.hh>
+#include <dune/stuff/la/container/eigen.hh>
 
 #include <dune/pymor/parameters/functional.hh>
 #include "interfaces.hh"
@@ -37,12 +40,24 @@ public:
                 "VectorImp must be derived from Dune::Pymor::LA::VectorInterface!");
 };
 
-template < class Vector, class Source, class Space >
-typename Vector::FieldType communicated_dot(const Vector& vector, const Source& source, const Space& space) {
-DUNE_THROW(NotImplemented, "");
-
-//      return space_.communicator().dot(vector_->backend(), source.backend());
+//template< class Traits, size_t domainDim, size_t rangeDim, size_t rangeDimCols > class SpaceInterface
+template < class Space >
+typename Space::RangeFieldType communicated_dot(const Dune::Stuff::LA::IstlDenseVector<typename Space::RangeFieldType>& vector,
+                                            const Dune::Stuff::LA::IstlDenseVector<typename Space::RangeFieldType>& source,
+                                            const Space& space) {
+  typename Space::RangeFieldType result = typename Space::RangeFieldType(0);
+  space.communicator().dot(vector.backend(), source.backend(), result);
+  return result;
 }
+
+
+template < template <class> class VectorImp, class Space >
+typename Space::RangeFieldType communicated_dot(const VectorImp<typename Space::RangeFieldType>& vector,
+                                            const VectorImp<typename Space::RangeFieldType>& source,
+                                            const Space& space) {
+  return vector.dot(source);
+}
+
 
 template< class VectorImp, class SpaceImp >
 class VectorBased
@@ -89,7 +104,7 @@ public:
                  "the dim of source (" << source.dim() << ") does not match the dim_source of this (" << dim_source()
                  << ")!");
 //    return space_.communicator().dot(vector_->backend(), source.backend());
-    return communicated_dot(*vector, source, space);
+    return communicated_dot(*vector_, source, space_);
   }
 
   FrozenType freeze_parameter(const Parameter mu = Parameter()) const

@@ -58,7 +58,7 @@ public:
 
   LinearAffinelyDecomposedVectorBased(const AffinelyDecomposedVectorType affinelyDecomposedVector, const SpaceImp& space)
     : BaseType(affinelyDecomposedVector, space)
-    , affinelyDecomposedVector_(affinelyDecomposedVector)
+    , affinelyDecomposedVector_(affinelyDecomposedVector, space)
     , space_(space)
   {
     if (!affinelyDecomposedVector_.has_affine_part() && affinelyDecomposedVector_.num_components() == 0)
@@ -139,7 +139,7 @@ public:
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                  << Parametric::parameter_type() << ")!");
-    return FrozenType(new VectorType(affinelyDecomposedVector_.freeze_parameter(mu), space_));
+    return FrozenType(new VectorType(affinelyDecomposedVector_.freeze_parameter(mu)), space_);
   }
 
   FrozenType* freeze_parameter_and_return_ptr(const Parameter mu = Parameter()) const
