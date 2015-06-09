@@ -264,7 +264,7 @@ public:
                  "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
                  << dim_range() << ")!");
     matrix_->mv(source, range);
-    space_.communicator().copyOwnerToAll(range.as_imp(),range.as_imp());
+    space_.communicator().copyOwnerToAll(range.backend(),range.backend());
   } // ... apply(...)
 
   using BaseType::apply;
