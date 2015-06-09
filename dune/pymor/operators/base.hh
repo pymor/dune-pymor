@@ -264,9 +264,19 @@ public:
                  "the dim of range (" << range.pb_dim() << ") does not match the dim_range of this ("
                  << dim_range() << ")!");
     matrix_->mv(source, range);
+    space_.communicator().copyOwnerToAll(range.as_imp(),range.as_imp());
   } // ... apply(...)
 
   using BaseType::apply;
+
+  ScalarType apply2(const RangeType& range, const SourceType& source, const Parameter mu = Parameter()) const
+  {
+    RangeType tmp = range.copy();
+    apply(source, tmp, mu);
+    typename SpaceImp::RangeFieldType result = typename SpaceImp::RangeFieldType(0);
+    space_.communicator().dot(tmp.backend(), source.backend(), result);
+    return result;
+  }
 
   static std::vector< std::string > invert_options()
   {
