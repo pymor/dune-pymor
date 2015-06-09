@@ -57,8 +57,8 @@ public:
   typedef typename LA::AffinelyDecomposedConstContainer< VectorType > AffinelyDecomposedVectorType;
 
   LinearAffinelyDecomposedVectorBased(const AffinelyDecomposedVectorType affinelyDecomposedVector, const SpaceImp& space)
-    : BaseType(affinelyDecomposedVector, space)
-    , affinelyDecomposedVector_(affinelyDecomposedVector, space)
+    : BaseType(affinelyDecomposedVector)
+    , affinelyDecomposedVector_(affinelyDecomposedVector)
     , space_(space)
   {
     if (!affinelyDecomposedVector_.has_affine_part() && affinelyDecomposedVector_.num_components() == 0)
@@ -125,7 +125,7 @@ public:
       DUNE_THROW(Exceptions::wrong_parameter_type, "the type of mu (" << mu.type()
                  << ") does not match the parameter_type of this (" << Parametric::parameter_type() << ")!");
     if (!Parametric::parametric())
-      return affinelyDecomposedVector_.affine_part()->dot(source);
+      return communicated_dot(*affinelyDecomposedVector_.affine_part(), source, space_);
     else
       return freeze_parameter(mu).apply(source);
   }
