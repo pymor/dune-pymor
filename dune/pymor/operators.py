@@ -346,7 +346,7 @@ class WrappedOperatorBase(OperatorBase):
             options = options['type']
         elif options is None:
             options = next(self.invert_options.iterkeys())
-        vectors = U._list if ind is None else [U._list[i] for i in ind]
+        vectors = U._list if ind is None else [U._list[ind]] if isinstance(ind, Number) else [U._list[i] for i in ind]
         if self.parametric:
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             return ListVectorArray([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
