@@ -313,7 +313,7 @@ def wrap_vector(cls):
 
         @property
         def data(self):
-            return np.frombuffer(self._impl.data(), dtype=np.float)
+            return np.frombuffer(self._impl.data(), dtype=np.float64)
 
         def __init__(self, v):
             self._impl = v
@@ -398,6 +398,13 @@ def wrap_vector(cls):
 
         def valid(self):
             return self._impl.valid()
+
+        def __getstate__(self):
+            return self.data
+
+        def __setstate__(self, data):
+            self._impl = self.wrapped_type(len(data))
+            self.data[:] = data
 
     WrappedVector.__name__ = cls.__name__
 
