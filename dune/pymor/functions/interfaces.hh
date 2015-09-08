@@ -181,56 +181,54 @@ public:
 
   virtual double gamma(const Parameter& mu_1, const Parameter& mu_2) const
   {
-    if (parametric()) {
-      if (mu_1.type() != this->parameter_type())
-        DUNE_THROW(Exceptions::wrong_parameter_type,
-                   "The type of mu_1 is " << mu_1 << " and should be " << this->parameter_type());
-      if (mu_2.type() != this->parameter_type())
-        DUNE_THROW(Exceptions::wrong_parameter_type,
-                   "The type of mu_2 is " << mu_2 << " and should be " << this->parameter_type());
-      if (mu_1 == mu_2)
-        return 1.0;
-      else {
-        double ret = std::numeric_limits< double >::min();
-        assert(num_components() > 0);
-        for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
-          const double theta_mu_1 = coefficient(qq)->evaluate(mu_1);
-          const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
-          ret = std::max(ret, theta_mu_1 / theta_mu_2);
-        }
-        if (has_affine_part())
-          ret = std::max(ret, 1.0);
-        return ret;
-      }
-    } else
+    if (!parametric())
       return 1.0;
+    if (mu_1.type() != this->parameter_type())
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "The type of mu_1 is " << mu_1 << " and should be " << this->parameter_type());
+    if (mu_2.type() != this->parameter_type())
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "The type of mu_2 is " << mu_2 << " and should be " << this->parameter_type());
+    if (mu_1 == mu_2)
+      return 1.0;
+    else {
+      double ret = std::numeric_limits< double >::min();
+      assert(num_components() > 0);
+      for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
+        const double theta_mu_1 = coefficient(qq)->evaluate(mu_1);
+        const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
+        ret = std::max(ret, theta_mu_1 / theta_mu_2);
+      }
+      if (has_affine_part())
+        ret = std::max(ret, 1.0);
+      return ret;
+    }
   } // ... gamma(...)
 
   virtual double alpha(const Parameter& mu_1, const Parameter& mu_2) const
   {
-    if (parametric()) {
-      if (mu_1.type() != this->parameter_type())
-        DUNE_THROW(Exceptions::wrong_parameter_type,
-                   "The type of mu_1 is " << mu_1 << " and should be " << this->parameter_type());
-      if (mu_2.type() != this->parameter_type())
-        DUNE_THROW(Exceptions::wrong_parameter_type,
-                   "The type of mu_2 is " << mu_2 << " and should be " << this->parameter_type());
-      if (mu_1 == mu_2)
-        return 1.0;
-      else {
-        double ret = std::numeric_limits< double >::max();
-        assert(num_components() > 0);
-        for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
-          const double theta_mu_1 = coefficient(qq)->evaluate(mu_1);
-          const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
-          ret = std::min(ret, theta_mu_1 / theta_mu_2);
-        }
-        if (has_affine_part())
-          ret = std::min(ret, 1.0);
-        return ret;
-      }
-    } else
+    if (!parametric())
       return 1.0;
+    if (mu_1.type() != this->parameter_type())
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "The type of mu_1 is " << mu_1 << " and should be " << this->parameter_type());
+    if (mu_2.type() != this->parameter_type())
+      DUNE_THROW(Exceptions::wrong_parameter_type,
+                 "The type of mu_2 is " << mu_2 << " and should be " << this->parameter_type());
+    if (mu_1 == mu_2)
+      return 1.0;
+    else {
+      double ret = std::numeric_limits< double >::max();
+      assert(num_components() > 0);
+      for (DUNE_STUFF_SSIZE_T qq = 0; qq < num_components(); ++qq) {
+        const double theta_mu_1 = coefficient(qq)->evaluate(mu_1);
+        const double theta_mu_2 = coefficient(qq)->evaluate(mu_2);
+        ret = std::min(ret, theta_mu_1 / theta_mu_2);
+      }
+      if (has_affine_part())
+        ret = std::min(ret, 1.0);
+      return ret;
+    }
   } // ... alpha(...)
 
 private:
