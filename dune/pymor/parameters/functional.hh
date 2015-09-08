@@ -23,8 +23,8 @@ namespace Pymor {
 
 /**
  * \note Given a ParameterType with keys "foo" and "bar" of sizes 2 and 1, respectively, there are the following
- *       variables available for the expression: foo[0], foo[1] and bar. Note that scalar parameter components are never
- *       indexed by [] while vector valued ones always are!
+ *       variables available for the expression: foo[0], foo[1] and bar[0]. Note that scalar parameter components are
+ *       also indexed by []!
  */
 class ParameterFunctional
   : public Parametric
