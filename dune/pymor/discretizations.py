@@ -11,6 +11,8 @@ import pybindgen
 from pybindgen import retval, param
 import numpy as np
 
+from dune.pymor.la.container import make_listvectorarray
+
 from pymor.discretizations.interfaces import DiscretizationInterface
 from pymor.discretizations.basic import StationaryDiscretization
 from pymor.vectorarrays.list import ListVectorArray
@@ -388,8 +390,7 @@ if BLOCK_OPERATOR_PRESENT:
                 mu = self._wrapper.dune_parameter(mu)
                 global_solution = self._impl.solve_and_return_ptr(mu)
                 assert global_solution.valid()
-                global_solution = self._wrapper[global_solution]
-                global_solution = ListVectorArray(global_solution)
+                global_solution = make_listvectorarray(self._wrapper[global_solution])
                 return BlockVectorArray([self.localize_vector(global_solution, ss)
                                          for ss in np.arange(self._impl.num_subdomains())])
 
@@ -411,8 +412,8 @@ if BLOCK_OPERATOR_PRESENT:
                 if len(global_vector) != 1:
                     raise NotImplementedError
                 assert subdomain < self.num_subdomains
-                return ListVectorArray(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
-                                                                                subdomain)])
+                return make_listvectorarray(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
+                                                                                     subdomain)])
             def globalize_vectors(self, local_vectors):
                 assert isinstance(local_vectors, BlockVectorArray)
                 if len(local_vectors) != 1:
