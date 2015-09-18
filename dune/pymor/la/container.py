@@ -12,6 +12,13 @@ from pymor.core.defaults import defaults
 from pymor.core.interfaces import UberMeta
 from pymor.vectorarrays.list import VectorInterface, ListVectorArray
 
+
+def make_listvectorarray(vec, count=1):
+    lva = ListVectorArray.make_array(subtype=(type(vec), vec.dim), count=1)
+    lva._list[0] = vec
+    return lva
+
+
 # ReturnValue for converting a raw C pointer to a PyBuffer object
 # from pybindgen/examples/buffer/modulegen.py
 class BufferReturn(pybindgen.ReturnValue):
