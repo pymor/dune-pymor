@@ -8,6 +8,7 @@ from collections import OrderedDict
 
 import pybindgen
 from pybindgen import retval, param
+from itertools import izip
 
 from pymor.la import VectorSpace
 from pymor.operators.basic import OperatorBase
@@ -356,6 +357,15 @@ def wrap_operator(cls, wrapper):
 
         def __init__(self, op):
             WrappedOperatorBase.__init__(self, op)
+
+        def assemble_lincomb(self, operators, coefficients, name=None):
+            assert len(operators) > 0
+            assert len(operators) == len(coefficients)
+            matrix = operators[0]._impl.container()
+            matrix.scal(coefficients[0])
+            for op, c in izip(operators[1:], coefficients[1:]):
+                matrix.axpy(c, op._impl.container())
+            return self._wrapper[self.wrapped_type(matrix)]
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator
