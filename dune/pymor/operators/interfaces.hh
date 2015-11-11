@@ -9,6 +9,7 @@
 #include <dune/stuff/common/configuration.hh>
 #include <dune/stuff/common/crtp.hh>
 #include <dune/stuff/common/profiler.hh>
+#include <dune/stuff/common/timedlogging.hh>
 #include <dune/stuff/common/type_utils.hh>
 #include <dune/stuff/la/container/interfaces.hh>
 #include <dune/stuff/la/solver.hh>
@@ -154,6 +155,11 @@ public:
                      const std::string type = invert_options()[0],
                      const Parameter mu = Parameter()) const
   {
+    auto logger = DSC::TimedLogger().get("dune.pymor.operators.interfaces.apply_inverse");
+    logger.info() << "inverting ";
+    if (!mu.empty())
+      logger.info() << "for mu=" << mu << " ";
+    logger.info() << "with type " << type << std::endl;
     invert(type, mu).apply(range, source);
   }
 
