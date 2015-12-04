@@ -158,6 +158,13 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                       param('const std::string', 'filename'),
                       param('const std::string', 'name')],
                      is_const=True, throw=exceptions)
+    Class.add_method('visualize',
+                     None,
+                     [param('const ' + VectorType + ' &', 'vector'),
+                      param('const std::string', 'filename'),
+                      param('const std::string', 'name'),
+                      param('const bool', 'add_dirichlet')],
+                     is_const=True, throw=exceptions)
     return Class
 
 
