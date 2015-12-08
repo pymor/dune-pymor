@@ -91,6 +91,14 @@ public:
     return this->as_imp().get_vector(id);
   }
 
+  VectorType pb_get_vector(const std::string id) const
+  {
+    auto non_parametric_vector = get_vector(id);
+    if (non_parametric_vector.parametric())
+      DUNE_THROW(NotImplemented, "Requested vector '" << id << "' is parametric!");
+    return *non_parametric_vector.affine_part();
+  }
+
   VectorType create_vector() const
   {
     CHECK_CRTP(this->as_imp().create_vector());

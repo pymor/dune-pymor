@@ -100,6 +100,14 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                      [param('const std::string', 'id')],
                      is_const=True, throw=exceptions,
                      custom_name='get_product')
+    Class.add_method('available_vectors',
+                     retval('std::vector< std::string >'),
+                     [], is_const=True, throw=exceptions)
+    Class.add_method('pb_get_vector',
+                     retval(VectorType),
+                     [param('const std::string', 'id')],
+                     is_const=True, throw=exceptions,
+                     custom_name='get_vector')
     Class.add_method('create_vector_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
                      [], is_const=True, throw=exceptions,
@@ -185,7 +193,7 @@ def wrap_stationary_discretization(cls, wrapper):
             self._impl = d
             operators = {'operator': wrap_op(d.get_operator())}
             functionals = {'rhs': self._wrapper[d.get_rhs()]}
-            vector_operators = {}
+            vector_operators = FrozenDict({k: self._wrapper[d.get_vector(k)] for k in list(d.available_vectors())})
             self.operators = FrozenDict(operators)
             self.functionals = FrozenDict(functionals)
             self.vector_operators = FrozenDict(vector_operators)
