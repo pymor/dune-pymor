@@ -306,7 +306,8 @@ def inject_lib_dune_pymor(module, config_h_filename):
         Traits={'SourceType' : CommonDenseVector,
                 'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + CommonDenseVector + ' >',
                 'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + CommonDenseVector + ' >',
-                'ScalarType' : 'double'},
+                'ScalarType' : 'double',
+                'VectorType': CommonDenseVector},
         template_parameters=CommonDenseVector)
     #   and the Eigen backend
     if CONFIG_H['HAVE_EIGEN']:
@@ -321,7 +322,8 @@ def inject_lib_dune_pymor(module, config_h_filename):
             Traits={'SourceType' : EigenDenseVector,
                     'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenDenseVector + ' >',
                     'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenDenseVector + ' >',
-                    'ScalarType' : 'double'},
+                    'ScalarType' : 'double',
+                    'VectorType': EigenDenseVector},
             template_parameters=EigenDenseVector)
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
             module, exceptions, interfaces, CONFIG_H,
@@ -334,7 +336,8 @@ def inject_lib_dune_pymor(module, config_h_filename):
             Traits={'SourceType' : EigenMappedDenseVector,
                     'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenMappedDenseVector + ' >',
                     'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + EigenMappedDenseVector + ' >',
-                    'ScalarType' : 'double'},
+                    'ScalarType' : 'double',
+                    'VectorType': EigenMappedDenseVector},
             template_parameters=EigenMappedDenseVector)
     if CONFIG_H['HAVE_DUNE_ISTL']:
         _ = dune.pymor.functionals.inject_VectorBasedImplementation(
@@ -348,7 +351,8 @@ def inject_lib_dune_pymor(module, config_h_filename):
             Traits={'SourceType' : IstlDenseVector,
                     'ComponentType': 'Dune::Pymor::Functionals::VectorBased< ' + IstlDenseVector + ' >',
                     'FrozenType': 'Dune::Pymor::Functionals::VectorBased< ' + IstlDenseVector + ' >',
-                    'ScalarType' : 'double'},
+                    'ScalarType' : 'double',
+                    'VectorType': IstlDenseVector},
             template_parameters=IstlDenseVector)
     # next we add what we need of the operators
     (_, interfaces['Dune::Pymor::Tags::OperatorInterface']
