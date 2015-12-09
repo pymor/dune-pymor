@@ -335,6 +335,13 @@ def wrap_vector(cls):
         def make_zeros(cls, subtype):
             return cls(cls.wrapped_type(subtype))
 
+        def __getstate__(self):
+            return (self.dim, self.data)
+
+        def __setstate__(self, state):
+            self._impl = self.wrapped_type(state[0])
+            self.data[:] = state[1]
+
         @property
         def subtype(self):
             return self._impl.dim()
