@@ -17,7 +17,7 @@ from pymor.discretizations.interfaces import DiscretizationInterface
 from pymor.discretizations.basic import StationaryDiscretization
 from pymor.vectorarrays.list import ListVectorArray
 from pymor.vectorarrays.numpy import NumpyVectorArray
-from pymor.operators.constructions import induced_norm
+from pymor.operators.constructions import VectorOperator, induced_norm
 from pymor.tools.frozendict import FrozenDict
 from pymor.vectorarrays.block import BlockVectorArray
 try:
@@ -193,7 +193,8 @@ def wrap_stationary_discretization(cls, wrapper):
             self._impl = d
             operators = {'operator': wrap_op(d.get_operator())}
             functionals = {'rhs': self._wrapper[d.get_rhs()]}
-            vector_operators = FrozenDict({k: self._wrapper[d.get_vector(k)] for k in list(d.available_vectors())})
+            vector_operators = FrozenDict({k: VectorOperator(make_listvectorarray(self._wrapper[d.get_vector(k)]))
+                                           for k in list(d.available_vectors())})
             self.operators = FrozenDict(operators)
             self.functionals = FrozenDict(functionals)
             self.vector_operators = FrozenDict(vector_operators)
