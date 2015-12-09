@@ -211,7 +211,7 @@ def wrap_stationary_discretization(cls, wrapper):
             assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.solver_options = self._impl.solver_options()
 
-        with_arguments = frozenset({'operators', 'functionals', 'vector_operators', 'solver_options'})
+        with_arguments = frozenset({'operators', 'functionals', 'vector_operators', 'solver_options', 'cache_region'})
 
         def with_(self, **kwargs):
             assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
@@ -226,6 +226,12 @@ def wrap_stationary_discretization(cls, wrapper):
                 # assert all(op.source == NumpyVectorArray for op in {operator, rhs})
                 # assert all(op.type_range == NumpyVectorArray for op in {operator, rhs})
                 d = StationaryDiscretization(operator=operator, rhs=rhs)
+                return d.with_(**kwargs)
+            elif 'cache_region' in kwargs:
+                d = type(self)(self._impl)
+                d.unlock()
+                d.enable_caching(kwargs.pop('cache_region'))
+                d.lock()
                 return d.with_(**kwargs)
             else:
                 d = type(self)(self._impl)
