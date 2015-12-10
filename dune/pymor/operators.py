@@ -10,6 +10,8 @@ import pybindgen
 from pybindgen import retval, param
 from itertools import izip
 
+import numpy as np
+
 from pymor.la import VectorSpace
 from pymor.operators.basic import OperatorBase
 from pymor.operators.constructions import LincombOperator
@@ -340,7 +342,7 @@ class WrappedOperatorBase(OperatorBase):
             return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options, mu))
                                      for v in vectors], subtype=self.source.subtype)
         else:
-            assert self.check_parameter(mu)
+            # assert self.check_parameter(mu)
             return self.type_source([self.vec_type_source(self._impl.apply_inverse(v._impl, options))
                                      for v in vectors], subtype=self.source.subtype)
 
@@ -547,6 +549,12 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
                 self.affine_part = True
             else:
                 self.affine_part = False
+
+        def assemble(self, mu=None):
+            mu = self.parse_parameter(mu)
+            coefficients =  np.array([c.evaluate(mu) if hasattr(c, 'evaluate') else c for c in self.coefficients])
+            op = self.operators[0]
+            return op.assemble_lincomb(self.operators, coefficients)
 
         def projected(self, source_basis, range_basis, product=None, name=None):
             return (LincombOperator(self.operators, self.coefficients)

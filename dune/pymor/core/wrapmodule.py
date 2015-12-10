@@ -24,7 +24,7 @@ def wrap_module(mod):
     ParameterFunctional = mod.Dune.Pymor.ParameterFunctional
     ParameterType = mod.Dune.Pymor.ParameterType
     StationaryDiscretizationInterface = mod.Dune.Pymor.Tags.StationaryDiscretizationInterface
-    StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.Tags.StationaryMultiscaleDiscretiztionInterface
+    # StationaryMultiscaleDiscretiztionInterface = mod.Dune.Pymor.Tags.StationaryMultiscaleDiscretiztionInterface
 
     wrapped_modules = {}
 
@@ -86,8 +86,8 @@ def wrap_module(mod):
                     wrapped_class = wrap_functional(v, wrapper)
                 elif issubclass(v, OperatorInterface):
                     wrapped_class = wrap_operator(v, wrapper)
-                elif issubclass(v, StationaryMultiscaleDiscretiztionInterface):
-                    wrapped_class = wrap_multiscale_discretization(v, wrapper)
+                # elif issubclass(v, StationaryMultiscaleDiscretiztionInterface):
+                    # wrapped_class = wrap_multiscale_discretization(v, wrapper)
                 elif issubclass(v, StationaryDiscretizationInterface):
                     wrapped_class = wrap_stationary_discretization(v, wrapper)
                 else:
