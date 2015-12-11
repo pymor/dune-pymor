@@ -14,8 +14,12 @@ from pymor.vectorarrays.list import VectorInterface, ListVectorArray
 
 
 def make_listvectorarray(vec, count=1):
-    lva = ListVectorArray.make_array(subtype=(type(vec), vec.dim), count=1)
-    lva._list[0] = vec
+    if isinstance(vec, (list, tuple)):
+        lva = ListVectorArray.make_array(subtype=(type(vec[0]), vec[0].dim), count=len(vec))
+        lva._list = list(vec)
+    else:
+        lva = ListVectorArray.make_array(subtype=(type(vec), vec.dim), count=1)
+        lva._list[0] = vec
     return lva
 
 
