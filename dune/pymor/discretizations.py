@@ -431,17 +431,15 @@ if BLOCK_OPERATOR_PRESENT:
                     os.remove(file_name)
 
             def localize_vector(self, global_vector, subdomain):
-                if len(global_vector) != 1:
-                    raise NotImplementedError
                 assert subdomain < self.num_subdomains
-                return make_listvectorarray(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
-                                                                                     subdomain)])
+                return make_listvectorarray([self._wrapper[self._impl.localize_vector(global_vector._list[ii]._impl,
+                                                                                      subdomain)]
+                                             for ii in np.arange(len(global_vector))])
             def globalize_vectors(self, local_vectors):
                 assert isinstance(local_vectors, BlockVectorArray)
-                if len(local_vectors) != 1:
-                    raise NotImplementedError
-                global_vector = self._impl.globalize_vectors([block._list[0]._impl for block in local_vectors._blocks])
-                return ListVectorArray([self._wrapper[global_vector]])
+                return ListVectorArray([self._wrapper[self._impl.globalize_vectors([block._list[ii]._impl
+                                                                                    for block in local_vectors._blocks])]
+                                        for ii in np.arange(len(local_vectors))])
 
             def local_product(self, subdomain, id):
                 assert subdomain < self.num_subdomains
