@@ -384,6 +384,10 @@ if BLOCK_OPERATOR_PRESENT:
 
             with_arguments = StationaryDiscretization.with_arguments
 
+            def as_nonblocked(self):
+                WrappedNonBlockedType = wrap_stationary_discretization(type(self._impl), self._wrapper)
+                return WrappedNonBlockedType(self._impl)
+
             def with_(self, **kwargs):
                 assert 'operators' and 'functionals' in kwargs or kwargs.keys() == ['parameter_space']
                 assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
