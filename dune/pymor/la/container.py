@@ -343,8 +343,12 @@ def wrap_vector(cls):
         def dim(self):
             return self._impl.dim()
 
-        def copy(self):
-            return type(self)(self._impl.copy())
+        def copy(self, deep=False):
+            if deep:
+                return type(self)(self._impl.copy())
+            else:
+                return type(self)(self._impl)
+
 
         # @defaults('atol', 'rtol', qualname='dune.pymor.WrappedVector.almost_equal')
         def almost_equal(self, other,
