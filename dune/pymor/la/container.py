@@ -176,6 +176,21 @@ def inject_VectorImplementation(module, exceptions, interfaces, CONFIG_H, name, 
                      is_const=True,
                      throw=exceptions,
                      custom_name='amax')
+    Class.add_method('max',
+                     retval(ScalarType),
+                     [],
+                     is_const=True,
+                     throw=exceptions)
+    Class.add_method('min',
+                     retval(ScalarType),
+                     [],
+                     is_const=True,
+                     throw=exceptions)
+    Class.add_method('mean',
+                     retval(ScalarType),
+                     [],
+                     is_const=True,
+                     throw=exceptions)
     Class.add_method('components',
                      retval('std::vector< ' + ScalarType + ' >'),
                      [param('const std::vector< ' + CONFIG_H['DUNE_STUFF_SSIZE_T'] + '> &', 'component_indices')],
