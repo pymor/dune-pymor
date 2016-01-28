@@ -52,7 +52,8 @@ public:
   {
     auto config = Spe10FunctionType::default_config();
     config["type"] = static_id();
-    config["channel_width"] = "[0 0]";
+    config["blockade_width"] = "0";
+    config["blockade_value"] = "0";
     if (sub_name.empty())
       return config;
     else {
@@ -70,13 +71,15 @@ public:
     const Stuff::Common::Configuration default_cfg = default_config();
     // create
     return Stuff::Common::make_unique< ThisType >(
-          cfg.get("filename",      default_cfg.get< std::string >("filename")),
-          cfg.get("name",          default_cfg.get< std::string >("name")),
-          cfg.get("lower_left",    default_cfg.get< DomainType >("lower_left")),
-          cfg.get("upper_right",   default_cfg.get< DomainType >("upper_right")),
-          cfg.get("channel_width", default_cfg.get< Stuff::Common::FieldVector< D, 2 > >("channel_width")),
-          cfg.get("min",           default_cfg.get< R >("min")),
-          cfg.get("max",           default_cfg.get< R >("max")));
+          cfg.get("filename",       default_cfg.get< std::string >("filename")),
+          cfg.get("name",           default_cfg.get< std::string >("name")),
+          cfg.get("lower_left",     default_cfg.get< DomainType >("lower_left")),
+          cfg.get("upper_right",    default_cfg.get< DomainType >("upper_right")),
+          cfg.get("blockade_width", default_cfg.get< D >("blockade_width")),
+          cfg.get("blockade_value", default_cfg.get< R >("blockade_value")),
+          cfg.get("anisotropic",    default_cfg.get< bool >("anisotropic")),
+          cfg.get("min",            default_cfg.get< R >("min")),
+          cfg.get("max",            default_cfg.get< R >("max")));
   } // ... create(...)
 
   Model2(const std::string& filename = default_config().get< std::string >("filename"),
@@ -85,78 +88,49 @@ public:
             = default_config().get< DomainType >("lower_left"),
          const Stuff::Common::FieldVector< D, d >& upper_right
             = default_config().get< DomainType >("upper_right"),
-         const Stuff::Common::FieldVector< D, 2 >& channel_width
-            = default_config.get< Stuff::Common::FieldVector< D, 2 > >("channel_width"),
-         const R min = default_config().get< R >("min"),
-         const R max = default_config().get< R >("max"))
+         const D& blockade_width = default_config.get< D >("blockade_width"),
+         const R& blockade_value = default_config().get< R >("blockade_value"),
+         const bool anisotropic = default_config().get< bool >("anisotropic"),
+         const R& min = default_config().get< R >("min"),
+         const R& max = default_config().get< R >("max"))
     : BaseType(nm)
   {
     typedef Stuff::Functions::Constant<E, D, 3, R, 1>     ScalarConstantFunctionType;
     typedef Stuff::Functions::Indicator<E, D, 3, R, 1>    ScalarIndicatorFunctionType;
     typedef Stuff::Functions::Indicator<E, D, 3, R, 3, 3> TensorIndicatorFunctionType;
 
-    auto spe10 = std::make_shared<Spe10FunctionType>(filename, "spe10", lower_left, upper_right, min, max);
-    this->register_affine_part(spe10);
+    auto spe10 = std::make_shared<Spe10FunctionType>(filename, "spe10", lower_left, upper_right, anisotropic, min, max);
 
-    auto one = std::make_shared<ScalarConstantFunctionType>(1, "one");
-    if (channel_width[0] > 0) {
-      auto channel_x = std::shared_ptr<ScalarIndicatorFunctionType>(new ScalarIndicatorFunctionType(
+    if (blockade_width > 0) {
+      auto one = std::make_shared<ScalarConstantFunctionType>(1, "one");
+      auto blockade = std::shared_ptr<ScalarIndicatorFunctionType>(new ScalarIndicatorFunctionType(
           {{{{lower_left[0],
-                lower_left[1] + (upper_right[1] - lower_left[1])/2. - channel_width[0]/2.,
-              lower_left[2]},
-             {upper_right[0],
-                lower_left[1] + (upper_right[1] - lower_left[1])/2. + channel_width[0]/2.,
-                  lower_left[2] + (upper_right[2] - lower_left[2])/2.}},
-            1.}}));
-      typename TensorIndicatorFunctionType::RangeType channel_x_scaled_value(0.);
-      channel_x_scaled_value[0][0] = channel_x_scaled_value[1][1] = channel_x_scaled_value[2][2] = max;
-      auto channel_x_scaled = std::shared_ptr<TensorIndicatorFunctionType>(new TensorIndicatorFunctionType(
-          {{{{lower_left[0],
-                lower_left[1] + (upper_right[1] - lower_left[1])/2. - channel_width[0]/2.,
+                lower_left[1] + (upper_right[1] - lower_left[1])/2. - blockade_width/2.,
                   lower_left[2]},
              {upper_right[0],
-                lower_left[1] + (upper_right[1] - lower_left[1])/2. + channel_width[0]/2.,
-                  lower_left[2] + (upper_right[2] - lower_left[2])/2.}},
-            channel_x_scaled_value}}));
-      auto channel_x_remover = Stuff::Functions::make_difference(one, channel_x, "channel_x_remover");
-      auto spe10_wo_channel_x = Stuff::Functions::make_product(channel_x_remover, spe10, "spe10_wo_channel_x");
-      auto spe10_w_scaled_channel_x = Stuff::Functions::make_sum(spe10_wo_channel_x,
-                                                                 channel_x_scaled,
-                                                                 "spe10_w_scaled_channel_x");
-      this->register_component(Stuff::Functions::make_difference(spe10_w_scaled_channel_x, spe10, "component_x"),
-                               new Pymor::ParameterFunctional("channel",
-                                                              channel_width[1] > 0 ? 2 : 1,
-                               "channel[0]"));
-    }
-
-    if (channel_width[1] > 0) {
-      auto channel_y = std::shared_ptr<ScalarIndicatorFunctionType>(new ScalarIndicatorFunctionType(
-          {{{{lower_left[0] + (upper_right[0] - lower_left[0])/2. - channel_width[1]/2.,
-                lower_left[1],
-                  lower_left[2] + (upper_right[2] - lower_left[2])/2.},
-             {lower_left[0] + (upper_right[0] - lower_left[0])/2. + channel_width[1]/2.,
-                upper_right[1],
+                lower_left[1] + (upper_right[1] - lower_left[1])/2. + blockade_width/2.,
                   upper_right[2]}},
             1.}}));
-      typename TensorIndicatorFunctionType::RangeType channel_y_scaled_value(0.);
-      channel_y_scaled_value[0][0] = channel_y_scaled_value[1][1] = channel_y_scaled_value[2][2] = max;
-      auto channel_y_scaled = std::shared_ptr<TensorIndicatorFunctionType>(new TensorIndicatorFunctionType(
-          {{{{lower_left[0] + (upper_right[0] - lower_left[0])/2. - channel_width[1]/2.,
-                lower_left[1],
-                  lower_left[2] + (upper_right[2] - lower_left[2])/2.},
-             {lower_left[0] + (upper_right[0] - lower_left[0])/2. + channel_width[1]/2.,
-                upper_right[1],
+      typename TensorIndicatorFunctionType::RangeType blockade_scaled_value(0.);
+      blockade_scaled_value[0][0] = blockade_scaled_value[1][1] = blockade_scaled_value[2][2] = blockade_value;
+      auto blockade_scaled = std::shared_ptr<TensorIndicatorFunctionType>(new TensorIndicatorFunctionType(
+          {{{{lower_left[0],
+                lower_left[1] + (upper_right[1] - lower_left[1])/2. - blockade_width/2.,
+                  lower_left[2]},
+             {upper_right[0],
+                lower_left[1] + (upper_right[1] - lower_left[1])/2. + blockade_width/2.,
                   upper_right[2]}},
-            channel_y_scaled_value}}));
-      auto channel_y_remover = Stuff::Functions::make_difference(one, channel_y, "channel_y_remover");
-      auto spe10_wo_channel_y = Stuff::Functions::make_product(channel_y_remover, spe10, "spe10_wo_channel_y");
-      auto spe10_w_scaled_channel_y = Stuff::Functions::make_sum(spe10_wo_channel_y,
-                                                                 channel_y_scaled,
-                                                                 "spe10_w_scaled_channel_y");
-      this->register_component(Stuff::Functions::make_difference(spe10_w_scaled_channel_y, spe10, "component_y"),
-                               new Pymor::ParameterFunctional("channel",
-                                                              channel_width[0] > 0 ? 2 : 1,
-                               "channel[" + std::string(channel_width[0] > 0 ? "1" : "0") + "]"));
+            blockade_scaled_value}}));
+      auto blockade_remover = Stuff::Functions::make_difference(one, blockade, "blockade_remover");
+      auto spe10_wo_blockade = Stuff::Functions::make_product(blockade_remover, spe10, "spe10_wo_blockade");
+      auto spe10_w_scaled_blockade = Stuff::Functions::make_sum(spe10_wo_blockade,
+                                                                 blockade_scaled,
+                                                                 "spe10_w_scaled_blockade");
+      this->register_affine_part(spe10_w_scaled_blockade);
+      this->register_component(Stuff::Functions::make_difference(spe10, spe10_w_scaled_blockade, "component"),
+                               new Pymor::ParameterFunctional("blockade", 1, "blockade[0]"));
+    } else {
+      this->register_affine_part(spe10);
     }
   } // Model2(...)
 
