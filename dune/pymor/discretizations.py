@@ -191,7 +191,7 @@ def wrap_stationary_discretization(cls, wrapper):
                     setattr(self, '{}_norm'.format(k), induced_norm(v))
             self.linear = all(op.linear for op in operators.itervalues())
             self.solution_space = self.operator.source
-            self.build_parameter_type(inherits=operators.values())
+            self.build_parameter_type(inherits=operators.values() + functionals.values())
             assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.solver_options = self._impl.solver_options()
 
@@ -209,7 +209,7 @@ def wrap_stationary_discretization(cls, wrapper):
                 rhs = functionals['rhs']
                 # assert all(op.source == NumpyVectorArray for op in {operator, rhs})
                 # assert all(op.type_range == NumpyVectorArray for op in {operator, rhs})
-                d = StationaryDiscretization(operator=operator, rhs=rhs)
+                d = StationaryDiscretization(operator=operator, rhs=rhs, parameter_space=self.parameter_space)
                 return d.with_(**kwargs)
             else:
                 d = type(self)(self._impl)
