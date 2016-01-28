@@ -4,6 +4,7 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 from tempfile import mkstemp
+from itertools import izip
 import os
 import subprocess
 
@@ -238,16 +239,25 @@ def wrap_stationary_discretization(cls, wrapper):
 
         _solve = solve
 
-        def visualize(self, U, file_name=None, name='solution', delete=True):
-            assert len(U) == 1
-            if file_name is None:
-                _, file_name = mkstemp(suffix='.vtu')
-            if not file_name.endswith('.vtu'):
-                file_name = file_name + '.vtu'
-            self._impl.visualize(U._list[0]._impl, file_name[:-4], name)
-            subprocess.call(['paraview', file_name])
-            if delete:
-                os.remove(file_name)
+        def visualize(self, U, file_name=None, name='solution', delete=True, legend=None, separate_colorbars=None):
+            if isinstance(U, tuple) or isinstance(U, list):
+                Us = [V._list[0] for V in U]
+            else:
+                Us = U._list
+            if not legend:
+                legend = [name for ii in range(len(Us))]
+            assert len(Us) == len(legend)
+            if not self.logging_disabled:
+                self.logger.info('Visualizing {} functions ...'.format(len(Us)))
+            for V, name in izip(Us, legend):
+                if file_name is None:
+                    _, file_name = mkstemp(suffix='.vtu')
+                if not file_name.endswith('.vtu'):
+                    file_name = file_name + '.vtu'
+                self._impl.visualize(V._impl, file_name[:-4], name)
+                subprocess.call(['paraview', file_name])
+                if delete:
+                    os.remove(file_name)
 
     WrappedDiscretization.__name__ = cls.__name__
     return WrappedDiscretization
