@@ -357,6 +357,13 @@ def wrap_operator(cls, wrapper):
         def __init__(self, op):
             WrappedOperatorBase.__init__(self, op)
 
+        def with_(self, **kwargs):
+            assert 'name' in kwargs
+            self.unlock()
+            self.name = kwargs['name']
+            self.lock()
+            return self
+
         def assemble_lincomb(self, operators, coefficients, name=None):
             assert len(operators) > 0
             assert len(operators) == len(coefficients)
@@ -364,7 +371,8 @@ def wrap_operator(cls, wrapper):
             matrix.scal(coefficients[0])
             for op, c in izip(operators[1:], coefficients[1:]):
                 matrix.axpy(c, op._impl.container())
-            return self._wrapper[self.wrapped_type(matrix)]
+            op = self._wrapper[self.wrapped_type(matrix)]
+            return op.with_(name=name) if name else op
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator
@@ -542,17 +550,23 @@ def wrap_affinely_decomposed_operator(cls, wrapper):
             LincombOperator.__init__(self, operators, coefficients)
 
         def with_(self, **kwargs):
-            assert 'operators' in kwargs
-            ops = kwargs['operators']
-            assert len(ops) == len(self.operators)
-            return LincombOperator(operators=ops,
-                                   coefficients=kwargs['coefficients'] if 'coefficients' in kwargs.keys() else self.coefficients,
-                                   name=kwargs['name'] if 'name' in kwargs.keys() else self.name)
+            assert 'operators' in kwargs or 'name' in kwargs
+            if 'operators' in kwargs:
+                ops = kwargs['operators']
+                assert len(ops) == len(self.operators)
+                return LincombOperator(operators=ops,
+                                       coefficients=kwargs['coefficients'] if 'coefficients' in kwargs.keys() else self.coefficients,
+                                       name=kwargs['name'] if 'name' in kwargs.keys() else self.name)
+            else:
+                self.unlock()
+                self.name = kwargs['name']
+                self.lock()
+                return self
 
         def assemble(self, mu=None):
             mu = self._wrapper.dune_parameter(self.strip_parameter(mu))
             op = self._impl.freeze_parameter(mu)
-            return self._wrapper[op]
+            return self._wrapper[op].with_(name=self.name + '_assembled')
 
     WrappedOperator.__name__ = cls.__name__
     return WrappedOperator
