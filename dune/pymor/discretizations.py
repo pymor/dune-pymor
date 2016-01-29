@@ -202,15 +202,12 @@ def wrap_stationary_discretization(cls, wrapper):
         def with_(self, **kwargs):
             assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
             if 'operators' in kwargs and 'functionals' in kwargs:
-                assert 'operators' and 'functionals' in kwargs
                 operators = kwargs.pop('operators')
                 functionals = kwargs.pop('functionals')
                 assert set(operators.keys()) == {'operator'}
                 assert set(functionals.keys()) == {'rhs'}
                 operator = operators['operator']
                 rhs = functionals['rhs']
-                # assert all(op.source == NumpyVectorArray for op in {operator, rhs})
-                # assert all(op.type_range == NumpyVectorArray for op in {operator, rhs})
                 d = StationaryDiscretization(operator=operator, rhs=rhs, parameter_space=self.parameter_space)
                 return d.with_(**kwargs)
             else:
@@ -221,8 +218,6 @@ def wrap_stationary_discretization(cls, wrapper):
                         setattr(d, attr, getattr(self, attr))
                 if 'parameter_space' in kwargs:
                     d.parameter_space = kwargs.pop('parameter_space')
-                if 'solver_options' in kwargs:
-                    d.solver_options = kwargs.pop('solver_options')
                 assert len(kwargs) == 0
                 d.lock()
                 return d
