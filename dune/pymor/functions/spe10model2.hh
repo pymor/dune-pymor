@@ -53,7 +53,7 @@ public:
     auto config = Spe10FunctionType::default_config();
     config["type"] = static_id();
     config["blockade_width"] = "0";
-    config["blockade_value"] = "0";
+    config["blockade_value"] = config["min"];
     if (sub_name.empty())
       return config;
     else {
@@ -88,7 +88,7 @@ public:
             = default_config().get< DomainType >("lower_left"),
          const Stuff::Common::FieldVector< D, d >& upper_right
             = default_config().get< DomainType >("upper_right"),
-         const D& blockade_width = default_config.get< D >("blockade_width"),
+         const D& blockade_width = default_config().get< D >("blockade_width"),
          const R& blockade_value = default_config().get< R >("blockade_value"),
          const bool anisotropic = default_config().get< bool >("anisotropic"),
          const R& min = default_config().get< R >("min"),
