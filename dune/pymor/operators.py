@@ -325,7 +325,8 @@ class WrappedOperatorBase(OperatorBase):
             return ListVectorArray([self.vec_type_range(self._impl.apply(v._impl)) for v in vectors],
                                    subtype=self.range.subtype)
 
-    def apply_inverse(self, U, ind=None, mu=None, options=None):
+    def apply_inverse(self, U, ind=None, mu=None, options=None, least_squares=False):
+        assert not least_squares
         assert U in self.range
         assert options is None or isinstance(options, str) \
             or (isinstance(options, dict) and options.keys() == ['type'] and
