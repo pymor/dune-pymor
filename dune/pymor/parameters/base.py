@@ -104,6 +104,7 @@ def inject_Parameter(module, exceptions, CONFIG_H):
     Parameter.add_binary_comparison_operator('!=')
     Parameter.add_method('size', retval(CONFIG_H['DUNE_STUFF_SSIZE_T']), [], is_const=True)
     Parameter.add_method('report', retval('std::string'), [], is_const=True)
+    Parameter.add_method('report_for_filename', retval('std::string'), [], is_const=True)
     Parameter.allow_subclassing = True
     return module, Parameter
 

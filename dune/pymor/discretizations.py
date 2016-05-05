@@ -4,6 +4,7 @@
 # License: BSD 2-Clause License (http://opensource.org/licenses/BSD-2-Clause)
 
 from tempfile import mkstemp
+from itertools import izip
 import os
 import subprocess
 
@@ -170,11 +171,12 @@ def wrap_stationary_discretization(cls, wrapper):
         _wrapper = wrapper
 
         def __init__(self, d):
-            def wrap_op(op):
+            def wrap_op(op, name=None):
                 if not op.parametric() and op.num_components() == 0 and op.has_affine_part():
-                    return self._wrapper[op.affine_part()]
+                    wrapped_op = self._wrapper[op.affine_part()]
                 else:
-                    return self._wrapper[op]
+                    wrapped_op = self._wrapper[op]
+                return wrapped_op.with_(name=name) if name else wrapped_op
             self._impl = d
             operators = {'operator': wrap_op(d.get_operator())}
             functionals = {'rhs': self._wrapper[d.get_rhs()]}
@@ -184,14 +186,14 @@ def wrap_stationary_discretization(cls, wrapper):
             self.vector_operators = FrozenDict(vector_operators)
             self.operator = operators['operator']
             self.rhs = functionals['rhs']
-            self.products = FrozenDict({k: wrap_op(d.get_product(k)) for k in list(d.available_products())})
+            self.products = FrozenDict({k: wrap_op(d.get_product(k), k) for k in list(d.available_products())})
             if self.products:
                 for k, v in self.products.iteritems():
                     setattr(self, '{}_product'.format(k), v)
                     setattr(self, '{}_norm'.format(k), induced_norm(v))
             self.linear = all(op.linear for op in operators.itervalues())
             self.solution_space = self.operator.source
-            self.build_parameter_type(inherits=operators.values())
+            self.build_parameter_type(inherits=operators.values() + functionals.values())
             assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.solver_options = self._impl.solver_options()
 
@@ -200,16 +202,13 @@ def wrap_stationary_discretization(cls, wrapper):
         def with_(self, **kwargs):
             assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
             if 'operators' in kwargs and 'functionals' in kwargs:
-                assert 'operators' and 'functionals' in kwargs
                 operators = kwargs.pop('operators')
                 functionals = kwargs.pop('functionals')
                 assert set(operators.keys()) == {'operator'}
                 assert set(functionals.keys()) == {'rhs'}
                 operator = operators['operator']
                 rhs = functionals['rhs']
-                # assert all(op.source == NumpyVectorArray for op in {operator, rhs})
-                # assert all(op.type_range == NumpyVectorArray for op in {operator, rhs})
-                d = StationaryDiscretization(operator=operator, rhs=rhs)
+                d = StationaryDiscretization(operator=operator, rhs=rhs, parameter_space=self.parameter_space)
                 return d.with_(**kwargs)
             else:
                 d = type(self)(self._impl)
@@ -219,8 +218,6 @@ def wrap_stationary_discretization(cls, wrapper):
                         setattr(d, attr, getattr(self, attr))
                 if 'parameter_space' in kwargs:
                     d.parameter_space = kwargs.pop('parameter_space')
-                if 'solver_options' in kwargs:
-                    d.solver_options = kwargs.pop('solver_options')
                 assert len(kwargs) == 0
                 d.lock()
                 return d
@@ -237,16 +234,25 @@ def wrap_stationary_discretization(cls, wrapper):
 
         _solve = solve
 
-        def visualize(self, U, file_name=None, name='solution', delete=True):
-            assert len(U) == 1
-            if file_name is None:
-                _, file_name = mkstemp(suffix='.vtu')
-            if not file_name.endswith('.vtu'):
-                file_name = file_name + '.vtu'
-            self._impl.visualize(U._list[0]._impl, file_name[:-4], name)
-            subprocess.call(['paraview', file_name])
-            if delete:
-                os.remove(file_name)
+        def visualize(self, U, file_name=None, name='solution', delete=True, legend=None, separate_colorbars=None):
+            if isinstance(U, tuple) or isinstance(U, list):
+                Us = [V._list[0] for V in U]
+            else:
+                Us = U._list
+            if not legend:
+                legend = [name for ii in range(len(Us))]
+            assert len(Us) == len(legend)
+            if not self.logging_disabled:
+                self.logger.info('Visualizing {} functions ...'.format(len(Us)))
+            for V, name in izip(Us, legend):
+                if file_name is None:
+                    _, file_name = mkstemp(suffix='.vtu')
+                if not file_name.endswith('.vtu'):
+                    file_name = file_name + '.vtu'
+                self._impl.visualize(V._impl, file_name[:-4], name)
+                subprocess.call(['paraview', file_name])
+                if delete:
+                    os.remove(file_name)
 
     WrappedDiscretization.__name__ = cls.__name__
     return WrappedDiscretization

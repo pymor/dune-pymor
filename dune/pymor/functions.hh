@@ -16,6 +16,7 @@
 #include "functions/interfaces.hh"
 #include "functions/default.hh"
 #include "functions/checkerboard.hh"
+#include "functions/spe10model2.hh"
 
 namespace Dune {
 namespace Pymor {
@@ -138,8 +139,9 @@ private:
 
   typedef Functions::AffinelyDecomposableDefault< E, D, d, R, r, rC > AffinelyDecomposableDefaultType;
   typedef Functions::Checkerboard< E, D, d, R, r, rC >                CheckerboardType;
+  typedef Functions::Spe10::Model2< E, D, d, R, r, rC >               Spe10Model2Type;
 
-  typedef Stuff::FunctionsProvider< E, D, d, R, r, rC >       NonparametricProvider;
+  typedef Stuff::FunctionsProvider< E, D, d, R, r, rC >        NonparametricProvider;
   typedef Functions::NonparametricDefault< E, D, d, R, r, rC > WrapperType;
 
 public:
@@ -148,6 +150,7 @@ public:
     auto ret = NonparametricProvider::available();
     ret = call_append< AffinelyDecomposableDefaultType >(ret);
     ret = call_append< CheckerboardType >(ret);
+    ret = call_append< Spe10Model2Type >(ret);
     return ret;
   } // ... available(...)
 
@@ -157,6 +160,8 @@ public:
       return call_default_config< AffinelyDecomposableDefaultType >(sub_name);
     else if (call_compare< CheckerboardType >(type))
       return call_default_config< CheckerboardType >(sub_name);
+    else if (call_compare< Spe10Model2Type >(type))
+      return call_default_config< Spe10Model2Type >(sub_name);
     else
       return NonparametricProvider::default_config(type, sub_name);
   } // ... default_config(...)
@@ -168,6 +173,8 @@ public:
       return call_create< AffinelyDecomposableDefaultType >(cfg);
     else if (call_compare< CheckerboardType >(type))
       return call_create< CheckerboardType >(cfg);
+    else if (call_compare< Spe10Model2Type >(type))
+      return call_create< Spe10Model2Type >(cfg);
     else
       return Stuff::Common::make_unique< WrapperType >(NonparametricProvider::create(type, cfg));
   } // ... create(...)
