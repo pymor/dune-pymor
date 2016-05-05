@@ -14,8 +14,12 @@ from pymor.vectorarrays.list import VectorInterface, ListVectorArray
 
 
 def make_listvectorarray(vec, count=1):
-    lva = ListVectorArray.make_array(subtype=(type(vec), vec.dim), count=1)
-    lva._list[0] = vec
+    if isinstance(vec, (list, tuple)):
+        lva = ListVectorArray.make_array(subtype=(type(vec[0]), vec[0].dim), count=len(vec))
+        lva._list = list(vec)
+    else:
+        lva = ListVectorArray.make_array(subtype=(type(vec), vec.dim), count=1)
+        lva._list[0] = vec
     return lva
 
 
@@ -349,6 +353,13 @@ def wrap_vector(cls):
         @classmethod
         def make_zeros(cls, subtype):
             return cls(cls.wrapped_type(subtype))
+
+        def __getstate__(self):
+            return (self.dim, self.data)
+
+        def __setstate__(self, state):
+            self._impl = self.wrapped_type(state[0])
+            self.data[:] = state[1]
 
         @property
         def subtype(self):

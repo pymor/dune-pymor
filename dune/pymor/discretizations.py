@@ -18,7 +18,7 @@ from pymor.discretizations.interfaces import DiscretizationInterface
 from pymor.discretizations.basic import StationaryDiscretization
 from pymor.vectorarrays.list import ListVectorArray
 from pymor.vectorarrays.numpy import NumpyVectorArray
-from pymor.operators.constructions import induced_norm
+from pymor.operators.constructions import VectorOperator, induced_norm
 from pymor.tools.frozendict import FrozenDict
 from pymor.vectorarrays.block import BlockVectorArray
 try:
@@ -101,6 +101,14 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                      [param('const std::string', 'id')],
                      is_const=True, throw=exceptions,
                      custom_name='get_product')
+    Class.add_method('available_vectors',
+                     retval('std::vector< std::string >'),
+                     [], is_const=True, throw=exceptions)
+    Class.add_method('pb_get_vector',
+                     retval(VectorType),
+                     [param('const std::string', 'id')],
+                     is_const=True, throw=exceptions,
+                     custom_name='get_vector')
     Class.add_method('create_vector_and_return_ptr',
                      retval(VectorType + ' *', caller_owns_return=True),
                      [], is_const=True, throw=exceptions,
@@ -159,6 +167,13 @@ def inject_StationaryDiscretizationImplementation(module, exceptions, interfaces
                       param('const std::string', 'filename'),
                       param('const std::string', 'name')],
                      is_const=True, throw=exceptions)
+    Class.add_method('visualize',
+                     None,
+                     [param('const ' + VectorType + ' &', 'vector'),
+                      param('const std::string', 'filename'),
+                      param('const std::string', 'name'),
+                      param('const bool', 'add_dirichlet')],
+                     is_const=True, throw=exceptions)
     return Class
 
 
@@ -180,7 +195,8 @@ def wrap_stationary_discretization(cls, wrapper):
             self._impl = d
             operators = {'operator': wrap_op(d.get_operator())}
             functionals = {'rhs': self._wrapper[d.get_rhs()]}
-            vector_operators = {}
+            vector_operators = FrozenDict({k: VectorOperator(make_listvectorarray(self._wrapper[d.get_vector(k)]))
+                                           for k in list(d.available_vectors())})
             self.operators = FrozenDict(operators)
             self.functionals = FrozenDict(functionals)
             self.vector_operators = FrozenDict(vector_operators)
@@ -197,7 +213,7 @@ def wrap_stationary_discretization(cls, wrapper):
             assert self.parameter_type == self._wrapper[d.parameter_type()]
             self.solver_options = self._impl.solver_options()
 
-        with_arguments = frozenset({'operators', 'functionals', 'vector_operators', 'solver_options'})
+        with_arguments = frozenset({'operators', 'functionals', 'vector_operators', 'solver_options', 'cache_region'})
 
         def with_(self, **kwargs):
             assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
@@ -209,6 +225,12 @@ def wrap_stationary_discretization(cls, wrapper):
                 operator = operators['operator']
                 rhs = functionals['rhs']
                 d = StationaryDiscretization(operator=operator, rhs=rhs, parameter_space=self.parameter_space)
+                return d.with_(**kwargs)
+            elif 'cache_region' in kwargs:
+                d = type(self)(self._impl)
+                d.unlock()
+                d.enable_caching(kwargs.pop('cache_region'))
+                d.lock()
                 return d.with_(**kwargs)
             else:
                 d = type(self)(self._impl)
@@ -368,6 +390,10 @@ if BLOCK_OPERATOR_PRESENT:
 
             with_arguments = StationaryDiscretization.with_arguments
 
+            def as_nonblocked(self):
+                WrappedNonBlockedType = wrap_stationary_discretization(type(self._impl), self._wrapper)
+                return WrappedNonBlockedType(self._impl)
+
             def with_(self, **kwargs):
                 assert 'operators' and 'functionals' in kwargs or kwargs.keys() == ['parameter_space']
                 assert 'vector_operators' not in kwargs or not kwargs['vector_operators']
@@ -415,17 +441,15 @@ if BLOCK_OPERATOR_PRESENT:
                     os.remove(file_name)
 
             def localize_vector(self, global_vector, subdomain):
-                if len(global_vector) != 1:
-                    raise NotImplementedError
                 assert subdomain < self.num_subdomains
-                return make_listvectorarray(self._wrapper[self._impl.localize_vector(global_vector._list[0]._impl,
-                                                                                     subdomain)])
+                return make_listvectorarray([self._wrapper[self._impl.localize_vector(global_vector._list[ii]._impl,
+                                                                                      subdomain)]
+                                             for ii in np.arange(len(global_vector))])
             def globalize_vectors(self, local_vectors):
                 assert isinstance(local_vectors, BlockVectorArray)
-                if len(local_vectors) != 1:
-                    raise NotImplementedError
-                global_vector = self._impl.globalize_vectors([block._list[0]._impl for block in local_vectors._blocks])
-                return ListVectorArray([self._wrapper[global_vector]])
+                return ListVectorArray([self._wrapper[self._impl.globalize_vectors([block._list[ii]._impl
+                                                                                    for block in local_vectors._blocks])]
+                                        for ii in np.arange(len(local_vectors))])
 
             def local_product(self, subdomain, id):
                 assert subdomain < self.num_subdomains

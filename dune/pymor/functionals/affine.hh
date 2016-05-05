@@ -68,6 +68,18 @@ public:
       dim_ = boost::numeric_cast< DUNE_STUFF_SSIZE_T >(affinelyDecomposedVector_.component(0)->dim());
   }
 
+  LinearAffinelyDecomposedVectorBased(const VectorType& nonparametric_vector)
+    : BaseType()
+    , affinelyDecomposedVector_(new VectorType(nonparametric_vector))
+  {
+    if (!affinelyDecomposedVector_.has_affine_part() && affinelyDecomposedVector_.num_components() == 0)
+      DUNE_THROW(Stuff::Exceptions::requirements_not_met, "affinelyDecomposedVector must not be empty!");
+    if (affinelyDecomposedVector_.has_affine_part())
+      dim_ = boost::numeric_cast< DUNE_STUFF_SSIZE_T >(affinelyDecomposedVector_.affine_part()->dim());
+    else
+      dim_ = boost::numeric_cast< DUNE_STUFF_SSIZE_T >(affinelyDecomposedVector_.component(0)->dim());
+  }
+
   DUNE_STUFF_SSIZE_T num_components() const
   {
     return affinelyDecomposedVector_.num_components();

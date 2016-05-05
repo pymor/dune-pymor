@@ -149,14 +149,11 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
     for key in Traits.keys():
         assert(isinstance(Traits[key], str))
         assert(len(Traits[key].strip()) > 0)
-    assert('SourceType' in Traits)
     SourceType = Traits['SourceType']
-    assert('ComponentType' in Traits)
     ComponentType = Traits['ComponentType']
-    assert('ScalarType' in Traits)
     ScalarType = Traits['ScalarType']
-    assert('FrozenType' in Traits)
     FrozenType = Traits['ComponentType']
+    VectorType = Traits['VectorType']
     if template_parameters is not None:
         if isinstance(template_parameters, str):
             assert(len(template_parameters.strip()) > 0)
@@ -170,6 +167,7 @@ def inject_LinearAffinelyDecomposedVectorBasedImplementation(module,
                              parent=[interfaces['Dune::Pymor::Tags::AffinelyDecomposedFunctionalInterface'],
                                      interfaces['Dune::Pymor::Parametric']],
                              template_parameters=template_parameters)
+    Class.add_constructor([param('const ' + VectorType + '&', 'nonparametric_vector')], throw=exceptions)
     Class.add_method('type_this', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Class.add_method('type_source', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
     Class.add_method('type_scalar', retval('std::string'), [], is_const=True, is_static=True, throw=exceptions)
