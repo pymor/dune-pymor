@@ -96,8 +96,8 @@ public:
     : BaseType(nm)
   {
     typedef Stuff::Functions::Constant<E, D, 3, R, 1>     ScalarConstantFunctionType;
-    typedef Stuff::Functions::Indicator<E, D, 3, R, 1>    ScalarIndicatorFunctionType;
-    typedef Stuff::Functions::Indicator<E, D, 3, R, 3, 3> TensorIndicatorFunctionType;
+    typedef Stuff::Functions::DomainIndicator<E, D, 3, R, 1>    ScalarIndicatorFunctionType;
+    typedef Stuff::Functions::DomainIndicator<E, D, 3, R, 3, 3> TensorIndicatorFunctionType;
 
     auto spe10 = std::make_shared<Spe10FunctionType>(filename, "spe10", lower_left, upper_right, anisotropic, min, max);
 
