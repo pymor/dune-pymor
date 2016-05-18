@@ -375,7 +375,7 @@ def wrap_vector(cls):
 
         # @defaults('atol', 'rtol', qualname='dune.pymor.WrappedVector.almost_equal')
         def almost_equal(self, other,
-                         rtol=2**4 * np.finfo(np.zeros(1.).dtype).eps,
+                         rtol=2**4 * np.finfo(np.zeros(1).dtype).eps,
                          atol=0.):
             # assert atol == 0., 'Not supported'
             assert type(other) == type(self)
