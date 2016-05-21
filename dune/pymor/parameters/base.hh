@@ -215,10 +215,12 @@ protected:
 
   void inherit_parameter_type(const Parametric& other, const std::string id);
 
+public:
   const ParameterType& map_parameter_type(const std::string id) const;
 
   Parameter map_parameter(const Parameter& mu, const std::string id) const;
 
+protected:
   void replace_parameter_type(const ParameterType tt = ParameterType());
 
 private:
