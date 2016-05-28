@@ -6,6 +6,7 @@
 
 import pybindgen
 from pybindgen import retval, param
+from itertools import izip
 
 import numpy as np
 
@@ -14,6 +15,8 @@ from pymor.vectorarrays.interfaces import VectorSpace
 from pymor.vectorarrays.list import ListVectorArray
 from pymor.operators.basic import OperatorBase
 from pymor.operators.constructions import LincombOperator
+
+from dune.pymor.la.container import make_listvectorarray
 
 def inject_VectorBasedImplementation(module, exceptions, interfaces, CONFIG_H, Traits, template_parameters=None):
     assert(isinstance(module, pybindgen.module.Module))
@@ -127,6 +130,16 @@ def wrap_functional(cls, wrapper):
 
         def __init__(self, op):
             WrappedFunctionalBase.__init__(self, op)
+
+        def assemble_lincomb(self, operators, coefficients, name=None):
+            assert len(operators) > 0
+            assert len(operators) == len(coefficients)
+            vec = operators[0]._impl.as_vector()
+            vec.scal(coefficients[0])
+            for op, c in izip(operators[1:], coefficients[1:]):
+                vec.axpy(c, op._impl.as_vector())
+            op = self._wrapper[vec]
+            return make_listvectorarray(op)
 
     WrappedFunctional.__name__ = cls.__name__
     return WrappedFunctional
