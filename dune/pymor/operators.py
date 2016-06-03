@@ -365,7 +365,7 @@ def wrap_operator(cls, wrapper):
             self.lock()
             return self
 
-        def assemble_lincomb(self, operators, coefficients, name=None):
+        def assemble_lincomb(self, operators, coefficients, solver_options=None, name=None):
             assert len(operators) > 0
             assert len(operators) == len(coefficients)
             matrix = operators[0]._impl.container()
@@ -373,6 +373,7 @@ def wrap_operator(cls, wrapper):
             for op, c in izip(operators[1:], coefficients[1:]):
                 matrix.axpy(c, op._impl.container())
             op = self._wrapper[self.wrapped_type(matrix)]
+            op = op.with_(solver_options=solver_options) if solver_options else op
             return op.with_(name=name) if name else op
 
     WrappedOperator.__name__ = cls.__name__
