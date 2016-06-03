@@ -131,7 +131,8 @@ def wrap_functional(cls, wrapper):
         def __init__(self, op):
             WrappedFunctionalBase.__init__(self, op)
 
-        def assemble_lincomb(self, operators, coefficients, name=None):
+        def assemble_lincomb(self, operators, coefficients, solver_options=None, name=None):
+            assert not solver_options
             assert len(operators) > 0
             assert len(operators) == len(coefficients)
             vec = operators[0]._impl.as_vector()
