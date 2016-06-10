@@ -400,7 +400,8 @@ def wrap_multiscale_discretization(cls, wrapper):
                 rhs = functionals['rhs']
                 assert all(op.source.type == NumpyVectorArray or op.source.type == BlockVectorArray for op in (operator, rhs))
                 assert all(op.range.type  == NumpyVectorArray or op.range.type  == BlockVectorArray for op in (operator, rhs))
-                d = StationaryDiscretization(operator=operator, rhs=rhs)
+                d = StationaryDiscretization(operator=operator, rhs=rhs, parameter_space=self.parameter_space,
+                                             name=self.name)
                 return d.with_(**kwargs)
             else:
                 d = type(self)(self._impl)
