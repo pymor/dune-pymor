@@ -82,17 +82,17 @@ public:
           cfg.get("max",            default_cfg.get< R >("max")));
   } // ... create(...)
 
-  Model2(const std::string& filename = default_config().get< std::string >("filename"),
-         const std::string nm = default_config().get< std::string >("name"),
+  Model2(const std::string& filename = default_config().template get< std::string >("filename"),
+         const std::string nm = default_config().template get< std::string >("name"),
          const Stuff::Common::FieldVector< D, d >& lower_left
-            = default_config().get< DomainType >("lower_left"),
+            = default_config().template get< DomainType >("lower_left"),
          const Stuff::Common::FieldVector< D, d >& upper_right
-            = default_config().get< DomainType >("upper_right"),
-         const D& blockade_width = default_config().get< D >("blockade_width"),
-         const R& blockade_value = default_config().get< R >("blockade_value"),
-         const bool anisotropic = default_config().get< bool >("anisotropic"),
-         const R& min = default_config().get< R >("min"),
-         const R& max = default_config().get< R >("max"))
+            = default_config().template get< DomainType >("upper_right"),
+         const D& blockade_width = default_config().template get< D >("blockade_width"),
+         const R& blockade_value = default_config().template get< R >("blockade_value"),
+         const bool anisotropic = default_config().template get< bool >("anisotropic"),
+         const R& min = default_config().template get< R >("min"),
+         const R& max = default_config().template get< R >("max"))
     : BaseType(nm)
   {
     typedef Stuff::Functions::Constant<E, D, 3, R, 1>     ScalarConstantFunctionType;
