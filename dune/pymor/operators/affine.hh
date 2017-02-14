@@ -155,6 +155,11 @@ public:
     return FrozenType(new MatrixImp(affinelyDecomposedContainer_.freeze_parameter(mu)));
   }
 
+  const AffinelyDecomposedContainerType& container() const
+  {
+    return affinelyDecomposedContainer_;
+  }
+
 private:
   AffinelyDecomposedContainerType affinelyDecomposedContainer_;
   DUNE_STUFF_SSIZE_T dim_source_;
