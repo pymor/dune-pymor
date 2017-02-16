@@ -49,6 +49,7 @@ public:
   typedef typename Traits::FrozenType   FrozenType;
   typedef typename Traits::InverseType  InverseType;
 
+
   static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename SourceType::Traits >, SourceType >::value,
                 "SourceType has to be derived from Stuff::LA::VectorInterface!");
   static_assert(std::is_base_of< Stuff::LA::VectorInterface< typename RangeType::Traits >, RangeType >::value,

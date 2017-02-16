@@ -22,16 +22,16 @@ namespace Pymor {
 namespace Operators {
 
 
-template< class MatrixImp, class VectorImp >
+template< class MatrixImp, class VectorImp, class CommunicatorType >
 class LinearAffinelyDecomposedContainerBased;
 
 
-template< class MatrixImp, class VectorImp >
+template< class MatrixImp, class VectorImp, class CommunicatorType >
 class LinearAffinelyDecomposedContainerBasedTraits
 {
 public:
-  typedef LinearAffinelyDecomposedContainerBased< MatrixImp, VectorImp > derived_type;
-  typedef Operators::MatrixBasedDefault< MatrixImp, VectorImp > ComponentType;
+  typedef LinearAffinelyDecomposedContainerBased< MatrixImp, VectorImp, CommunicatorType > derived_type;
+  typedef Operators::MatrixBasedDefault< MatrixImp, VectorImp, CommunicatorType > ComponentType;
   typedef ComponentType                       FrozenType;
   typedef typename ComponentType::SourceType  SourceType;
   typedef typename ComponentType::RangeType   RangeType;
@@ -40,13 +40,13 @@ public:
 }; // class LinearAffinelyDecomposedContainerBasedTraits
 
 
-template< class MatrixImp, class VectorImp >
+template< class MatrixImp, class VectorImp, class CommunicatorType >
 class LinearAffinelyDecomposedContainerBased
-  : public AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp > >
+  : public AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp, CommunicatorType > >
 {
-  typedef AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp > > BaseType;
+  typedef AffinelyDecomposedOperatorInterface< LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp, CommunicatorType > > BaseType;
 public:
-  typedef LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp > Traits;
+  typedef LinearAffinelyDecomposedContainerBasedTraits< MatrixImp, VectorImp, CommunicatorType > Traits;
   typedef typename Traits::derived_type   ThisType;
   typedef typename Traits::ComponentType  ComponentType;
   typedef typename Traits::SourceType     SourceType;
@@ -61,9 +61,10 @@ private:
 public:
   static std::string static_id() { return "pymor.operators.linearaffinelydecomposedcontainerbased"; }
 
-  LinearAffinelyDecomposedContainerBased(const AffinelyDecomposedContainerType affinelyDecomposedContainer)
+  LinearAffinelyDecomposedContainerBased(const CommunicatorType& comm, const AffinelyDecomposedContainerType affinelyDecomposedContainer)
     : BaseType(affinelyDecomposedContainer)
     , affinelyDecomposedContainer_(affinelyDecomposedContainer)
+    , communicator_(comm)
   {
     if (!affinelyDecomposedContainer_.has_affine_part() && affinelyDecomposedContainer_.num_components() == 0)
       DUNE_THROW(Stuff::Exceptions::requirements_not_met, "affinelyDecomposedContainer must not be empty!");
@@ -83,7 +84,7 @@ public:
 
   ComponentType component(const DUNE_STUFF_SSIZE_T qq) const
   {
-    return ComponentType(affinelyDecomposedContainer_.component(qq));
+    return ComponentType(communicator_, affinelyDecomposedContainer_.component(qq));
   }
 
   ParameterFunctional coefficient(const DUNE_STUFF_SSIZE_T qq) const
@@ -98,7 +99,7 @@ public:
 
   ComponentType affine_part() const
   {
-    return ComponentType(affinelyDecomposedContainer_.affine_part());
+    return ComponentType(communicator_, affinelyDecomposedContainer_.affine_part());
   }
 
   bool linear() const
@@ -152,11 +153,12 @@ public:
       DUNE_THROW(Exceptions::wrong_parameter_type,
                  "the type of mu (" << mu.type() << ") does not match the parameter_type of this ("
                  << Parametric::parameter_type() << ")!");
-    return FrozenType(new MatrixImp(affinelyDecomposedContainer_.freeze_parameter(mu)));
+    return FrozenType(communicator_, new MatrixImp(affinelyDecomposedContainer_.freeze_parameter(mu)));
   }
 
 private:
   AffinelyDecomposedContainerType affinelyDecomposedContainer_;
+  const CommunicatorType& communicator_;
   DUNE_STUFF_SSIZE_T dim_source_;
   DUNE_STUFF_SSIZE_T dim_range_;
 }; // class LinearAffinelyDecomposedContainerBased
